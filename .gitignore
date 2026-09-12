@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+
+# Storybook
+storybook-static/
+.storybook/*.log
+
+# Build output
+dist/
+build/
+
+# Logs
+*.log
+debug-storybook.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Env files
+.env
+.env.local
+.env.*.local
+
+# Editor / tool local state
+.claude/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db

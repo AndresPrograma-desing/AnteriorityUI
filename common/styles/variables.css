@@ -1,0 +1,192 @@
+:root {
+  /*fondo sistema*/
+  --bg-soft: rgba(216, 239, 220, 0);
+  --bg-modal-big: rgb(188, 219, 188);
+  --bg-marron-gueso: #E3DAC9;
+  /*colores de botones*/
+  --button-blue: linear-gradient(135deg, #0284c7, #0369a1);
+  --button-hover-blue: #0369a1;
+  --button-green: #0f766e;
+  --button-hover-green: rgb(0, 167, 39);
+  --cancel-button: red;
+  --button-hover-red: rgb(203, 3, 3);
+  /*letras*/
+  --letter: #103529;
+  --letter-white: #ffffff;
+  /*interfaz CitasDoctor*/
+  --ink: #0f172a;
+  --line: #008412;
+  --brand-dark: #115e59;
+  --danger-bg: #fdfdfd;
+  --danger-text: #991b1b;
+
+  /*diseño*/
+  --blur: blur(18px);
+  --shadow: 2px 1px 6px rgb(0, 0, 0);
+
+  --color-secondary: rgb(2, 169, 18);
+  --color-secondary-dark: #027800;
+  --color-primary: rgb(23, 23, 255);
+  --color-primary-dark: #032585;
+  --color-danger: #ea1f1f;
+  --color-danger-dark: #dc2626;
+  --color-danger-bg: #fee2e2;
+  --color-text: #1e293b;
+  --color-text-muted: #64748b;
+  --color-text-muted2: #b3b7bd;
+  --color-border: #e2e8f0;
+  --productCardConsulta: #088d4f;
+  --color-card-bg: #ffffff;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  --transition: all 0.2s ease;
+
+
+  /* Glassmorphism Green-White Gradient */
+  --bg-glass-gradient-green: linear-gradient(135deg, rgb(101, 255, 49), rgba(85, 255, 0, 0.45));
+  --bg-glass-gradient-ross: linear-gradient(135deg, rgba(207, 173, 2, 0.25), rgba(255, 255, 255, 0.45));
+  --bg-glass-gradient-logo: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(255, 255, 255, 0.5), rgba(14, 165, 233, 0.15));
+
+  --logo-yellow-soft: #60aaff31;
+  --logo-yellow-border: rgba(254, 240, 138, 0.5);
+
+  --glass-blur-panel: blur(12px);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.4);
+
+  /* Pink-Green Glassmorphism */
+  --gr-pink-green: linear-gradient(135deg, #f47fe9 0%, #017A51 100%);
+  --glass-blur-pink-green: blur(10px);
+
+  /* Sidebar Glassmorphism */
+  --sidebar-bg: linear-gradient(135deg, rgba(34, 197, 94, 0.5), rgba(255, 255, 255, 0.4), rgba(14, 165, 233, 0.5));
+  --sidebar-blur: blur(24px);
+  --sidebar-border-right: 1px solid rgba(14, 165, 233, 0.3);
+  --sidebar-text: #0f172a;
+  --sidebar-text-muted: #475569;
+  --sidebar-text-active: #0ea5e9;
+  --sidebar-hover-bg: rgba(14, 165, 233, 0.08);
+  --sidebar-border: rgba(14, 165, 233, 0.15);
+
+
+  /*AlertModal*/
+  --modal-overlay-bg: rgba(15, 23, 42, 0.65);
+  --modal-bg: #ffffff70;
+  --modal-border: 1px solid rgba(226, 232, 240, 0.8);
+  --modal-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+  --modal-title-color: #0f172a;
+  --modal-text-color: #faebeb;
+  --primary-color: #2563eb;
+  --primary-hover: #000000;
+  --secondary-color: #f1f5f9;
+  --secondary-hover: #e2e8f0;
+  --border-radius-md: 0.5rem;
+  --border-radius-lg: 0.75rem;
+  --transition: all 0.2s ease;
+
+
+  /*AgreeProduct*/
+  --input-border: #e2e8f0;
+  --input-focus: #2a4d97;
+  --bg-dropdown: #ffffff;
+  --text-muted: #64748b00;
+  --item-hover: #f8fafc;
+
+
+  /*CreatedCita*/
+  --bg-page: #f8fafc;
+  --bg-inputs: #ffffff;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --border-light: #e2e8f0;
+  --border-focus: #0ea5e9;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --transition: all 0.2s ease;
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+
+  /*Facturas*/
+  --bg-facturas: #1e293b;
+  --bg-main: #0f172a;
+  --bg-hover: rgb(0, 80, 47);
+  --text-main: #f1f5f9;
+  --text-muted: #ffffff;
+  --accent-green: #10b981;
+  --accent-blue: #0c3d9f;
+  --border-color: #ffffff;
+
+  /*colores*/
+  --color-black: #000000;
+  --color-white: #ffffff;
+
+  /*inputs*/
+  --inputs-bordes: #309ff9;
+  --inputs-px: 2px;
+
+  /*Buttons color */
+  --btn-login: #34cc06;
+  --btn-login-hover: #259e04;
+  --btn-blue: rgb(1, 1, 225);
+
+  /* Switch Colors */
+  --SW-green: rgb(0, 125, 0);
+  --SW-blue: rgb(1, 1, 225);
+  --SW-red: rgb(197, 0, 0);
+  --SW-white: white;
+  --SW-disable-default: rgb(100, 100, 100);
+  --SW-thumb-color: white;
+  --SW-thumb-color: black;
+
+
+  /*Bordes*/
+  --border-gray-low: #9b9b9b;
+  --border-gray-hight: #575757;
+  --border-white: #f3f4f6;
+  --border-black: #000000;
+
+  /* Gradients */
+  --gr-login: linear-gradient(135deg, #0041f2, #1341e0);
+  --gr-login-hover: linear-gradient(135deg, #0039d1, #1039c2);
+  --gr-create: linear-gradient(135deg, #0041f2, #0039d1);
+  --gr-create-hover: linear-gradient(135deg, #0039d1, #1039c2);
+  --gr-danger: linear-gradient(135deg, #d10000, #c20000);
+  --gr-danger-hover: linear-gradient(135deg, #c20000, #a30000);
+  --gr-cancel: linear-gradient(135deg, #d10000, #c20000);
+  --gr-cancel-hover: linear-gradient(135deg, #c20000, #a30000);
+  --gr-spinner-green-blue: linear-gradient(135deg, #027800, #0284c7);
+  --gr-spinner-green-blue-hover: linear-gradient(135deg, #0039d1, #1039c2);
+}
+
+.glass-panel-green {
+  background: var(--bg-glass-gradient-green) !important;
+  backdrop-filter: var(--glass-blur-panel) !important;
+  -webkit-backdrop-filter: var(--glass-blur-panel) !important;
+  border: var(--glass-border) !important;
+}
+
+.sidebar-glass {
+  background: var(--sidebar-bg) !important;
+  backdrop-filter: var(--sidebar-blur) !important;
+  -webkit-backdrop-filter: var(--sidebar-blur) !important;
+  border-right: var(--sidebar-border-right) !important;
+}
+
+.glass-pink-green {
+  background: var(--gr-pink-green) !important;
+  backdrop-filter: var(--glass-blur-pink-green) !important;
+  -webkit-backdrop-filter: var(--glass-blur-pink-green) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.glass-pink-green * {
+  color: #ffffff !important;
+}

@@ -1,0 +1,192 @@
+.editorContainer {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.02);
+  overflow: hidden;
+  transition: border-color 0.15s ease;
+  position: relative;
+}
+
+.editorContainer:focus-within {
+  border-color: #7c9cff;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background-color: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+.toolbarGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.toolbarDivider {
+  width: 1px;
+  height: 18px;
+  background-color: rgba(255, 255, 255, 0.12);
+  margin: 0 0.25rem;
+}
+
+.toolButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: #9ba1ae;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.toolButton:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #e6e8ec;
+}
+
+.toolButton:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.modeToggle {
+  display: inline-flex;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.25);
+  border-radius: 6px;
+  padding: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.modeButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: none;
+  background: transparent;
+  color: #9ba1ae;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.modeButton:hover {
+  color: #e6e8ec;
+}
+
+.modeButtonActive {
+  background-color: rgba(124, 156, 255, 0.15);
+  color: var(--markdown-editor-active, #7c9cff);
+  font-weight: 600;
+}
+
+.contentArea {
+  display: flex;
+  width: 100%;
+  overflow: hidden;
+}
+
+.textarea {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  padding: 0.85rem 1rem;
+  background: transparent;
+  border: none;
+  color: #e6e8ec;
+  font-family: inherit;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  resize: none;
+  outline: none;
+  overflow-y: auto;
+}
+
+.textarea::placeholder {
+  color: #6b7280;
+}
+
+.splitArea {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 100%;
+  height: 100%;
+}
+
+.splitEditor {
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  height: 100%;
+}
+
+.previewPane {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  padding: 0.85rem 1.1rem;
+  background-color: rgba(0, 0, 0, 0.15);
+  overflow-y: auto;
+}
+
+.emptyPreview {
+  color: #6b7280;
+  font-style: italic;
+  font-size: 0.85rem;
+  padding-top: 0.5rem;
+}
+
+/* Barra de redimensionamiento estilo VS Code */
+.resizeHandle {
+  height: 14px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: ns-resize;
+  background-color: rgba(255, 255, 255, 0.02);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  user-select: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+  flex-shrink: 0;
+}
+
+.resizeHandle:hover {
+  background-color: rgba(124, 156, 255, 0.12);
+  border-top-color: rgba(124, 156, 255, 0.5);
+}
+
+.resizeHandleDragging {
+  background-color: rgba(124, 156, 255, 0.22);
+  border-top-color: #7c9cff;
+}
+
+.gripPill {
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background-color: rgba(255, 255, 255, 0.2);
+  transition: background-color 0.15s ease, width 0.15s ease;
+}
+
+.resizeHandle:hover .gripPill,
+.resizeHandleDragging .gripPill {
+  background-color: #7c9cff;
+  width: 48px;
+}

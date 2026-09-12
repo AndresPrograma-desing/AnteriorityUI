@@ -1,0 +1,65 @@
+.container {
+  cursor: pointer;
+}
+
+.tooltip {
+  position: absolute;
+  z-index: 99999;
+  width: max-content;
+  max-width: 320px;
+  background-color: var(--modaltooltip-bg, #0f172a); /* Slate 900 */
+  color: var(--modaltooltip-text, #f8fafc);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.25), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  pointer-events: none;
+  animation: tooltipFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Posicionamiento y Transformaciones */
+.top {
+  transform: translate(-50%, -100%);
+}
+
+.bottom {
+  transform: translate(-50%, 0);
+}
+
+/* Flecha direccional */
+.arrow {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background-color: var(--modaltooltip-bg, #0f172a);
+  transform: rotate(45deg);
+  left: 50%;
+  margin-left: -4px;
+}
+
+.top .arrow {
+  bottom: -4px;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.bottom .arrow {
+  top: -4px;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Animación de entrada con Scale suave */
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    scale: 0.92;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}

@@ -1,0 +1,7 @@
+.greenHighlight {
+  color: var(--green-highlight-text, #059669);
+  background-color: var(--green-highlight-bg, #ecfdf5);
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-weight: 700;
+}
