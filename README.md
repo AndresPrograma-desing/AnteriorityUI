@@ -11,7 +11,7 @@ Librería interna de componentes React (UI) para reutilizar entre proyectos. Con
 Publicada en el registro público de npm — se instala igual que cualquier otra dependencia, sin tokens ni configuración extra:
 
 ```bash
-pnpm add git+https://github.com/AndresPrograma-desing/AnteriorityUI.git
+pnpm add anteriority-ui
 ```
 
 Cada versión se genera a partir de un tag `vX.Y.Z` (semver real, no el HEAD de `main`) — ver [Versionado y releases](#versionado-y-releases).
