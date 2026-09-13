@@ -1,5 +1,5 @@
 import React from 'react';
-import { Breadcrumbs } from './Index';
+import { Breadcrumbs } from './index';
 
 export default {
   title: 'Components/Breadcrumbs',

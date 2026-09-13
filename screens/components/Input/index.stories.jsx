@@ -1,4 +1,4 @@
-import Input from './Index.jsx';
+import Input from './index.jsx';
 
 export default {
   title: 'Components/Input',

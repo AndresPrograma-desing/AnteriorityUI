@@ -1,7 +1,7 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
-import styles from './Index.module.css';
-import Loading from '../Loading/Index';
+import styles from './index.module.css';
+import Loading from '../Loading/index';
 
 function Frame({ title, icon, content, error, children, className = '', isModal = false, onClose, isLoading = false, bgColor, iconColor, descriptionBgColor }) {
     const frameCardStyle = {

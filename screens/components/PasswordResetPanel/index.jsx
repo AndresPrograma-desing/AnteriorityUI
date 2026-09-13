@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Mail, Eye, EyeOff } from "lucide-react";
 import DrawPanel from "../DrawPanel/index";
-import TextField from "../Material-UI/Components/TextField/Index";
+import TextField from "../Material-UI/Components/TextField/index";
 import ToggleCard from "../ToggleCard";
-import Loading from "../Loading/Index";
+import Loading from "../Loading/index";
 import ErrorMessage from "../Notification/Error/ErrorMessage";
 import Button from "../Button/index";
 import CountdownBar from "../CountdownBar";

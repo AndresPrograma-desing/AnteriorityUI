@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Switch from './Index';
+import Switch from './index';
 
 export default {
   title: 'Components/Swich',

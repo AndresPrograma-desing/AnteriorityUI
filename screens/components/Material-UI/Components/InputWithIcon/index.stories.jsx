@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Mail, Search as SearchIcon, User } from 'lucide-react';
-import InputWithIcon from './Index';
+import InputWithIcon from './index';
 
 export default {
   title: 'Components/Material-UI/InputWithIcon',

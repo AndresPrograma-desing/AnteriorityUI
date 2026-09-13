@@ -1,5 +1,5 @@
-import Filter from './Index.jsx';
-import TextField from '../Material-UI/Components/TextField/Index';
+import Filter from './index.jsx';
+import TextField from '../Material-UI/Components/TextField/index';
 
 export default {
   title: 'Components/Filter',

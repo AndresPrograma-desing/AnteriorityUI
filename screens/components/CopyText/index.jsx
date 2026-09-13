@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Copy, Check } from 'lucide-react';
 import ModalTooltip from '../ModalTooltip/ModalTooltip';
-import styles from './Index.module.css'; 
+import styles from './index.module.css'; 
 
 export default function CopyableText({ text, bgColor, borderColor, textColor }) {
 

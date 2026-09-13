@@ -72,6 +72,7 @@
   height: 20px;
   margin-right: 8px;
   vertical-align: middle;
+  color: var(--alertmodal-icon-color, currentColor);
 }
 
 .modalActions {

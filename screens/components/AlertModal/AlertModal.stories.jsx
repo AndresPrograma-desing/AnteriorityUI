@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Trash2 } from 'lucide-react';
 import AlertModal from './AlertModal';
 
 export default {
@@ -85,3 +86,19 @@ export const WithImage = {
     onClose: () => console.log('closed'),
   },
 };
+
+export const WithCustomIcon = {
+  args: {
+    open: true,
+    title: 'Operación Exitosa',
+    message: 'Los cambios fueron guardados correctamente en la base de datos.',
+    icon: Trash2,
+    iconColor: '#ef4444',
+    titleBorderColor: '#ef4444',
+    confirmText: 'Eliminar',
+    cancelText: 'Cancelar',
+    onClose: () => console.log('closed'),
+    onConfirm: () => console.log('confirmed delete'),
+  },
+};
+

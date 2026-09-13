@@ -1,4 +1,4 @@
-import HoursPicker from './Index.jsx';
+import HoursPicker from './index.jsx';
 
 export default {
   title: 'Components/HoursPicker',

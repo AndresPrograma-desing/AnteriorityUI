@@ -1,6 +1,6 @@
 import React from 'react';
 import ModalTooltip from '../ModalTooltip/ModalTooltip';
-import styles from './Index.module.css';
+import styles from './index.module.css';
 
 export default function BlueLink({ label, url, navigate, color }) {
   const handleClick = (e) => {

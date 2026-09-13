@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Popover from '@mui/material/Popover';
 import { User, HelpCircle, Bold, Link, Copy, Send } from 'lucide-react';
-import styles from './Index.module.css';
+import styles from './index.module.css';
 
 // Reusable screen components
-import UserAvatar from '../Profile/Avatar/Index.jsx';
-import Loading from '../Loading/Index.jsx';
-import CopyableText from '../CopyText/Index.jsx';
-import GreenHighlight from '../GreenHighlight/Index.jsx';
-import BlueLink from '../BlueLink/Index.jsx';
-import MarkdownContent from '../MarkdownContent/Index.jsx';
+import UserAvatar from '../Profile/Avatar/index';
+import Loading from '../Loading/index';
+import CopyableText from '../CopyText/index';
+import GreenHighlight from '../GreenHighlight/index';
+import BlueLink from '../BlueLink/index';
+import MarkdownContent from '../MarkdownContent/index';
 
 // Convierte la sintaxis propia del chat (**resaltado**, $etiqueta|url$, (copiable))
 // a Markdown real antes de pasarla al renderer, manteniendo esos formatos como

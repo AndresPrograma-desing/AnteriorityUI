@@ -1,6 +1,6 @@
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import styles from './Index.module.css';
+import styles from './index.module.css';
 
 export const MarkdownContent = ({ children, className = '', style, components, linkColor }) => (
   <div

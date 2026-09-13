@@ -1,5 +1,5 @@
 import React, { forwardRef } from 'react';
-import TextField from '../Material-UI/Components/TextField/Index';
+import TextField from '../Material-UI/Components/TextField/index';
 
 const Input = forwardRef(({ 
     label, 
