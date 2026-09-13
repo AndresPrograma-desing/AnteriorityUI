@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Home, FileText, Settings, Users, LogOut, User } from 'lucide-react';
-import ProSidebar from './Index';
+import ProSidebar from './index';
 
 export default {
   title: 'Components/Sidebar',

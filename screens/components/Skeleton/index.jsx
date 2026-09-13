@@ -1,4 +1,4 @@
-import styles from './Index.module.css';
+import styles from './index.module.css';
 
 const Skeleton = ({ width = '100%', height = '1em', radius = '6px', circle = false, className = '', style = {} }) => (
   <span

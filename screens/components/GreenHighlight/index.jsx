@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './Index.module.css';
+import styles from './index.module.css';
 
 export default function GreenHighlight({ children, textColor, bgColor, style }) {
     const cssVarStyle = {

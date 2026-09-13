@@ -1,5 +1,5 @@
 import React from 'react';
-import UserAvatar from './Avatar/Index';
+import UserAvatar from './Avatar/index';
 import { Pencil } from 'lucide-react';
 
 export default function UserProfileHeader({ username, avatarUrl, onEditClick, textColor = '#ffffff' }) {

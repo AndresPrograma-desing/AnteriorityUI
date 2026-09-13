@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './index.module.css';
-import { formatHighlightedText } from '../GreenHighlight/utils.jsx';
+import { formatHighlightedText } from '../GreenHighlight/utils';
 
 const ToggleCard = ({
   title,

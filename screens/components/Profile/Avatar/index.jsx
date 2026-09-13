@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import Avatar from '@mui/material/Avatar';
 import { Camera } from 'lucide-react';
 import { getAvatarInitial, stringToColor } from './utils'; 
-import styles from './Index.module.css';
+import styles from './index.module.css';
 import ModalTooltip from '../../ModalTooltip/ModalTooltip';
 import AlertModal from '../../AlertModal/AlertModal';
-import Loading from '../../Loading/Index';
+import Loading from '../../Loading/index';
 
 export default function UserAvatar({ 
   src, 

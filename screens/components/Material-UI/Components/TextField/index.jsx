@@ -1,6 +1,6 @@
 import React, { forwardRef } from 'react';
 import MuiTextField from '@mui/material/TextField';
-import { formatHighlightedText } from '../../../GreenHighlight/utils.jsx';
+import { formatHighlightedText } from '../../../GreenHighlight/utils';
 
 const TextField = forwardRef(({ 
   label, 

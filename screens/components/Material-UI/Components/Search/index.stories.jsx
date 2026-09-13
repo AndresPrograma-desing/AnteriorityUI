@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Search from './Index';
+import Search from './index';
 
 export default {
   title: 'Components/Material-UI/Search',

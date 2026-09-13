@@ -1,4 +1,4 @@
-import GreenHighlight from './Index.jsx';
+import GreenHighlight from './index.jsx';
 
 export default {
   title: 'Components/GreenHighlight',

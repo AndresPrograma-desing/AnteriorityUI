@@ -1,5 +1,5 @@
 import React from 'react';
-import UserProfileHeader from './Index';
+import UserProfileHeader from './index';
 
 export default {
   title: 'Components/Profile',

@@ -9,7 +9,8 @@ Guía para trabajar en este repo. Para documentación orientada a consumidores d
 ## Estructura
 
 ```
-screens/components/   → ~50 componentes de UI, uno por carpeta (index.jsx/Index.jsx + .module.css + .stories.jsx)
+index.js              → barrel: re-exporta los ~50 componentes por nombre (import { Button } from 'anteriority-ui')
+screens/components/   → ~50 componentes de UI, uno por carpeta (index.jsx + .module.css + .stories.jsx, siempre en minúscula)
 common/
   styles/             → variables.css (design tokens en :root) y typography.css (fuente global + import de Google Fonts)
   theme/muiTheme.js   → theme de MUI compartido (fontFamily: var(--font-sans))
@@ -53,16 +54,28 @@ Si se agrega un componente nuevo con texto visible, verificar que se vea con la 
 ```bash
 pnpm storybook          # levanta Storybook en http://localhost:6006
 pnpm build-storybook    # build estático de Storybook
-pnpm build              # compila la librería a dist/ (scripts/build.mjs) — solo para probar el build, no hace falta para desarrollar
+pnpm build              # check-case + compila a dist/ + verify-dist — correr antes de confiar en un release
+pnpm check-case         # solo el audit de mayúsculas/minúsculas en imports (rápido, sin compilar)
 ```
+
+## Barrel (`index.js`) — indexación de componentes
+
+`index.js` en la raíz re-exporta cada componente por nombre (`export { default as Button } from './screens/components/Button/index.js'`, etc.) para que un consumidor pueda hacer `import { Button, Sidebar } from 'anteriority-ui'` sin conocer el subpath de cada uno. Es un archivo **mantenido a mano**, no generado — al agregar un componente nuevo en `screens/components/`, agregarlo también acá. Reglas:
+- Alias siempre = nombre de la carpeta (no el nombre interno de la variable/función, que a veces difiere — ej. `Sidebar/index.jsx` exporta internamente `ProSidebar`, pero el barrel lo expone como `Sidebar`).
+- Solo se re-exporta el `default` de cada componente, nunca `export *` — varios componentes tienen sus propios `VARIANTS`/`SIZES`/`COLORS` locales (ver [Convención: props de color](#convención-props-de-color) y el patrón `variant`/`type`) que colisionarían entre sí como named exports al tope del barrel. Quien necesite esos named exports sigue importando el subpath directo del componente.
+- `screens/components/Avatar/` (el stub vacío) queda **fuera** del barrel a propósito — ver [Componentes sin implementar](#componentes-sin-implementar). El avatar real (`Profile/Avatar`) está en el barrel como `ProfileAvatar`.
+- `FormControls` no tiene default export (exporta `FormCard`, `FormInput`, `FormTextArea` con nombre propio) — se re-exportan tal cual, sin alias de carpeta.
 
 ## Build y publicación (versionado real, npm público)
 
 El paquete se publica en el registro público de npm como `anteriority-ui`, no vía `git+https://...` apuntando a `main` (ese instalaba el HEAD del branch sin versión ni changelog — ver [.github/workflows/publish.yml](.github/workflows/publish.yml)). Se eligió npm público en vez de GitHub Packages a propósito: GitHub Packages exige autenticación hasta para instalar (incluso en repos públicos), y la prioridad acá era que instalar fuera tan simple como `pnpm add mui` — sin `.npmrc` ni token del lado del consumidor. El costo es que el código queda visible públicamente en npm (el repo de GitHub puede seguir siendo privado).
 
-- `scripts/build.mjs` transpila JSX → JS con esbuild (`jsx: 'automatic'`) y copia CSS Modules/otros assets, **preservando exactamente la misma estructura y capitalización de carpetas que el código fuente** (incluida la inconsistencia `index.jsx` vs `Index.jsx` por componente) para que los subpath imports documentados en README.md sigan resolviendo igual. También genera `dist/package.json` (subset de campos del `package.json` raíz — ver el script para la lista exacta) porque `publishConfig.directory: "dist"` en el `package.json` raíz le dice a `pnpm publish` que empaquete desde ahí, no desde la raíz del repo.
-- El workflow se dispara con push de un tag `vX.Y.Z` y valida que coincida con la versión de `package.json` antes de publicar — ver la sección "Versionado y releases" en README.md para el flujo (`pnpm version patch/minor/major` + `git push --tags`).
-- Si se agrega un componente/carpeta nueva bajo `screens/`, `common/`, `features/` o `hooks/`, no hace falta tocar nada del build — `scripts/build.mjs` recorre esos cuatro directorios dinámicamente.
+- `scripts/build.mjs` transpila JSX → JS con esbuild (`jsx: 'automatic'`) y copia CSS Modules/otros assets, preservando la misma estructura de carpetas que el código fuente para que los subpath imports documentados en README.md sigan resolviendo igual. También genera `dist/package.json` (subset de campos del `package.json` raíz — ver el script para la lista exacta) porque `publishConfig.directory: "dist"` en el `package.json` raíz le dice a `pnpm publish` que empaquete desde ahí, no desde la raíz del repo.
+- **Todos los imports relativos internos deben ser sin extensión** (`from '../Loading/index'`, no `'../Loading/index.jsx'`). Un import con extensión `.jsx` explícita funciona en el código fuente (Vite/Storybook resuelve contra el archivo `.jsx` real), pero rompe en `dist/` una vez compilado, porque esbuild transpila `.jsx` → `.js` sin reescribir el string del import — queda apuntando a un archivo que ya no existe. `scripts/verify-dist.mjs` (bundlea `dist/index.js` completo con esbuild, con los peer deps como `external`) es lo único que detecta esto; `pnpm build-storybook` NO alcanza porque corre contra el código fuente, no contra el paquete compilado.
+- `scripts/check-case.mjs` audita que cada import relativo matchee el nombre real en disco con mayúsculas/minúsculas exactas (había 22 componentes con entry file `Index.jsx` en vez de `index.jsx` — rompía deploys en Linux por ser case-sensitive, invisible en Windows/Mac). Corre como parte de `pnpm build` y en CI ([.github/workflows/ci.yml](.github/workflows/ci.yml)).
+- **Gotcha real ya vivido:** un rename de archivo solo-de-casing (`Index.jsx` → `index.jsx`) en Windows puede quedar sin aplicar físicamente en disco después de un `git checkout`/merge, aunque el índice de git ya diga `index.jsx` — NTFS es case-insensitive y git a veces no reescribe el archivo físico si solo cambia el casing. Si `pnpm check-case` falla después de un pull que "debería" traer un fix de casing ya mergeado, sospechar de esto antes de asumir que el fix nunca se aplicó.
+- El workflow de publish se dispara con push de un tag `vX.Y.Z` y valida que coincida con la versión de `package.json` antes de publicar — ver la sección "Versionado y releases" en README.md para el flujo (`pnpm version patch/minor/major` + `git push --tags`).
+- Si se agrega un componente/carpeta nueva bajo `screens/`, `common/`, `features/` o `hooks/`, no hace falta tocar nada del build — `scripts/build.mjs` recorre esos cuatro directorios dinámicamente. Sí hay que agregarlo a mano al barrel `index.js` (ver arriba).
 - `react`, `react-dom`, `@mui/material`, `@emotion/*` ya son `peerDependencies` (no van empaquetados) — eso ya estaba bien resuelto antes de este cambio; lo que faltaba era el build + versionado, no las peer deps.
 
 ## ⚠️ Gotcha de pnpm workspace

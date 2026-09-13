@@ -1,4 +1,4 @@
-import Skeleton from './Index';
+import Skeleton from './index';
 
 export default {
   title: 'Components/Skeleton',

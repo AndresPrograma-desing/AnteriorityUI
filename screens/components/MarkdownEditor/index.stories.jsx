@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MarkdownEditor } from './Index';
+import { MarkdownEditor } from './index';
 
 export default {
   title: 'Components/MarkdownEditor',

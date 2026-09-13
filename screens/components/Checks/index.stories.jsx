@@ -1,5 +1,5 @@
 import React from 'react';
-import PermissionCheckboxItem from './Index';
+import PermissionCheckboxItem from './index';
 
 export default {
   title: 'Components/Checks',

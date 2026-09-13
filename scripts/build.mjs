@@ -32,7 +32,7 @@ async function main() {
   await rm(outDir, { recursive: true, force: true });
   await mkdir(outDir, { recursive: true });
 
-  const allFiles = [];
+  const allFiles = [path.join(rootDir, 'index.js')];
   for (const dir of sourceDirs) {
     const abs = path.join(rootDir, dir);
     try {
@@ -85,6 +85,7 @@ async function main() {
     name,
     version,
     description,
+    main,
     license,
     author,
     type,
@@ -102,6 +103,7 @@ async function main() {
         name,
         version,
         description,
+        main,
         license,
         author,
         type,

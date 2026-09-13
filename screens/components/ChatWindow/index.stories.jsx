@@ -1,5 +1,5 @@
 import React from 'react';
-import ChatWindow from './Index';
+import ChatWindow from './index';
 
 export default {
   title: 'Components/ChatWindow',

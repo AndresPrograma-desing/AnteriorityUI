@@ -164,7 +164,7 @@ Enlace de texto con estilo de "link azul" que abre URLs externas en una nueva pe
 
 **Import:**
 ```jsx
-import BlueLink from '../BlueLink/Index'; // export default
+import BlueLink from '../BlueLink/index'; // export default
 ```
 
 **Uso básico:**
@@ -200,7 +200,7 @@ Rastro de navegación (breadcrumb trail) animado; el último elemento de `items`
 
 **Import:**
 ```jsx
-import { Breadcrumbs } from '../Breadcrumbs/Index'; // named export (también default export)
+import { Breadcrumbs } from '../Breadcrumbs/index'; // named export (también default export)
 ```
 
 **Uso básico:**
@@ -354,7 +354,7 @@ Variante de selector de fecha equivalente a `CalendarComponent`, pero el calenda
 
 **Import:**
 ```jsx
-import CalendarPicker from '../CalendarPicker/Index'; // export default
+import CalendarPicker from '../CalendarPicker/index'; // export default
 ```
 
 **Uso básico:**
@@ -468,7 +468,7 @@ Ventana de chat completa (header de contacto, lista de mensajes con auto-scroll,
 
 **Import:**
 ```jsx
-import ChatWindow from '../ChatWindow/Index'; // export default
+import ChatWindow from '../ChatWindow/index'; // export default
 ```
 
 **Uso básico:**
@@ -523,7 +523,7 @@ import ChatWindow from '../ChatWindow/Index'; // export default
 
 **Import:**
 ```jsx
-import PermissionCheckboxItem from '../Checks/Index'; // export default
+import PermissionCheckboxItem from '../Checks/index'; // export default
 ```
 
 **Uso básico:**
@@ -610,7 +610,7 @@ Texto/código con click-to-copy: al hacer click copia el valor al portapapeles v
 
 **Import:**
 ```jsx
-import CopyableText from '../CopyText/Index'; // export default
+import CopyableText from '../CopyText/index'; // export default
 ```
 
 **Uso básico:**
@@ -879,7 +879,7 @@ Barra de acciones para filtros de una tabla/listado: botón "Filtrar" que abre u
 
 **Import:**
 ```jsx
-import Filter from '../Filter/Index'; // export default, archivo Index.jsx
+import Filter from '../Filter/index'; // export default, archivo index.jsx
 ```
 
 **Uso básico:**
@@ -987,7 +987,7 @@ Contenedor tipo "card" con título, ícono, descripción y estado de error/carga
 
 **Import:**
 ```jsx
-import Frame from '../Frame/Index'; // export default, archivo Index.jsx
+import Frame from '../Frame/index'; // export default, archivo index.jsx
 ```
 
 **Uso básico:**
@@ -1032,7 +1032,7 @@ Envoltorio `<strong>` para resaltar texto (por ejemplo montos o palabras clave) 
 
 **Import:**
 ```jsx
-import GreenHighlight from '../GreenHighlight/Index'; // export default, archivo Index.jsx
+import GreenHighlight from '../GreenHighlight/index'; // export default, archivo index.jsx
 ```
 
 **Uso básico:**
@@ -1069,7 +1069,7 @@ Selector de hora (formato 12h AM/PM en la UI, valor en formato 24h) implementado
 
 **Import:**
 ```jsx
-import HoursPicker from '../HoursPicker/Index'; // export default, archivo Index.jsx
+import HoursPicker from '../HoursPicker/index'; // export default, archivo index.jsx
 ```
 
 **Uso básico:**
@@ -1157,7 +1157,7 @@ Wrapper de `TextField` que agrega manejo simplificado de `required` (asterisco `
 
 **Import:**
 ```jsx
-import Input from '../Input/Index'; // export default, forwardRef, archivo Index.jsx
+import Input from '../Input/index'; // export default, forwardRef, archivo index.jsx
 ```
 
 **Uso básico:**
@@ -1196,7 +1196,7 @@ Indicador de carga con varias variantes visuales (spinner, barras, rebote, caja)
 
 **Import:**
 ```jsx
-import Loading from '../Loading/Index'; // export default, archivo Index.jsx
+import Loading from '../Loading/index'; // export default, archivo index.jsx
 ```
 
 **Uso básico:**
@@ -1233,7 +1233,7 @@ Renderiza una cadena markdown como HTML, con soporte GFM (tablas, listas de tare
 
 **Import:**
 ```jsx
-import { MarkdownContent } from '../MarkdownContent/Index'; // named export (también default export)
+import { MarkdownContent } from '../MarkdownContent/index'; // named export (también default export)
 ```
 
 **Uso básico:**
@@ -1267,7 +1267,7 @@ Editor de texto markdown con barra de herramientas (negrita, cursiva, encabezado
 
 **Import:**
 ```jsx
-import { MarkdownEditor } from '../MarkdownEditor/Index'; // named export (también default export)
+import { MarkdownEditor } from '../MarkdownEditor/index'; // named export (también default export)
 ```
 
 **Uso básico:**
@@ -1319,7 +1319,7 @@ Campo de texto de Material-UI con un ícono (lucide-react) como adorno, con tres
 
 **Import:**
 ```jsx
-import InputWithIcon from '../Material-UI/Components/InputWithIcon/Index'; // export default, archivo Index.jsx
+import InputWithIcon from '../Material-UI/Components/InputWithIcon/index'; // export default, archivo index.jsx
 ```
 
 **Uso básico:**
@@ -1493,7 +1493,7 @@ Campo de búsqueda basado en `Autocomplete` de Material-UI, con estado de carga 
 
 **Import:**
 ```jsx
-import Search from '../Material-UI/Components/Search/Index'; // export default, archivo Index.jsx
+import Search from '../Material-UI/Components/Search/index'; // export default, archivo index.jsx
 ```
 
 **Uso básico:**
@@ -1546,7 +1546,7 @@ import Search from '../Material-UI/Components/Search/Index'; // export default, 
 
 **Import:**
 ```jsx
-import Selector from '../Material-UI/Components/Selector/Index'; // export default, archivo Index.jsx
+import Selector from '../Material-UI/Components/Selector/index'; // export default, archivo index.jsx
 ```
 
 **Uso básico:**
@@ -1594,7 +1594,7 @@ Wrapper del `TextField` de Material-UI usado como base de varios otros component
 
 **Import:**
 ```jsx
-import TextField from '../Material-UI/Components/TextField/Index'; // export default, forwardRef, archivo Index.jsx
+import TextField from '../Material-UI/Components/TextField/index'; // export default, forwardRef, archivo index.jsx
 ```
 
 **Uso básico:**
@@ -1809,7 +1809,7 @@ Encabezado de perfil de usuario para barras superiores/sidebars: avatar, nombre 
 
 **Import:**
 ```jsx
-import Profile from 'screens/components/Profile/Index';
+import Profile from 'screens/components/Profile/index';
 ```
 
 **Uso básico:**
@@ -1841,7 +1841,7 @@ Avatar de usuario (basado en MUI `Avatar`) con fallback de inicial y color gener
 
 **Import:**
 ```jsx
-import Avatar from 'screens/components/Profile/Avatar/Index';
+import Avatar from 'screens/components/Profile/Avatar/index';
 ```
 
 **Uso básico:**
@@ -1920,8 +1920,8 @@ Barra lateral de navegación colapsable con grupos de items, badges por método 
 
 **Import:**
 ```jsx
-import Sidebar from 'screens/components/Sidebar/Index';
-// también disponible como export nombrado: import { ProSidebar } from 'screens/components/Sidebar/Index';
+import Sidebar from 'screens/components/Sidebar/index';
+// también disponible como export nombrado: import { ProSidebar } from 'screens/components/Sidebar/index';
 ```
 
 **Uso básico:**
@@ -1981,8 +1981,8 @@ Placeholder de carga (shimmer) simple, en forma de bloque, línea o círculo.
 
 **Import:**
 ```jsx
-import Skeleton from 'screens/components/Skeleton/Index';
-// también disponible como export nombrado: import { Skeleton } from 'screens/components/Skeleton/Index';
+import Skeleton from 'screens/components/Skeleton/index';
+// también disponible como export nombrado: import { Skeleton } from 'screens/components/Skeleton/index';
 ```
 
 **Uso básico:**
@@ -2088,7 +2088,7 @@ Interruptor (toggle) tipo switch con animación de ripple al hacer click y toolt
 
 **Import:**
 ```jsx
-import Swich from 'screens/components/Swich/Index';
+import Swich from 'screens/components/Swich/index';
 ```
 
 **Uso básico:**

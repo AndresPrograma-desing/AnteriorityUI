@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import styles from './Index.module.css';
+import styles from './index.module.css';
 
 const Loading = ({ text = "", phrases = [], size = 'medium', variant = 'default', className = '', color }) => {
   const [currentText, setCurrentText] = useState(text);

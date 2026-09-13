@@ -1,5 +1,5 @@
 import React from 'react';
-import BlueLink from './Index';
+import BlueLink from './index';
 
 export default {
   title: 'Components/BlueLink',
