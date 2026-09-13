@@ -24,7 +24,7 @@ export function FormCard({ icon: Icon, title, children, headerActions, iconColor
     );
 }
 
-import TextField from '../Material-UI/Components/TextField/Index';
+import TextField from '../Material-UI/Components/TextField/index';
 
 export function FormInput({ label, icon: Icon, ...props }) {
     return (

@@ -2,8 +2,8 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronLeft, ChevronRight, Pencil, Trash2, Pin, PinOff, GripVertical, Users } from 'lucide-react';
 import Button from '../Button/index';
-import Skeleton from '../Skeleton/Index';
-import styles from './Index.module.css';
+import Skeleton from '../Skeleton/index';
+import styles from './index.module.css';
 import { TEXTS } from './constants';
 import { getBadgeClass, getInitial, isSidebarToggleShortcut, toggleSidebarCollapsed } from './utils';
 

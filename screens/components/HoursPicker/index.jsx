@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Clock, X, ChevronUp, ChevronDown } from 'lucide-react';
-import styles from './Index.module.css';
-import TextField from '../Material-UI/Components/TextField/Index';
-import Frame from '../Frame/Index';
+import styles from './index.module.css';
+import TextField from '../Material-UI/Components/TextField/index';
+import Frame from '../Frame/index';
 import Button from '../Button/index';
 import {
     TEXT_HOURS_PICKER,

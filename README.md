@@ -59,6 +59,20 @@ pnpm add react react-dom @mui/material @emotion/react @emotion/styled
    });
    ```
 
+## Importar componentes
+
+Todos los componentes están indexados en el entry point principal — no hace falta conocer el subpath de cada uno:
+
+```jsx
+import { Button, Sidebar, TableB } from 'anteriority-ui';
+```
+
+Alternativa, importando el subpath directo de cada componente (útil para acceder a exports nombrados extra que no pasan por el barrel, ej. `Button.VARIANTS`):
+
+```jsx
+import Button, { VARIANTS } from 'anteriority-ui/screens/components/Button';
+```
+
 ## Estructura del proyecto
 
 ```

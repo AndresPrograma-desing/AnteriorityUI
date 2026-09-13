@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Popover from '@mui/material/Popover';
-import InputWithIcon from '../Material-UI/Components/InputWithIcon/Index';
+import InputWithIcon from '../Material-UI/Components/InputWithIcon/index';
 import { CircleUser, Check, X } from 'lucide-react';
 import styles from './index.module.css';
 import { updateUserName } from '../../../features/user-profile/api';

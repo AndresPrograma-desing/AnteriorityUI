@@ -1,6 +1,6 @@
 import React from 'react';
 import { ChevronRight, Home } from 'lucide-react';
-import styles from './Index.module.css';
+import styles from './index.module.css';
 
 /**
  * Generic breadcrumb trail. `items` is the full path in order — the last

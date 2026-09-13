@@ -3,8 +3,8 @@ import { createPortal } from 'react-dom';
 import { TriangleAlert } from 'lucide-react';
 import styles from './AlertModal.module.css';
 import Button from '../Button/index';
-import TextField from '../Material-UI/Components/TextField/Index';
-import Selector from '../Material-UI/Components/Selector/Index';
+import TextField from '../Material-UI/Components/TextField/index';
+import Selector from '../Material-UI/Components/Selector/index';
 
 
 const FIELD_LABELS = {

@@ -1,5 +1,5 @@
 import React from 'react';
-import CalendarPicker from './Index';
+import CalendarPicker from './index';
 
 export default {
   title: 'Components/CalendarPicker',

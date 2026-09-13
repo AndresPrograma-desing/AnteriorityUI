@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './index.module.css';
-import Skeleton from '../Skeleton/Index';
+import Skeleton from '../Skeleton/index';
 import { AlertCircle, Inbox, Filter as FilterIcon } from 'lucide-react';
 import Button from '../Button';
 import ScrollBar from '../ScrollBar';

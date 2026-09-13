@@ -1,4 +1,4 @@
-import { MarkdownContent } from './Index';
+import { MarkdownContent } from './index';
 
 export default {
   title: 'Components/MarkdownContent',

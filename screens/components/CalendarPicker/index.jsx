@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { format, addMonths, subMonths, isSameDay, isSameMonth, setMonth, setYear } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight, CalendarDays, X, ChevronDown } from 'lucide-react';
-import styles from './Index.module.css';
-import TextField from '../Material-UI/Components/TextField/Index';
-import Frame from '../Frame/Index';
+import styles from './index.module.css';
+import TextField from '../Material-UI/Components/TextField/index';
+import Frame from '../Frame/index';
 import Button from '../Button/index';
-import Selector from '../Material-UI/Components/Selector/Index';
+import Selector from '../Material-UI/Components/Selector/index';
 import { MONTHS, WEEKDAYS, BUTTONS } from './Constants';
 import { parseValueToDate, getDaysForMonth } from './utils';
 

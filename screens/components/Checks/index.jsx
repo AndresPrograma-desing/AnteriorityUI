@@ -1,7 +1,7 @@
 import React from 'react';
 import Checkbox from '@mui/material/Checkbox';
 import ButtonBase from '@mui/material/ButtonBase';
-import styles from './Index.module.css';
+import styles from './index.module.css';
 
 import ModalTooltip from '../ModalTooltip/ModalTooltip';
 

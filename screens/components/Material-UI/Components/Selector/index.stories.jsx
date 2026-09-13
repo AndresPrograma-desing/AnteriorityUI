@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Selector from './Index';
+import Selector from './index';
 
 export default {
   title: 'Components/Material-UI/Selector',

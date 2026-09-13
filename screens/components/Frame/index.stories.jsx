@@ -1,5 +1,5 @@
 import { Info } from 'lucide-react';
-import Frame from './Index.jsx';
+import Frame from './index.jsx';
 
 export default {
   title: 'Components/Frame',

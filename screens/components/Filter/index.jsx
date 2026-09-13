@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Filter as FilterIcon, Trash2, Search } from 'lucide-react';
 import DrawPanel from '../DrawPanel/index';
 import Button from '../Button/index';
-import styles from './Index.module.css';
+import styles from './index.module.css';
 import ModalTooltip from '../ModalTooltip/ModalTooltip';
 
 const Filter = ({
