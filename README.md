@@ -9,7 +9,7 @@ Librería interna de componentes React (UI) para reutilizar entre proyectos. Con
 ## Instalación
 
 ```bash
-pnpm add anteriority-ui
+pnpm add git+https://github.com/AndresPrograma-desing/AnteriorityUI.git
 ```
 
 ### Peer dependencies
