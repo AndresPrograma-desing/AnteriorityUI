@@ -8,9 +8,13 @@ Librería interna de componentes React (UI) para reutilizar entre proyectos. Con
 
 ## Instalación
 
+Publicada en el registro público de npm — se instala igual que cualquier otra dependencia, sin tokens ni configuración extra:
+
 ```bash
 pnpm add git+https://github.com/AndresPrograma-desing/AnteriorityUI.git
 ```
+
+Cada versión se genera a partir de un tag `vX.Y.Z` (semver real, no el HEAD de `main`) — ver [Versionado y releases](#versionado-y-releases).
 
 ### Peer dependencies
 
@@ -72,6 +76,23 @@ hooks/                → hooks reutilizables (useAdminPasswordReset)
 ```
 
 Cada componente en `screens/components/` es independiente entre sí salvo por composición explícita (por ejemplo, `Button` usa `ModalTooltip`, `TableB` usa `Barnner`). Ningún componente de UI importa nada de `features/` directamente salvo los que ya tienen lógica de negocio propia (`PasswordResetPanel`, `UserEditPopover`).
+
+## Versionado y releases
+
+La librería se compila (JSX → JS, se preserva la estructura de carpetas) antes de publicarse — ver [scripts/build.mjs](scripts/build.mjs). El build corre solo en CI, no hace falta ejecutarlo a mano salvo para probarlo localmente con `pnpm run build`.
+
+**Setup único, antes del primer release:** generar un [access token de npm](https://www.npmjs.com/) de tipo *Automation* (desde la cuenta/organización de npm que va a ser dueña del paquete) y cargarlo como secret `NPM_TOKEN` en Settings → Secrets and variables → Actions de este repo. Sin esto el workflow de publish falla.
+
+Para publicar una nueva versión (ej. después de un fix en un componente):
+
+```bash
+pnpm version patch   # o minor / major — bumpea package.json, commitea y crea el tag vX.Y.Z
+git push && git push --tags
+```
+
+El push del tag dispara [.github/workflows/publish.yml](.github/workflows/publish.yml), que compila y publica a npm con el secret `NPM_TOKEN`. El workflow falla si el tag no coincide con la versión del `package.json`, como chequeo de seguridad.
+
+Los proyectos consumidores controlan cuándo actualizar corriendo `pnpm update anteriority-ui` (respetando el rango semver que hayan fijado), en vez de recibir cambios de golpe con cada push a `main`.
 
 ## Ver los componentes en Storybook
 
