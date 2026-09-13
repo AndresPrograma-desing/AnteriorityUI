@@ -53,7 +53,17 @@ Si se agrega un componente nuevo con texto visible, verificar que se vea con la 
 ```bash
 pnpm storybook          # levanta Storybook en http://localhost:6006
 pnpm build-storybook    # build estático de Storybook
+pnpm build              # compila la librería a dist/ (scripts/build.mjs) — solo para probar el build, no hace falta para desarrollar
 ```
+
+## Build y publicación (versionado real, npm público)
+
+El paquete se publica en el registro público de npm como `anteriority-ui`, no vía `git+https://...` apuntando a `main` (ese instalaba el HEAD del branch sin versión ni changelog — ver [.github/workflows/publish.yml](.github/workflows/publish.yml)). Se eligió npm público en vez de GitHub Packages a propósito: GitHub Packages exige autenticación hasta para instalar (incluso en repos públicos), y la prioridad acá era que instalar fuera tan simple como `pnpm add mui` — sin `.npmrc` ni token del lado del consumidor. El costo es que el código queda visible públicamente en npm (el repo de GitHub puede seguir siendo privado).
+
+- `scripts/build.mjs` transpila JSX → JS con esbuild (`jsx: 'automatic'`) y copia CSS Modules/otros assets, **preservando exactamente la misma estructura y capitalización de carpetas que el código fuente** (incluida la inconsistencia `index.jsx` vs `Index.jsx` por componente) para que los subpath imports documentados en README.md sigan resolviendo igual. También genera `dist/package.json` (subset de campos del `package.json` raíz — ver el script para la lista exacta) porque `publishConfig.directory: "dist"` en el `package.json` raíz le dice a `pnpm publish` que empaquete desde ahí, no desde la raíz del repo.
+- El workflow se dispara con push de un tag `vX.Y.Z` y valida que coincida con la versión de `package.json` antes de publicar — ver la sección "Versionado y releases" en README.md para el flujo (`pnpm version patch/minor/major` + `git push --tags`).
+- Si se agrega un componente/carpeta nueva bajo `screens/`, `common/`, `features/` o `hooks/`, no hace falta tocar nada del build — `scripts/build.mjs` recorre esos cuatro directorios dinámicamente.
+- `react`, `react-dom`, `@mui/material`, `@emotion/*` ya son `peerDependencies` (no van empaquetados) — eso ya estaba bien resuelto antes de este cambio; lo que faltaba era el build + versionado, no las peer deps.
 
 ## ⚠️ Gotcha de pnpm workspace
 
