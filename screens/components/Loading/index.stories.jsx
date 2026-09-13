@@ -1,4 +1,4 @@
-import Loading from './Index';
+import Loading from './index';
 
 export default {
   title: 'Components/Loading',

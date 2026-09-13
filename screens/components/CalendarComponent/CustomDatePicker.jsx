@@ -3,7 +3,7 @@ import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterv
 import { es } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight, CalendarDays, X, ChevronDown } from 'lucide-react';
 import styles from './CustomDatePicker.module.css';
-import TextField from '../Material-UI/Components/TextField/Index';
+import TextField from '../Material-UI/Components/TextField/index';
 
 const CustomDatePicker = ({ label, name, value, onChange, required = false, disabled = false, selectedColor, accentColor }) => {
   const [currentDate, setCurrentDate] = useState(new Date());

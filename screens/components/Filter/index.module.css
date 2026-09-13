@@ -33,13 +33,6 @@
     border-radius: 16px;
 }
 
-.filterContent {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    gap: 1.5rem;
-}
-
 .fields {
     display: flex;
     flex-direction: column;
@@ -49,19 +42,6 @@
     padding: 0.5rem 0;
 }
 
-.drawerActions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 0.75rem;
-    padding-top: 1.25rem;
-    border-top: 1px solid var(--border-color, #e2e8f0);
-    margin-top: auto;
-}
-
-.filterButtonWrapper {
-    position: relative;
-    display: inline-flex;
-}
 .filterButtonWrapper {
     position: relative;
     display: inline-flex;

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Filter as FilterIcon, Trash2, Search } from 'lucide-react';
 import DrawPanel from '../DrawPanel/index';
 import Button from '../Button/index';
-import styles from './Index.module.css';
+import styles from './index.module.css';
 import ModalTooltip from '../ModalTooltip/ModalTooltip';
 
 const Filter = ({
@@ -13,7 +13,13 @@ const Filter = ({
     width = '350px',
     title = 'Filtros',
     activeFiltersCount = 0,
-    badgeColor
+    badgeColor,
+    confirmText = 'Aplicar',
+    cancelText = 'Cancelar',
+    loading = false,
+    panelColor,
+    borderColor,
+    textColor,
 }) => {
     const [isOpen, setIsOpen] = useState(false);
 
@@ -74,28 +80,17 @@ const Filter = ({
                 onClose={() => setIsOpen(false)}
                 title={title}
                 width={width}
+                showActions
+                onConfirm={handleApply}
+                confirmText={confirmText}
+                cancelText={cancelText}
+                loading={loading}
+                panelColor={panelColor}
+                borderColor={borderColor}
+                textColor={textColor}
             >
-                <div className={styles.filterContent}>
-                    <div className={styles.fields}>
-                        {children}
-                    </div>
-
-                    <div className={styles.drawerActions}>
-                        <Button
-                            onClick={() => setIsOpen(false)}
-                            variant={Button.VARIANTS.DANGER}
-                            color={Button.COLORS.TRANSPARENT}
-                            borderColor="var(--border-gray-low)"
-                        >
-                            Cancelar
-                        </Button>
-                        <Button
-                            onClick={handleApply}
-                            variant={Button.VARIANTS.PRIMARY}
-                        >
-                            Aplicar
-                        </Button>
-                    </div>
+                <div className={styles.fields}>
+                    {children}
                 </div>
             </DrawPanel>
         </div>

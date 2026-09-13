@@ -15,8 +15,8 @@ import {
   Edit3,
   Columns,
 } from 'lucide-react';
-import { MarkdownContent } from '../MarkdownContent/Index';
-import styles from './Index.module.css';
+import { MarkdownContent } from '../MarkdownContent/index';
+import styles from './index.module.css';
 
 export const MarkdownEditor = ({
   value = '',

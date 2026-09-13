@@ -4,7 +4,7 @@ import styles from './index.module.css';
 import { handleAction } from './utils';
 
 import Button from '../Button/index';
-import InputWithIcon from '../Material-UI/Components/InputWithIcon/Index'; 
+import InputWithIcon from '../Material-UI/Components/InputWithIcon/index'; 
 
 const PlaceholderButton = ({
   icon: Icon,

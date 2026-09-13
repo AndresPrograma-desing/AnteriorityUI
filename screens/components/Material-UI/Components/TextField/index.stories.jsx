@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import TextField from './Index';
+import TextField from './index';
 
 export default {
   title: 'Components/Material-UI/TextField',

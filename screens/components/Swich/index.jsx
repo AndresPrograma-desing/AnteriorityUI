@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import styles from './Index.module.css';
+import styles from './index.module.css';
 import ModalTooltip from '../ModalTooltip/ModalTooltip';
 import { SWITCH_TEXTS } from './constants';  
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import UserAvatar from './Index';
+import UserAvatar from './index';
 
 export default {
   title: 'Components/Profile/Avatar',

@@ -3,8 +3,8 @@ import { createPortal } from 'react-dom';
 import { TriangleAlert } from 'lucide-react';
 import styles from './AlertModal.module.css';
 import Button from '../Button/index';
-import TextField from '../Material-UI/Components/TextField/Index';
-import Selector from '../Material-UI/Components/Selector/Index';
+import TextField from '../Material-UI/Components/TextField/index';
+import Selector from '../Material-UI/Components/Selector/index';
 
 
 const FIELD_LABELS = {
@@ -156,6 +156,8 @@ export default function AlertModal({
   inputError = '',
   imageUrl = '',
   showWarningIcon = true,
+  icon: IconProp,
+  iconColor,
   bgColor,
   titleBorderColor,
   errorTextColor,
@@ -170,13 +172,38 @@ export default function AlertModal({
     ...(titleBorderColor ? { '--alertmodal-title-border': titleBorderColor } : {}),
     ...(errorTextColor ? { '--alertmodal-error-text': errorTextColor } : {}),
     ...(errorBgColor ? { '--alertmodal-error-bg': errorBgColor, '--alertmodal-error-border': errorBgColor } : {}),
+    ...(iconColor ? { '--alertmodal-icon-color': iconColor } : {}),
+  };
+
+  const renderIcon = () => {
+    if (IconProp === null || IconProp === false) return null;
+
+    if (IconProp) {
+      if (React.isValidElement(IconProp)) {
+        return React.cloneElement(IconProp, {
+          className: `${styles.warningIcon} ${IconProp.props.className || ''}`.trim(),
+          style: {
+            ...(iconColor ? { color: iconColor } : {}),
+            ...IconProp.props.style,
+          },
+        });
+      }
+      const CustomIcon = IconProp;
+      return <CustomIcon className={styles.warningIcon} style={iconColor ? { color: iconColor } : undefined} />;
+    }
+
+    if (showWarningIcon) {
+      return <TriangleAlert className={styles.warningIcon} style={iconColor ? { color: iconColor } : undefined} />;
+    }
+
+    return null;
   };
 
   const content = (
     <div data-test="alert-modal" className={styles.modalOverlay} onClick={onClose || (() => { })}>
       <div className={styles.modalBox} style={themeVars} onClick={(e) => e.stopPropagation()}>
         <h3 className={styles.modalTitle}>
-          {showWarningIcon && <TriangleAlert className={styles.warningIcon} />}
+          {renderIcon()}
           {title}</h3>
         <div className={styles.modalBody}>
           {imageUrl && (

@@ -1,7 +1,7 @@
 import React from 'react';
-import GreenHighlight from './Index.jsx';
-import BlueLink from '../BlueLink/Index.jsx';
-import CopyableText from '../CopyText/Index.jsx';
+import GreenHighlight from './index';
+import BlueLink from '../BlueLink/index';
+import CopyableText from '../CopyText/index';
 
 export const formatHighlightedText = (content, GreenHighlightComponent = GreenHighlight, textColor, bgColor) => {
     if (typeof content !== 'string') return content;

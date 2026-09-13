@@ -1,4 +1,4 @@
-import CopyableText from './Index.jsx';
+import CopyableText from './index.jsx';
 
 export default {
   title: 'Components/CopyText',

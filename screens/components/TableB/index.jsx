@@ -3,8 +3,8 @@ import styles from './index.module.css';
 import { Inbox, ChevronDown, ChevronUp, Filter as FilterIcon } from 'lucide-react';
 import Barnner from '../Barnner';
 import Button from '../Button';
-import Loading from '../Loading/Index';
-import Skeleton from '../Skeleton/Index';
+import Loading from '../Loading/index';
+import Skeleton from '../Skeleton/index';
 import ScrollBar from '../ScrollBar';
 import { getNextFilterValue, getFilterOptionLabel } from './utils';
 
