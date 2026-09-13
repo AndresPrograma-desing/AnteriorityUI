@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/favicon/anteriorityUI.ico" alt="anteriority-ui" width="480" />
+</p>
+
 # anteriority-ui
 
 Librería interna de componentes React (UI) para reutilizar entre proyectos. Construida sobre [MUI](https://mui.com/), [lucide-react](https://lucide.dev/) y CSS Modules, con [Storybook](https://storybook.js.org/) para navegar y probar cada componente de forma aislada.
