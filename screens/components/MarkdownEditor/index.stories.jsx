@@ -35,6 +35,16 @@ export const Empty = {
   },
 };
 
+export const WithCodeBlock = {
+  render: (args) => <EditorWithState {...args} />,
+  args: {
+    value:
+      '# Título del snippet\n\nHaz click en el ícono de copiar del título o del bloque para copiarlos rápido.\n\n```js\nfunction fibonacci(n) {\n  if (n <= 1) return n;\n  return fibonacci(n - 1) + fibonacci(n - 2);\n}\n\nconsole.log(fibonacci(10));\n```',
+    placeholder: 'Write your markdown here...',
+    defaultHeight: 380,
+  },
+};
+
 export const CustomLabels = {
   render: (args) => <EditorWithState {...args} />,
   args: {

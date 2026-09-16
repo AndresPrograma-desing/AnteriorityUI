@@ -1229,7 +1229,7 @@ import Loading from '../Loading/index'; // export default, archivo index.jsx
 
 ### MarkdownContent
 
-Renderiza una cadena markdown como HTML, con soporte GFM (tablas, listas de tareas, etc.) vía `react-markdown` + `remark-gfm`.
+Renderiza una cadena markdown como HTML, con soporte GFM (tablas, listas de tareas, etc.) vía `react-markdown` + `remark-gfm`. Los bloques de código (` ``` `) y los encabezados (`#` a `######`) muestran, al pasar el mouse (o al enfocarlos con teclado), un botón con ícono de copiar en la esquina que copia respectivamente el código completo o el texto del título al portapapeles (con feedback visual de "copiado" por ~1.6s).
 
 **Import:**
 ```jsx
@@ -1248,8 +1248,12 @@ import { MarkdownContent } from '../MarkdownContent/index'; // named export (tam
 | children | string | — | Contenido markdown a renderizar. |
 | className | string | `''` | Clase(s) CSS adicionales. |
 | style | object | — | Estilos inline adicionales. |
-| components | object | — | Mapa de renderers personalizados de `react-markdown`. |
+| components | object | — | Mapa de renderers personalizados de `react-markdown`. Un renderer propio para `code`/`pre`/`h1`-`h6` reemplaza por completo el renderer con botón de copiar de ese tag. |
 | linkColor | string | — | Color de los enlaces (`--markdown-link`). |
+| copyCodeLabel | string | `'Copiar código'` | Tooltip/aria-label del botón de copiar sobre bloques de código. |
+| copiedCodeLabel | string | `'Código copiado'` | Tooltip/aria-label del botón tras copiar un bloque de código. |
+| copyTitleLabel | string | `'Copiar título'` | Tooltip/aria-label del botón de copiar sobre encabezados (`h1`-`h6`). |
+| copiedTitleLabel | string | `'Título copiado'` | Tooltip/aria-label del botón tras copiar un encabezado. |
 
 **Ejemplos:**
 ```jsx
@@ -1258,12 +1262,17 @@ import { MarkdownContent } from '../MarkdownContent/index'; // named export (tam
 ```jsx
 <MarkdownContent>{'```js\nfunction greet(name) {\n  return `Hello, ${name}!`;\n}\n```'}</MarkdownContent>
 ```
+```jsx
+<MarkdownContent copyCodeLabel="Copy code" copiedCodeLabel="Copied!" copyTitleLabel="Copy title" copiedTitleLabel="Copied!">
+  {'# My Title\n\n```js\nconsole.log("hi");\n```'}
+</MarkdownContent>
+```
 
 ---
 
 ### MarkdownEditor
 
-Editor de texto markdown con barra de herramientas (negrita, cursiva, encabezados, listas, cita, código, enlace, tabla), atajos de teclado, modos Editor/Dividido/Vista previa y altura ajustable con arrastre.
+Editor de texto markdown con barra de herramientas (negrita, cursiva, título, encabezados, listas, cita, código, enlace, tabla), atajos de teclado, modos Editor/Dividido/Vista previa y altura ajustable con arrastre. El botón de título inserta un encabezado `# ` y el de código un bloque ` ``` `; ambos, al previsualizarse (con `MarkdownContent`), muestran un botón de copiar rápido (ver [MarkdownContent](#markdowncontent)).
 
 **Import:**
 ```jsx
@@ -1289,7 +1298,7 @@ const [value, setValue] = useState('# Hello world');
 | onChange | function | — | Se llama con un evento simulado `{ target: { value } }`. |
 | placeholder | string | `''` | Placeholder del textarea. |
 | defaultHeight | number | `320` | Alto inicial (px) del área de contenido; ajustable arrastrando el handle inferior (entre 180 y 1200px). |
-| labels | object | `{}` | Textos personalizables: `editorTab`, `splitTab`, `previewTab`, tooltips de cada botón, textos por defecto al insertar formato, encabezados de la tabla de ejemplo. |
+| labels | object | `{}` | Textos personalizables: `editorTab`, `splitTab`, `previewTab`, tooltips de cada botón (incluye `titleTooltip` para el botón de título), textos por defecto al insertar formato, encabezados de la tabla de ejemplo. |
 | activeColor | string | — | Color de acento del modo/pestaña activa (`--markdown-editor-active`). |
 
 **Ejemplos:**
