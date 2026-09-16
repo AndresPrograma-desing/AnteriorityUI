@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Copy, Check } from 'lucide-react';
-import styles from './index.module.css';
+import Button from '../Button/index';
 
 export const CopyButton = ({ text, className = '', label = 'Copiar', copiedLabel = 'Copiado' }) => {
   const [copied, setCopied] = useState(false);
@@ -23,15 +23,18 @@ export const CopyButton = ({ text, className = '', label = 'Copiar', copiedLabel
   };
 
   return (
-    <button
-      type="button"
-      className={`${styles.copyButton} ${className}`}
+    <Button
+      variant="ghost"
+      color="transparent"
+      circle
       onClick={handleCopy}
-      title={copied ? copiedLabel : label}
+      className={className}
+      style={{ width: '1.6rem', height: '1.6rem', minWidth: 0, padding: 0 }}
+      ToolTip={copied ? copiedLabel : label}
       aria-label={copied ? copiedLabel : label}
     >
       {copied ? <Check size={14} /> : <Copy size={14} />}
-    </button>
+    </Button>
   );
 };
 

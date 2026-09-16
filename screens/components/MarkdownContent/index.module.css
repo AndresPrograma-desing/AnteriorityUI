@@ -38,10 +38,12 @@
 .headingCopyButton {
   flex-shrink: 0;
   opacity: 0;
+  transition: opacity 0.15s ease;
 }
 
 .headingWithCopy:hover .headingCopyButton,
-.headingWithCopy:focus-within .headingCopyButton {
+.headingWithCopy:focus-within .headingCopyButton,
+.headingCopyButton:focus-visible {
   opacity: 1;
 }
 
@@ -144,37 +146,13 @@
   top: 0.6rem;
   right: 0.6rem;
   opacity: 0;
+  transition: opacity 0.15s ease;
 }
 
 .codeBlockWrapper:hover .codeCopyButton,
-.codeBlockWrapper:focus-within .codeCopyButton {
+.codeBlockWrapper:focus-within .codeCopyButton,
+.codeCopyButton:focus-visible {
   opacity: 1;
-}
-
-.copyButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.6rem;
-  height: 1.6rem;
-  padding: 0;
-  border: 1px solid rgba(128, 128, 128, 0.3);
-  border-radius: 6px;
-  background: rgba(20, 20, 20, 0.55);
-  color: inherit;
-  cursor: pointer;
-  transition: opacity 0.15s ease, background 0.15s ease, color 0.15s ease;
-}
-
-.copyButton:hover {
-  background: rgba(124, 156, 255, 0.25);
-  color: var(--markdown-link, #7c9cff);
-}
-
-.copyButton:focus-visible {
-  opacity: 1;
-  outline: 2px solid var(--markdown-link, #7c9cff);
-  outline-offset: 1px;
 }
 
 .markdown hr {
