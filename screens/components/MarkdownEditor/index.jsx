@@ -3,6 +3,7 @@ import { Tooltip } from '@mui/material';
 import {
   Bold,
   Italic,
+  Heading1,
   Heading2,
   Heading3,
   List,
@@ -34,6 +35,7 @@ export const MarkdownEditor = ({
     previewEmptyPreview = 'Sin contenido para previsualizar',
     boldTooltip = 'Negrita (Ctrl+B)',
     italicTooltip = 'Cursiva (Ctrl+I)',
+    titleTooltip = 'Título',
     heading2Tooltip = 'Encabezado principal',
     heading3Tooltip = 'Subtítulo',
     bulletListTooltip = 'Lista con viñetas',
@@ -248,6 +250,17 @@ export const MarkdownEditor = ({
           </Tooltip>
 
           <div className={styles.toolbarDivider} />
+
+          <Tooltip title={titleTooltip} arrow>
+            <button
+              type="button"
+              className={styles.toolButton}
+              onClick={() => insertLinePrefix('# ')}
+              disabled={viewMode === 'preview'}
+            >
+              <Heading1 size={16} />
+            </button>
+          </Tooltip>
 
           <Tooltip title={heading2Tooltip} arrow>
             <button

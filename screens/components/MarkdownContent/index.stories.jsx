@@ -28,3 +28,10 @@ export const WithCodeBlock = {
     children: '```js\nfunction greet(name) {\n  return `Hello, ${name}!`;\n}\n```',
   },
 };
+
+export const WithCopyableTitleAndCode = {
+  args: {
+    children:
+      '# Guía rápida\n\nPasa el mouse sobre el título para ver el botón de copiar, y sobre el bloque de código para copiarlo completo.\n\n```js\nfunction fibonacci(n) {\n  if (n <= 1) return n;\n  return fibonacci(n - 1) + fibonacci(n - 2);\n}\n\nconsole.log(fibonacci(10));\n```',
+  },
+};

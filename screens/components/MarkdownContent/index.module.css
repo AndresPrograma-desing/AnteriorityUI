@@ -25,6 +25,26 @@
   margin: 1.1em 0 0.5em 0;
 }
 
+.headingWithCopy {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.headingText {
+  min-width: 0;
+}
+
+.headingCopyButton {
+  flex-shrink: 0;
+  opacity: 0;
+}
+
+.headingWithCopy:hover .headingCopyButton,
+.headingWithCopy:focus-within .headingCopyButton {
+  opacity: 1;
+}
+
 .markdown h1 { font-size: 1.35rem; }
 .markdown h2 { font-size: 1.2rem; }
 .markdown h3 { font-size: 1.05rem; }
@@ -113,6 +133,48 @@
   padding: 0;
   border-radius: 0;
   color: inherit;
+}
+
+.codeBlockWrapper {
+  position: relative;
+}
+
+.codeCopyButton {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  opacity: 0;
+}
+
+.codeBlockWrapper:hover .codeCopyButton,
+.codeBlockWrapper:focus-within .codeCopyButton {
+  opacity: 1;
+}
+
+.copyButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  padding: 0;
+  border: 1px solid rgba(128, 128, 128, 0.3);
+  border-radius: 6px;
+  background: rgba(20, 20, 20, 0.55);
+  color: inherit;
+  cursor: pointer;
+  transition: opacity 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.copyButton:hover {
+  background: rgba(124, 156, 255, 0.25);
+  color: var(--markdown-link, #7c9cff);
+}
+
+.copyButton:focus-visible {
+  opacity: 1;
+  outline: 2px solid var(--markdown-link, #7c9cff);
+  outline-offset: 1px;
 }
 
 .markdown hr {
