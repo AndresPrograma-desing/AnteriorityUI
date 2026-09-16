@@ -1,6 +1,6 @@
 {
   "name": "anteriority-ui",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Librería interna de componentes React (UI) construida sobre MUI, lucide-react y CSS Modules.",
   "packageManager": "pnpm@11.1.2",
   "main": "index.js",
@@ -44,6 +44,7 @@
   "dependencies": {
     "date-fns": "^4.4.0",
     "lucide-react": "^1.26.0",
+    "mermaid": "^11.4.1",
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1"
   },

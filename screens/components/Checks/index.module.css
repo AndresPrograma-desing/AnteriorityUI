@@ -22,11 +22,11 @@
 
 .label {
   font-size: 0.95rem;
-  color: #e5e7eb;
+  color: var(--checks-label, #1e293b);
   margin-left: 8px;
 }
 
 .checked .label {
-  color: #94a3b8;
+  color: var(--checks-checked-label, #64748b);
   text-decoration: line-through;
 }

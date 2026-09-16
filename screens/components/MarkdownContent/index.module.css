@@ -147,3 +147,26 @@
   color: inherit;
   font-weight: 700;
 }
+
+.mermaidBlock {
+  display: flex;
+  justify-content: center;
+  overflow-x: auto;
+  margin: 0 0 0.75em 0;
+}
+
+.mermaidBlock svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.mermaidError {
+  margin: 0 0 0.75em 0;
+  padding: 0.6rem 0.85rem;
+  background: rgba(248, 113, 113, 0.12);
+  border: 1px solid rgba(248, 113, 113, 0.35);
+  border-radius: 6px;
+  color: #f87171;
+  font-size: 0.8rem;
+  white-space: pre-wrap;
+}

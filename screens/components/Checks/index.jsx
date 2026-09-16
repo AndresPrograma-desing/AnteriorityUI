@@ -5,7 +5,13 @@ import styles from './index.module.css';
 
 import ModalTooltip from '../ModalTooltip/ModalTooltip';
 
-export default function PermissionCheckboxItem({ label, checked, onChange, disabled, checkedBgColor }) {
+export default function PermissionCheckboxItem({ label, checked, onChange, disabled, checkedBgColor, labelColor, checkedLabelColor }) {
+  const style = {
+    ...(checkedBgColor ? { '--checks-checked-bg': checkedBgColor } : {}),
+    ...(labelColor ? { '--checks-label': labelColor } : {}),
+    ...(checkedLabelColor ? { '--checks-checked-label': checkedLabelColor } : {}),
+  };
+
   return (
     <ButtonBase
       component="div"
@@ -13,7 +19,7 @@ export default function PermissionCheckboxItem({ label, checked, onChange, disab
       onClick={!disabled ? onChange : undefined}
       disabled={disabled}
       focusRipple
-      style={checkedBgColor ? { '--checks-checked-bg': checkedBgColor } : undefined}
+      style={Object.keys(style).length ? style : undefined}
     >
         <ModalTooltip  text={label}>
       <Checkbox

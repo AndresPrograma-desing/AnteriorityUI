@@ -9,6 +9,17 @@
     flex-direction: column;
 }
 
+.frameCardModal {
+    max-height: 90vh;
+    overflow-y: auto;
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
+
+.frameCardModal::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
+}
+
 .headerContainer {
     display: flex;
     align-items: center;

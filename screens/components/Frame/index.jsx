@@ -12,7 +12,7 @@ function Frame({ title, icon, content, error, children, className = '', isModal 
 
     const frameContent = (
         <div
-            className={`${styles.frameCard} ${className}`}
+            className={`${styles.frameCard} ${isModal ? styles.frameCardModal : ''} ${className}`}
             style={frameCardStyle}
             onClick={(e) => e.stopPropagation()}
         >
