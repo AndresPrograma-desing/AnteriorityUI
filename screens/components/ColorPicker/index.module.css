@@ -1,0 +1,137 @@
+.root {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--cp-text, var(--color-text, #1e293b));
+}
+
+.trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.4rem 0.7rem;
+    background: var(--cp-bg, #ffffff);
+    color: var(--cp-text, var(--color-text, #1e293b));
+    border: 1px solid var(--cp-border, var(--color-border, #e2e8f0));
+    border-radius: var(--radius-md, 0.5rem);
+    font-family: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: border-color 0.15s;
+}
+
+.trigger:hover:not(:disabled),
+.trigger[aria-expanded='true'] {
+    border-color: var(--cp-accent, var(--color-primary, #1717ff));
+}
+
+.trigger:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.swatch,
+.preview {
+    flex-shrink: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    background-color: var(--swatch-color);
+    border: 1px solid rgba(128, 128, 128, 0.4);
+}
+
+.hexText {
+    font-variant-numeric: tabular-nums;
+}
+
+.popover {
+    width: 240px;
+    padding: 0.75rem;
+    background: var(--cp-bg, #ffffff);
+    color: var(--cp-text, var(--color-text, #1e293b));
+    border: 1px solid var(--cp-border, var(--color-border, #e2e8f0));
+    border-radius: var(--radius-lg, 0.75rem);
+    box-shadow: var(--shadow-lg, 0 10px 15px -3px rgb(0 0 0 / 0.1));
+    font-family: inherit;
+}
+
+.panel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.saturationArea {
+    position: relative;
+    height: 140px;
+    border-radius: var(--radius-md, 0.5rem);
+    cursor: crosshair;
+    touch-action: none;
+    outline-offset: 2px;
+}
+
+.saturationThumb,
+.hueThumb {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+}
+
+.saturationThumb {
+    background-color: var(--swatch-color);
+}
+
+.hueTrack {
+    position: relative;
+    height: 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    touch-action: none;
+    outline-offset: 2px;
+}
+
+.hueThumb {
+    top: 50%;
+    background-color: #ffffff;
+}
+
+.formatRow {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.valueRow {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.channelsRow {
+    display: flex;
+    flex: 1;
+    gap: 0.4rem;
+}
+
+.channelField {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.15rem;
+    min-width: 0;
+}
+
+.error {
+    font-size: 0.75rem;
+    color: var(--color-danger, #ea1f1f);
+}

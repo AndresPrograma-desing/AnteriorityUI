@@ -23,6 +23,7 @@ const NumericInput = forwardRef(({
     showStepper = true,
     popoverBgColor,
     popoverIconColor,
+    popoverPlacement = 'top',
     name,
     inputProps,
     ...props
@@ -64,6 +65,7 @@ const NumericInput = forwardRef(({
 
     const handleBlur = (e) => {
         props.onBlur?.(e);
+        setAnchor(null);
         const text = String(latest.current.current ?? '');
         if (text === '' || text === '-' || text === '.' || text === '-.') return;
         const clamped = clampNumber(Number(text), min, max);
@@ -126,11 +128,11 @@ const NumericInput = forwardRef(({
                 <Popper
                     open={isOpen}
                     anchorEl={anchor}
-                    placement="top"
+                    placement={popoverPlacement}
                     style={{ zIndex: 1400 }}
                     modifiers={[
                         { name: 'offset', options: { offset: [0, 4] } },
-                        { name: 'flip', options: { fallbackPlacements: ['bottom'], padding: 8 } },
+                        { name: 'flip', options: { fallbackPlacements: [popoverPlacement === 'top' ? 'bottom' : 'top'], padding: 8 } },
                         { name: 'preventOverflow', options: { altAxis: true, padding: 8 } },
                     ]}
                 >

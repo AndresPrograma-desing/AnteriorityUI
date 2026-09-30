@@ -556,6 +556,39 @@ import PermissionCheckboxItem from '../Checks/index'; // export default
 
 ---
 
+### ColorPicker
+
+Selector de color: botón con muestra + hex que despliega un popover con área de saturación/brillo, barra de matiz y edición numérica en HEX, RGB o HSL. Lógica portada del `ColorPickerPanel` de Workspace-Backoffice-Web (sin `energy-ui` ni `i18next`).
+
+**Import:**
+```jsx
+import ColorPicker from '../ColorPicker/index'; // export default (memo), archivo index.jsx
+```
+
+**Uso básico:**
+```jsx
+const [color, setColor] = useState('#1717FF');
+<ColorPicker label="Color" value={color} onChange={setColor} />
+```
+
+**Props:**
+
+| Prop | Tipo | Default | Descripción |
+|---|---|---|---|
+| value | string | `'#000000'` | Color en hex de 6 dígitos (con o sin `#`). Controlado: si cambia desde afuera, el panel se resincroniza. |
+| onChange | function | — | Recibe el hex en mayúsculas (`'#RRGGBB'`). Durante el arrastre se emite con throttle de 80 ms y se hace flush al soltar. |
+| label | string | — | Etiqueta sobre el botón. |
+| ariaLabel | string | `label` | `aria-label` del botón. |
+| disabled | boolean | `false` | Deshabilita el selector. |
+| placement | string | `'bottom-start'` | Posición del popover (se voltea/ajusta solo si no hay espacio). |
+| labels | object | textos en español | Textos traducibles: `saturation`, `hue`, `invalidHex`, `invalidRgb`, `invalidHsl`, `channels` (`r g b h s l`). |
+| className | string | `''` | Clase CSS del contenedor. |
+| bgColor / textColor / borderColor / accentColor | string | blanco / `#1e293b` / `#e2e8f0` / `#1717ff` | Colores del botón y del popover. |
+
+**Notas:** Accesible por teclado (flechas sobre el área de saturación y la barra de matiz, Escape cierra). Soporta mouse y touch (pointer events). Un valor inválido en HEX/RGB/HSL muestra error y se restaura al salir del campo.
+
+---
+
 ### Container
 
 Envoltorio de tarjeta genérico para secciones de contenido, con soporte opcional de paginación integrada (`Paginador` de Material-UI).
@@ -1182,6 +1215,7 @@ import Input from '../Input/index'; // export default, forwardRef, archivo index
 | allowDecimal | boolean | `false` | Permite punto decimal (solo con `numeric`). |
 | allowNegative | boolean | `min < 0` o sin `min` | Permite signo `-` (solo con `numeric`). |
 | showStepper | boolean | `true` | Muestra el popover de flechas (solo con `numeric`). |
+| popoverPlacement | `'top'` \| `'bottom'` | `'top'` | Lado del popover respecto al campo (se voltea solo si no hay espacio; solo con `numeric`). |
 | popoverBgColor / popoverIconColor | string | `'#ffffff'` / `'#0f172a'` | Colores del popover (solo con `numeric`). |
 | ...props | any | — | Cualquier otra prop de `TextField` (`type`, `placeholder`, `value`, `onChange`, `disabled`, etc.). |
 

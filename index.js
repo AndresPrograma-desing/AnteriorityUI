@@ -16,6 +16,7 @@ export { default as CalendarPicker } from './screens/components/CalendarPicker/i
 export { default as CardV1 } from './screens/components/CardV1/index.js';
 export { default as ChatWindow } from './screens/components/ChatWindow/index.js';
 export { default as Checks } from './screens/components/Checks/index.js';
+export { default as ColorPicker } from './screens/components/ColorPicker/index.js';
 export { default as Container } from './screens/components/Container/index.js';
 export { default as CopyText } from './screens/components/CopyText/index.js';
 export { default as CountdownBar } from './screens/components/CountdownBar/index.js';
