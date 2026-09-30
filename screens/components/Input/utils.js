@@ -1,9 +1,13 @@
 
-export const isValidNumericText = (text, { allowDecimal = false, allowNegative = false } = {}) => {
-    const sign = allowNegative ? '-?' : '';
-    const body = allowDecimal ? '\d*\.?\d*' : '\d*';
-    return new RegExp(`^${sign}${body}$`).test(text);
+const NUMERIC_PATTERNS = {
+    'int': /^\d*$/,
+    'int-neg': /^-?\d*$/,
+    'dec': /^\d*\.?\d*$/,
+    'dec-neg': /^-?\d*\.?\d*$/,
 };
+
+export const isValidNumericText = (text, { allowDecimal = false, allowNegative = false } = {}) =>
+    NUMERIC_PATTERNS[`${allowDecimal ? 'dec' : 'int'}${allowNegative ? '-neg' : ''}`].test(text);
 
 export const clampNumber = (n, min, max) => {
     let out = n;
