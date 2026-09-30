@@ -1,5 +1,6 @@
 import React, { forwardRef } from 'react';
 import TextField from '../Material-UI/Components/TextField/index';
+import NumericInput from './NumericInput';
 
 const Input = forwardRef(({ 
     label, 
@@ -9,6 +10,7 @@ const Input = forwardRef(({
     helperText, 
     required, 
     requiredColor = 'red',
+    numeric = false,
     ...props 
 }, ref) => {
     const displayLabel = label ? (
@@ -18,8 +20,10 @@ const Input = forwardRef(({
         </span>
     ) : undefined;
 
+    const Field = numeric ? NumericInput : TextField;
+
     return (
-        <TextField
+        <Field
             id={id}
             label={displayLabel}
             error={error}

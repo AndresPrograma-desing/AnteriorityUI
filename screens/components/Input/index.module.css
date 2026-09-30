@@ -47,3 +47,55 @@
 .required{
     margin-left: 4px;
 }
+.numericPopover {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 4px;
+    background-color: var(--numeric-popover-bg, #ffffff);
+    border-radius: 8px;
+}
+
+.numericStep {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 24px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--numeric-popover-icon, #0f172a);
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+
+.numericStep:hover {
+    background-color: rgba(128, 128, 128, 0.2);
+}
+
+.numericOption {
+    min-width: 72px;
+    height: 28px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--numeric-popover-icon, #0f172a);
+    font: inherit;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+
+.numericOption:hover:not(:disabled) {
+    background-color: rgba(128, 128, 128, 0.2);
+}
+
+.numericOption:disabled {
+    cursor: default;
+}
+
+.numericOptionActive {
+    font-weight: 700;
+    background-color: rgba(128, 128, 128, 0.25);
+}

@@ -1176,6 +1176,13 @@ import Input from '../Input/index'; // export default, forwardRef, archivo index
 | helperText | string | — | Texto de ayuda bajo el campo (se ignora si hay `error`). |
 | required | boolean | — | Muestra el indicador `**` junto a la etiqueta. |
 | requiredColor | string | `'red'` | Color del indicador de requerido. |
+| numeric | boolean | `false` | Solo acepta números. Al enfocar muestra un popover con flechas ▲▼; la rueda del mouse y las flechas del teclado también suben/bajan el valor. |
+| min / max | number | — | Límites (solo con `numeric`); se aplican al usar el stepper y al salir del campo. |
+| step | number | `1` | Incremento por click/rueda (solo con `numeric`). |
+| allowDecimal | boolean | `false` | Permite punto decimal (solo con `numeric`). |
+| allowNegative | boolean | `min < 0` o sin `min` | Permite signo `-` (solo con `numeric`). |
+| showStepper | boolean | `true` | Muestra el popover de flechas (solo con `numeric`). |
+| popoverBgColor / popoverIconColor | string | `'#ffffff'` / `'#0f172a'` | Colores del popover (solo con `numeric`). |
 | ...props | any | — | Cualquier otra prop de `TextField` (`type`, `placeholder`, `value`, `onChange`, `disabled`, etc.). |
 
 **Ejemplos:**
@@ -1584,6 +1591,7 @@ import Selector from '../Material-UI/Components/Selector/index'; // export defau
 | required | boolean | — | Muestra un indicador `**` junto a la etiqueta. |
 | requiredColor | string | `'red'` | Color del indicador de requerido. |
 | disableClearable | boolean | `false` | Si es `true`, oculta el botón de limpiar selección. |
+| hideScrollbar | boolean | `true` | Oculta la barra de scroll de la lista desplegable (el scroll con rueda/teclado/touch sigue funcionando). |
 
 **Ejemplos:**
 ```jsx

@@ -35,3 +35,14 @@ export const WithHelperText = {
     helperText: 'Debe tener al menos 8 caracteres',
   },
 };
+
+export const Numeric = {
+  args: {
+    label: 'Cantidad',
+    numeric: true,
+    defaultValue: 100,
+    min: 0,
+    max: 1000,
+    step: 5,
+  },
+};

@@ -15,7 +15,8 @@ export default function Selector({
     placeholder,
     required,
     requiredColor = "red",
-    disableClearable = false
+    disableClearable = false,
+    hideScrollbar = true
 }) {
     const normalizeVal = (val) => String(val || '').toLowerCase().replace(/[_\s\/-]+/g, '');
 
@@ -56,7 +57,15 @@ export default function Selector({
             slotProps={{
                 popper: {
                     sx: { zIndex: 100000 }
-                }
+                },
+                // La lista sigue haciendo scroll (rueda/teclado/touch), solo se oculta la barra.
+                listbox: hideScrollbar ? {
+                    sx: {
+                        scrollbarWidth: 'none',
+                        msOverflowStyle: 'none',
+                        '&::-webkit-scrollbar': { display: 'none' }
+                    }
+                } : undefined
             }}
             renderOption={(props, option) => {
                 const { key, ...optionProps } = props;
