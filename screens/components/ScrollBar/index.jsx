@@ -9,6 +9,7 @@ export default function ScrollBar({
   autoHide = true,
   maxHeight,
   hideHorizontalTrack = false,
+  hideVerticalTrack = false,
   scrollAreaRef,
   className = '',
   contentClassName = '',
@@ -44,7 +45,7 @@ export default function ScrollBar({
         {children}
       </div>
 
-      {vertical && thumb.v.size > 0 && (
+      {vertical && !hideVerticalTrack && thumb.v.size > 0 && (
         <div className={`${styles.trackVertical} ${visible ? styles.trackVisible : ''}`}>
           <div
             className={styles.thumbVertical}

@@ -11,7 +11,7 @@ Registro de actualizaciones relevantes hechas sobre componentes existentes de la
 - `TableA` y `TableB` suman `stickyFirstColumn`: la primera columna queda fija a la izquierda al desplazar la tabla en horizontal.
 - `TableA` y `TableB` suman `stickyHeader` (+ `maxHeight`): la tabla scrollea en vertical por dentro y el encabezado queda fijo arriba con `position: sticky`.
 - `TableA` y `TableB` suman `scrollFooter`: pie `position: sticky` al borde inferior de la pantalla con botones ◀ / ▶ y un slider sincronizado con el scroll. Solo aparece si la tabla es más ancha que su contenedor y reemplaza la barra horizontal propia. Colores configurables: `scrollFooterBgColor`, `scrollFooterBorderColor`, `scrollControlsColor`. Textos configurables: `scrollLeftLabel`, `scrollRightLabel`, `scrollSliderLabel`.
-- `ScrollBar` suma `hideHorizontalTrack` y `scrollAreaRef` (acceso al elemento scrolleable).
+- `ScrollBar` suma `hideHorizontalTrack`, `hideVerticalTrack` y `scrollAreaRef` (acceso al elemento scrolleable).
 
 **Por qué:** tablas anchas y altas obligaban a bajar hasta el pie para mover la barra horizontal, y la primera columna (el identificador de la fila) se perdía al desplazar.
 

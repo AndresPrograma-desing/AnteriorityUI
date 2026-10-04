@@ -69,6 +69,7 @@ const TableA = (props) => {
     <ScrollBar
       horizontal
       vertical={stickyHeader}
+      hideVerticalTrack
       maxHeight={stickyHeader ? maxHeight : undefined}
       scrollAreaRef={scrollAreaRef}
       hideHorizontalTrack={scrollFooter}
