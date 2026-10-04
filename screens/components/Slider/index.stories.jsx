@@ -11,7 +11,7 @@ export const Default = {
     const [value, setValue] = useState(30);
     return (
       <div style={{ width: 280 }}>
-        <Slider {...args} value={value} onChange={setValue} aria-label="Valor" />
+        <Slider {...args} value={value} onChange={setValue} showPercentage aria-label="Valor" />
         <p>Valor: {value}</p>
       </div>
     );

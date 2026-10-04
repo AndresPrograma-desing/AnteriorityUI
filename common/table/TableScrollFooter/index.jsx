@@ -54,6 +54,7 @@ export default function TableScrollFooter({ scrollAreaRef, controlsColor, leftLa
           min={0}
           max={metrics.max}
           value={Math.min(metrics.left, metrics.max)}
+          showPercentage
           accentColor="var(--tableFooter-accent, #7c9cff)"
           aria-label={sliderLabel}
           onChange={(value) => { scrollAreaRef.current.scrollLeft = value; }}

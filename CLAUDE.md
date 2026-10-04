@@ -42,6 +42,10 @@ La mayoría de los componentes con color propio (fondo, texto, ícono, borde) ex
 - **Los componentes con sistema `variant`/`type` (Barnner, DesplegablePanel, Notification/Error, TableB) mantienen su variant tal cual** — las props de color nuevas son un override opcional por encima de la paleta que resolvería el variant.
 - Nombres reutilizados a propósito para consistencia entre componentes: `bgColor`, `textColor`, `iconColor`, `borderColor`, `accentColor`.
 
+## Convención: valores fijos en `constants.js`
+
+Cuando un componente tiene valores fijos que no son props (colores por defecto, tamaños, grosores, pasos, listas de opciones, etc.), se definen en un `constants.js` dentro de la carpeta del componente (`screens/components/<Name>/constants.js`) con `export const` en MAYÚSCULAS, y el `index.jsx` los importa (`import { DEFAULT_ACCENT } from './constants.js'`). No dejar esos literales sueltos dentro del `index.jsx`. Ejemplo: `screens/components/Slider/constants.js` (`DEFAULT_ACCENT`, `DEFAULT_THICKNESS`). Ya siguen esta convención `CalendarPicker`, `ColorPicker`, `CountdownBar`, `DesplegablePanel`, `HoursPicker`, `Sidebar` y `Swich`.
+
 ## Tipografía y theme
 
 La fuente global es **Plus Jakarta Sans** (Google Fonts), no Roboto (default de MUI) ni el serif por default del navegador. Esto requiere DOS piezas trabajando juntas:

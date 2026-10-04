@@ -2067,7 +2067,7 @@ import Skeleton from 'screens/components/Skeleton/index';
 
 ### Slider
 
-Slider horizontal controlado, basado en un `<input type="range">` nativo, con color de acento configurable. Es el que usa el pie de desplazamiento de `TableA`/`TableB`.
+Slider horizontal controlado, basado en el `Slider` de MUI, con color de acento configurable y tooltip opcional con el porcentaje. Es el que usa el pie de desplazamiento de `TableA`/`TableB`.
 
 **Import:**
 ```jsx
@@ -2079,7 +2079,7 @@ import Slider from 'screens/components/Slider/index';
 ```jsx
 const [value, setValue] = useState(30);
 
-<Slider value={value} onChange={setValue} aria-label="Volumen" />
+<Slider value={value} onChange={setValue} showPercentage aria-label="Volumen" />
 ```
 
 **Props:**
@@ -2092,7 +2092,9 @@ const [value, setValue] = useState(30);
 | `step` | `number` | `1` | Incremento. |
 | `onChange` | `function(value: number)` | — | Se llama con el nuevo valor ya convertido a número. |
 | `disabled` | `boolean` | `false` | Deshabilita el slider. |
+| `showPercentage` | `boolean` | `false` | Muestra en el tooltip del thumb el porcentaje del recorrido (`(value - min) / (max - min)`), al arrastrar o pasar el mouse. |
 | `accentColor` | `string` | `'#7c9cff'` | Color de acento (barra rellena y thumb). |
+| `thickness` | `number` | `8` | Grosor de la línea en px (el thumb crece en proporción). |
 | `className` | `string` | `''` | Clase adicional. |
 | `style` | `object` | — | Estilos inline. |
 | `aria-label` | `string` | — | Texto accesible del slider. |
