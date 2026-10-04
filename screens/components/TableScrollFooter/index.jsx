@@ -6,7 +6,7 @@ import styles from './index.module.css';
 // Fracción del ancho visible que se desplaza la tabla con cada clic.
 const SCROLL_STEP = 0.6;
 
-// Botones y slider que mueven el área de scroll horizontal de TableA (scrollAreaRef). Solo se
+// Botones y slider que mueven el área de scroll horizontal de una tabla (TableA/TableB, vía scrollAreaRef). Solo se
 // muestra cuando la tabla es más ancha que su contenedor.
 export default function TableScrollFooter({ scrollAreaRef, controlsColor, leftLabel, rightLabel, sliderLabel }) {
   const [metrics, setMetrics] = useState({ max: 0, left: 0 });
@@ -37,7 +37,7 @@ export default function TableScrollFooter({ scrollAreaRef, controlsColor, leftLa
   };
 
   return (
-    <div className={styles.scrollFooter}>
+    <div className={styles.footer}>
       <Button
         size="small"
         variant={Button.VARIANTS.GHOST}
@@ -49,7 +49,7 @@ export default function TableScrollFooter({ scrollAreaRef, controlsColor, leftLa
       />
       <input
         type="range"
-        className={styles.scrollSlider}
+        className={styles.slider}
         min={0}
         max={metrics.max}
         step={1}

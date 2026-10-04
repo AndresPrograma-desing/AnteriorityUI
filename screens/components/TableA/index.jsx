@@ -4,7 +4,7 @@ import Skeleton from '../Skeleton/index';
 import { AlertCircle, Inbox, Filter as FilterIcon } from 'lucide-react';
 import Button from '../Button';
 import ScrollBar from '../ScrollBar';
-import TableScrollFooter from './TableScrollFooter';
+import TableScrollFooter from '../TableScrollFooter';
 import { getNextFilterValue, getFilterOptionLabel } from './utils';
 
 const TableA = (props) => {
@@ -49,9 +49,9 @@ const TableA = (props) => {
     '--tableA-border': borderColor,
     '--tableA-hover': hoverColor,
     '--tableA-row-border': rowBorderColor,
-    '--tableA-footer-bg': scrollFooterBgColor,
-    '--tableA-footer-border': scrollFooterBorderColor,
-    '--tableA-scroll-accent': scrollControlsColor
+    '--tableFooter-bg': scrollFooterBgColor ?? surfaceColor,
+    '--tableFooter-border': scrollFooterBorderColor ?? borderColor,
+    '--tableFooter-accent': scrollControlsColor
   };
 
   const scrollAreaRef = useRef(null);

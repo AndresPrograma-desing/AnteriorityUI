@@ -108,3 +108,23 @@ export const WithColumnFilter = {
     return <TableB columns={filterableColumns} data={filteredData} rowKey="id" />;
   },
 };
+
+const wideColumns = [
+  { key: 'name', label: 'Nombre', width: 220 },
+  ...Array.from({ length: 12 }, (_, i) => ({ key: `c${i}`, label: `Columna ${i + 1}`, width: 140 })),
+];
+
+const wideData = Array.from({ length: 30 }, (_, row) => ({
+  id: row,
+  name: `Fila ${row + 1}`,
+  ...Object.fromEntries(Array.from({ length: 12 }, (_, i) => [`c${i}`, row * 12 + i])),
+}));
+
+export const StickyFirstColumnWithScrollFooter = {
+  args: {
+    columns: wideColumns,
+    data: wideData,
+    stickyFirstColumn: true,
+    scrollFooter: true,
+  },
+};
