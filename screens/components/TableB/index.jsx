@@ -7,7 +7,6 @@ import Loading from '../Loading/index';
 import Skeleton from '../Skeleton/index';
 import ScrollBar from '../ScrollBar';
 import TableScrollFooter from '../TableScrollFooter';
-import useStickyHeader from '../TableScrollFooter/useStickyHeader';
 import { getNextFilterValue, getFilterOptionLabel } from './utils';
 
 const TableB = (props) => {
@@ -36,6 +35,7 @@ const TableB = (props) => {
     filterActiveColor = '#10b981',
     stickyFirstColumn = false,
     stickyHeader = false,
+    maxHeight = '70vh',
     scrollFooter = false,
     scrollFooterBgColor,
     scrollFooterBorderColor,
@@ -46,7 +46,6 @@ const TableB = (props) => {
   } = props;
   const [expandedKeys, setExpandedKeys] = useState({});
   const scrollAreaRef = useRef(null);
-  useStickyHeader(scrollAreaRef, stickyHeader);
 
   const handleCycleFilter = (filter) => {
     if (!filter || !Array.isArray(filter.options) || filter.options.length === 0) return;
@@ -92,7 +91,8 @@ const TableB = (props) => {
   const table = (
     <ScrollBar
       horizontal
-      vertical={false}
+      vertical={stickyHeader}
+      maxHeight={stickyHeader ? maxHeight : undefined}
       scrollAreaRef={scrollAreaRef}
       hideHorizontalTrack={scrollFooter}
       className={containerClassName}

@@ -298,9 +298,10 @@
   width: 100%;
 }
 
-/* Encabezado fijo: useStickyHeader lo desplaza con translateY; necesita quedar sobre las celdas. */
+/* Encabezado fijo: la tabla scrollea en vertical por dentro (maxHeight) y el th se pega arriba. */
 :where(.stickyHeader) th {
-  position: relative;
+  position: sticky;
+  top: 0;
   z-index: 2;
 }
 

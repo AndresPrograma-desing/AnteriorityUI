@@ -2212,7 +2212,8 @@ import TableA from 'screens/components/TableA';
 | `filterIconColor` | `string` | — | Color del ícono de embudo cuando la columna no tiene filtro activo. |
 | `filterActiveColor` | `string` | `'#10b981'` | Color del ícono de embudo cuando `col.filter.value` tiene un valor (filtro activo). |
 | `stickyFirstColumn` | `boolean` | `false` | Deja la primera columna fija a la izquierda mientras la tabla se desplaza en horizontal. Su celda necesita fondo opaco: por defecto usa `surfaceColor`; si pintás las filas con un tinte (`rowClassName`), el fondo de `td:first-child` debe seguir siendo opaco (ej. el tinte como `linear-gradient` sobre el color de superficie). |
-| `stickyHeader` | `boolean` | `false` | Mantiene visible el encabezado al scrollear la página (se desplaza con `translateY` según el scroll del ancestro scrolleable más cercano, porque `position: sticky` queda atrapado dentro del área de scroll horizontal de la tabla). |
+| `stickyHeader` | `boolean` | `false` | Encabezado siempre visible: la tabla pasa a scrollear en vertical por dentro (hasta `maxHeight`) y el `<th>` queda pegado arriba con `position: sticky`. Combina bien con `scrollFooter`, que queda siempre a la vista bajo la tabla. |
+| `maxHeight` | `string` \| `number` | `'70vh'` | Alto máximo del área de la tabla cuando `stickyHeader` está activo. |
 | `scrollFooter` | `boolean` | `false` | Muestra un pie pegado al borde inferior de la pantalla (`position: sticky`) con un botón ◀, un slider y un botón ▶ para desplazar la tabla en horizontal sin bajar hasta su final. Solo aparece si la tabla es más ancha que su contenedor y reemplaza la barra de scroll horizontal propia de la tabla. Ningún ancestro de la tabla debe tener `overflow: hidden/auto` entre ella y el scroll de la página (usar `overflow: clip` si hace falta recortar). |
 | `scrollFooterBgColor` | `string` | `surfaceColor` | Fondo del pie de desplazamiento. |
 | `scrollFooterBorderColor` | `string` | `borderColor` | Borde del pie de desplazamiento. |
@@ -2329,7 +2330,8 @@ import TableB from 'screens/components/TableB';
 | `filterIconColor` | `string` | — | Color del ícono de embudo sin filtro activo. |
 | `filterActiveColor` | `string` | `'#10b981'` | Color del ícono de embudo con filtro activo. |
 | `stickyFirstColumn` | `boolean` | `false` | Deja la primera columna fija a la izquierda al desplazar en horizontal. Su celda usa `surfaceColor` como fondo opaco (si pintás las filas con un tinte, el fondo de `td:first-child` debe seguir siendo opaco). Las celdas con colSpan (vacío, error, fila expandida) no se fijan. |
-| `stickyHeader` | `boolean` | `false` | Mantiene visible el encabezado al scrollear la página (se desplaza con `translateY` según el scroll del ancestro scrolleable más cercano, porque `position: sticky` queda atrapado dentro del área de scroll horizontal de la tabla). |
+| `stickyHeader` | `boolean` | `false` | Encabezado siempre visible: la tabla pasa a scrollear en vertical por dentro (hasta `maxHeight`) y el `<th>` queda pegado arriba con `position: sticky`. Combina bien con `scrollFooter`, que queda siempre a la vista bajo la tabla. |
+| `maxHeight` | `string` \| `number` | `'70vh'` | Alto máximo del área de la tabla cuando `stickyHeader` está activo. |
 | `scrollFooter` | `boolean` | `false` | Pie `position: sticky` al borde inferior de la pantalla con ◀, slider y ▶ para desplazar la tabla sin bajar hasta su final. Solo aparece si la tabla es más ancha que su contenedor y reemplaza la barra horizontal propia. Ningún ancestro entre la tabla y el scroll de la página debe tener `overflow: hidden/auto` (usar `overflow: clip`). |
 | `scrollFooterBgColor`, `scrollFooterBorderColor` | `string` | `surfaceColor`, `borderColor` | Fondo y borde del pie. |
 | `scrollControlsColor` | `string` | `'#7c9cff'` (slider) / color por defecto de `Button` | Color de los botones ◀ ▶ y del slider. |
