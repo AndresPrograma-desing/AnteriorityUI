@@ -12,10 +12,7 @@
   border-radius: 0 0 12px 12px;
 }
 
-.slider {
+.sliderWrap {
   flex: 0 1 320px;
   min-width: 80px;
-  height: 6px;
-  cursor: pointer;
-  accent-color: var(--tableFooter-accent, #7c9cff);
 }

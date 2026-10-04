@@ -171,6 +171,7 @@ Documentación completa de props y ejemplos de uso de los 50 componentes en **[A
 | [ScrollBar](AnteriorityUI.md#scrollbar) | Contenedor con scrollbar estilizada |
 | [Sidebar](AnteriorityUI.md#sidebar) | Barra lateral de navegación completa |
 | [Skeleton](AnteriorityUI.md#skeleton) | Placeholders de carga (shimmer) |
+| [Slider](AnteriorityUI.md#slider) | Slider horizontal controlado (input range) |
 | [SubSidebarLayout](AnteriorityUI.md#subsidebarlayout) | Layout de sub-sidebar con menú |
 | [SummaryCard](AnteriorityUI.md#summarycard) | Tarjeta de resumen con degradado |
 | [Swich](AnteriorityUI.md#swich) | Interruptor (switch) on/off |

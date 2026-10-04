@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import Button from '../Button';
+import Button from '../../../screens/components/Button';
+import Slider from '../../../screens/components/Slider';
 import styles from './index.module.css';
 
 // Fracción del ancho visible que se desplaza la tabla con cada clic.
 const SCROLL_STEP = 0.6;
 
-// Botones y slider que mueven el área de scroll horizontal de una tabla (TableA/TableB, vía scrollAreaRef). Solo se
+// Uso interno de TableA/TableB (no es un componente público): botones y slider que mueven el área de
+// scroll horizontal de la tabla vía scrollAreaRef. Solo se
 // muestra cuando la tabla es más ancha que su contenedor.
 export default function TableScrollFooter({ scrollAreaRef, controlsColor, leftLabel, rightLabel, sliderLabel }) {
   const [metrics, setMetrics] = useState({ max: 0, left: 0 });
@@ -47,16 +49,16 @@ export default function TableScrollFooter({ scrollAreaRef, controlsColor, leftLa
         disabled={metrics.left <= 1}
         onClick={() => scrollBy(-1)}
       />
-      <input
-        type="range"
-        className={styles.slider}
-        min={0}
-        max={metrics.max}
-        step={1}
-        value={Math.min(metrics.left, metrics.max)}
-        aria-label={sliderLabel}
-        onChange={(event) => { scrollAreaRef.current.scrollLeft = Number(event.target.value); }}
-      />
+      <div className={styles.sliderWrap}>
+        <Slider
+          min={0}
+          max={metrics.max}
+          value={Math.min(metrics.left, metrics.max)}
+          accentColor="var(--tableFooter-accent, #7c9cff)"
+          aria-label={sliderLabel}
+          onChange={(value) => { scrollAreaRef.current.scrollLeft = value; }}
+        />
+      </div>
       <Button
         size="small"
         variant={Button.VARIANTS.GHOST}

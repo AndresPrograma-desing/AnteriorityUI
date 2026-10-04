@@ -6,7 +6,7 @@ import Button from '../Button';
 import Loading from '../Loading/index';
 import Skeleton from '../Skeleton/index';
 import ScrollBar from '../ScrollBar';
-import TableScrollFooter from '../TableScrollFooter';
+import TableScrollFooter from '../../../common/table/TableScrollFooter';
 import { getNextFilterValue, getFilterOptionLabel } from './utils';
 
 const TableB = (props) => {

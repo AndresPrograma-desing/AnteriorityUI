@@ -4,7 +4,7 @@ import Skeleton from '../Skeleton/index';
 import { AlertCircle, Inbox, Filter as FilterIcon } from 'lucide-react';
 import Button from '../Button';
 import ScrollBar from '../ScrollBar';
-import TableScrollFooter from '../TableScrollFooter';
+import TableScrollFooter from '../../../common/table/TableScrollFooter';
 import { getNextFilterValue, getFilterOptionLabel } from './utils';
 
 const TableA = (props) => {

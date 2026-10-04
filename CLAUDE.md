@@ -12,6 +12,7 @@ Guía para trabajar en este repo. Para documentación orientada a consumidores d
 index.js              → barrel: re-exporta los ~50 componentes por nombre (import { Button } from 'anteriority-ui')
 screens/components/   → ~50 componentes de UI, uno por carpeta (index.jsx + .module.css + .stories.jsx, siempre en minúscula)
 common/
+  table/              → piezas internas compartidas por TableA/TableB (TableScrollFooter); no son componentes públicos
   styles/             → variables.css (design tokens en :root) y typography.css (fuente global + import de Google Fonts)
   theme/muiTheme.js   → theme de MUI compartido (fontFamily: var(--font-sans))
   api/client.js       → cliente HTTP genérico (fetch wrapper), sin lógica de negocio ni endpoints hardcodeados

@@ -4,7 +4,7 @@ Registro de actualizaciones relevantes hechas sobre componentes existentes de la
 
 ## TableA / TableB — primera columna fija y pie de desplazamiento horizontal
 
-**Componentes afectados:** `TableA`, `TableB`, `ScrollBar`, `TableScrollFooter` (nuevo, compartido).
+**Componentes afectados:** `TableA`, `TableB`, `ScrollBar`, `Slider` (nuevo) y el pie interno `common/table/TableScrollFooter` (no es un componente público).
 
 **Qué cambió:**
 
@@ -15,7 +15,7 @@ Registro de actualizaciones relevantes hechas sobre componentes existentes de la
 
 **Por qué:** tablas anchas y altas obligaban a bajar hasta el pie para mover la barra horizontal, y la primera columna (el identificador de la fila) se perdía al desplazar.
 
-**Archivos tocados:** `screens/components/TableScrollFooter/` (nuevo: pie compartido), `screens/components/TableA/` y `screens/components/TableB/` (`index.jsx`, `index.module.css`, stories); `screens/components/ScrollBar/index.jsx`; `AnteriorityUI.md`.
+**Archivos tocados:** `screens/components/Slider/` (nuevo), `common/table/TableScrollFooter/` (nuevo: pie interno compartido por ambas tablas), `screens/components/TableA/` y `screens/components/TableB/` (`index.jsx`, `index.module.css`, stories); `screens/components/ScrollBar/index.jsx`; `AnteriorityUI.md`.
 
 **Compatibilidad:** cambio aditivo; las props nuevas son opcionales y desactivadas por defecto.
 

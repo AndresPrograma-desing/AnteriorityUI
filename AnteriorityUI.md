@@ -2064,6 +2064,40 @@ import Skeleton from 'screens/components/Skeleton/index';
 
 ---
 
+### Slider
+
+Slider horizontal controlado, basado en un `<input type="range">` nativo, con color de acento configurable. Es el que usa el pie de desplazamiento de `TableA`/`TableB`.
+
+**Import:**
+```jsx
+import Slider from 'screens/components/Slider/index';
+// también disponible como export nombrado: import { Slider } from 'screens/components/Slider/index';
+```
+
+**Uso básico:**
+```jsx
+const [value, setValue] = useState(30);
+
+<Slider value={value} onChange={setValue} aria-label="Volumen" />
+```
+
+**Props:**
+
+| Prop | Tipo | Default | Descripción |
+|---|---|---|---|
+| `value` | `number` | `0` | Valor actual (controlado). |
+| `min` | `number` | `0` | Valor mínimo. |
+| `max` | `number` | `100` | Valor máximo. |
+| `step` | `number` | `1` | Incremento. |
+| `onChange` | `function(value: number)` | — | Se llama con el nuevo valor ya convertido a número. |
+| `disabled` | `boolean` | `false` | Deshabilita el slider. |
+| `accentColor` | `string` | `'#7c9cff'` | Color de acento (barra rellena y thumb). |
+| `className` | `string` | `''` | Clase adicional. |
+| `style` | `object` | — | Estilos inline. |
+| `aria-label` | `string` | — | Texto accesible del slider. |
+
+---
+
 ### SubSidebarLayout
 
 Layout de dos columnas: un sub-menú lateral con botones tipo pestaña y un área de contenido a la derecha.
