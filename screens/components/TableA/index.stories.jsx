@@ -132,6 +132,7 @@ export const StickyFirstColumnWithScrollFooter = {
     data: wideData,
     keyExtractor: (row) => row.id,
     stickyFirstColumn: true,
+    stickyHeader: true,
     scrollFooter: true,
   },
 };

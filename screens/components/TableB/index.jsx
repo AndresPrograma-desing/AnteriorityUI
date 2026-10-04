@@ -7,6 +7,7 @@ import Loading from '../Loading/index';
 import Skeleton from '../Skeleton/index';
 import ScrollBar from '../ScrollBar';
 import TableScrollFooter from '../TableScrollFooter';
+import useStickyHeader from '../TableScrollFooter/useStickyHeader';
 import { getNextFilterValue, getFilterOptionLabel } from './utils';
 
 const TableB = (props) => {
@@ -34,6 +35,7 @@ const TableB = (props) => {
     filterIconColor,
     filterActiveColor = '#10b981',
     stickyFirstColumn = false,
+    stickyHeader = false,
     scrollFooter = false,
     scrollFooterBgColor,
     scrollFooterBorderColor,
@@ -44,6 +46,7 @@ const TableB = (props) => {
   } = props;
   const [expandedKeys, setExpandedKeys] = useState({});
   const scrollAreaRef = useRef(null);
+  useStickyHeader(scrollAreaRef, stickyHeader);
 
   const handleCycleFilter = (filter) => {
     if (!filter || !Array.isArray(filter.options) || filter.options.length === 0) return;
@@ -84,7 +87,7 @@ const TableB = (props) => {
     return '';
   };
 
-  const containerClassName = `${styles.tableContainer} ${stickyFirstColumn ? styles.stickyFirstColumn : ''}`;
+  const containerClassName = `${styles.tableContainer} ${stickyFirstColumn ? styles.stickyFirstColumn : ''} ${stickyHeader ? styles.stickyHeader : ''} ${scrollFooter ? styles.withFooter : ''}`;
 
   const table = (
     <ScrollBar

@@ -125,6 +125,7 @@ export const StickyFirstColumnWithScrollFooter = {
     columns: wideColumns,
     data: wideData,
     stickyFirstColumn: true,
+    stickyHeader: true,
     scrollFooter: true,
   },
 };

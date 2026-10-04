@@ -108,6 +108,12 @@
   width: 100%;
 }
 
+/* Encabezado fijo: useStickyHeader lo desplaza con translateY; necesita quedar sobre las celdas. */
+:where(.stickyHeader) th {
+  position: relative;
+  z-index: 2;
+}
+
 /* Primera columna fija a la izquierda al desplazar. :where() deja especificidad 0 para que el
    consumidor pueda pintar su propio fondo (debe seguir siendo opaco). Las celdas con colSpan
    (estados vacío/error) no se fijan. */
@@ -125,4 +131,11 @@
   z-index: 1;
   background-color: var(--tableA-surface, white);
   box-shadow: 2px 0 4px rgba(0, 0, 0, 0.12);
+}
+
+/* Con pie de desplazamiento la tabla se une a él: sin borde ni radio inferior para no duplicar la línea ni dejar hueco. */
+.withFooter {
+  border-bottom: 0;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
 }

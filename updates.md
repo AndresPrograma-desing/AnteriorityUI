@@ -9,6 +9,7 @@ Registro de actualizaciones relevantes hechas sobre componentes existentes de la
 **Qué cambió:**
 
 - `TableA` y `TableB` suman `stickyFirstColumn`: la primera columna queda fija a la izquierda al desplazar la tabla en horizontal.
+- `TableA` y `TableB` suman `stickyHeader`: el encabezado se mantiene visible al scrollear la página (hook compartido `useStickyHeader`).
 - `TableA` y `TableB` suman `scrollFooter`: pie `position: sticky` al borde inferior de la pantalla con botones ◀ / ▶ y un slider sincronizado con el scroll. Solo aparece si la tabla es más ancha que su contenedor y reemplaza la barra horizontal propia. Colores configurables: `scrollFooterBgColor`, `scrollFooterBorderColor`, `scrollControlsColor`. Textos configurables: `scrollLeftLabel`, `scrollRightLabel`, `scrollSliderLabel`.
 - `ScrollBar` suma `hideHorizontalTrack` y `scrollAreaRef` (acceso al elemento scrolleable).
 

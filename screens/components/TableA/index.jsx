@@ -5,6 +5,7 @@ import { AlertCircle, Inbox, Filter as FilterIcon } from 'lucide-react';
 import Button from '../Button';
 import ScrollBar from '../ScrollBar';
 import TableScrollFooter from '../TableScrollFooter';
+import useStickyHeader from '../TableScrollFooter/useStickyHeader';
 import { getNextFilterValue, getFilterOptionLabel } from './utils';
 
 const TableA = (props) => {
@@ -31,6 +32,7 @@ const TableA = (props) => {
     filterIconColor,
     filterActiveColor = '#10b981',
     stickyFirstColumn = false,
+    stickyHeader = false,
     scrollFooter = false,
     scrollFooterBgColor,
     scrollFooterBorderColor,
@@ -55,13 +57,14 @@ const TableA = (props) => {
   };
 
   const scrollAreaRef = useRef(null);
+  useStickyHeader(scrollAreaRef, stickyHeader);
 
   const handleCycleFilter = (filter) => {
     if (!filter || !Array.isArray(filter.options) || filter.options.length === 0) return;
     filter.onChange?.(getNextFilterValue(filter.options, filter.value));
   };
 
-  const wrapperClassName = `${styles.tableWrapper} ${stickyFirstColumn ? styles.stickyFirstColumn : ''}`;
+  const wrapperClassName = `${styles.tableWrapper} ${stickyFirstColumn ? styles.stickyFirstColumn : ''} ${stickyHeader ? styles.stickyHeader : ''} ${scrollFooter ? styles.withFooter : ''}`;
 
   const table = (
     <ScrollBar
