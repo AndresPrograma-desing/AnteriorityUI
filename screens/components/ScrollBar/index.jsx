@@ -8,6 +8,8 @@ export default function ScrollBar({
   horizontal = true,
   autoHide = true,
   maxHeight,
+  hideHorizontalTrack = false,
+  scrollAreaRef,
   className = '',
   contentClassName = '',
   style
@@ -26,7 +28,11 @@ export default function ScrollBar({
       onMouseLeave={handleMouseLeave}
     >
       <div
-        ref={scrollRef}
+        ref={(node) => {
+          scrollRef.current = node;
+          if (typeof scrollAreaRef === 'function') scrollAreaRef(node);
+          else if (scrollAreaRef) scrollAreaRef.current = node;
+        }}
         className={`${styles.scrollArea} ${contentClassName}`}
         style={{
           overflowY: vertical ? 'auto' : 'hidden',
@@ -48,7 +54,7 @@ export default function ScrollBar({
         </div>
       )}
 
-      {horizontal && thumb.h.size > 0 && (
+      {horizontal && !hideHorizontalTrack && thumb.h.size > 0 && (
         <div className={`${styles.trackHorizontal} ${visible ? styles.trackVisible : ''}`}>
           <div
             className={styles.thumbHorizontal}

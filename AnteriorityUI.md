@@ -1950,6 +1950,8 @@ import ScrollBar from 'screens/components/ScrollBar';
 | `horizontal` | `boolean` | `true` | Habilita scroll/thumb horizontal. |
 | `autoHide` | `boolean` | `true` | Si es `false`, los thumbs permanecen siempre visibles. |
 | `maxHeight` | `string` \| `number` | — | Altura máxima del área scrolleable. |
+| `hideHorizontalTrack` | `boolean` | `false` | Oculta el thumb/track horizontal propio (el scroll sigue funcionando). Lo usa `TableA` cuando muestra su pie de desplazamiento. |
+| `scrollAreaRef` | `ref` \| `function` | — | Recibe el elemento del área de scroll interna, para poder leer o mover `scrollLeft`/`scrollTop` desde afuera. |
 | `className` | `string` | `''` | Clase adicional para el contenedor raíz. |
 | `contentClassName` | `string` | `''` | Clase adicional para el área de scroll interna. |
 | `style` | `object` | — | Estilos inline para el contenedor raíz. |
@@ -2209,6 +2211,12 @@ import TableA from 'screens/components/TableA';
 | `surfaceColor`, `headerColor`, `textColor`, `headingColor`, `mutedTextColor`, `borderColor`, `hoverColor`, `rowBorderColor` | `string` | — | Overrides de tema vía variables CSS `--tableA-*`. |
 | `filterIconColor` | `string` | — | Color del ícono de embudo cuando la columna no tiene filtro activo. |
 | `filterActiveColor` | `string` | `'#10b981'` | Color del ícono de embudo cuando `col.filter.value` tiene un valor (filtro activo). |
+| `stickyFirstColumn` | `boolean` | `false` | Deja la primera columna fija a la izquierda mientras la tabla se desplaza en horizontal. Su celda necesita fondo opaco: por defecto usa `surfaceColor`; si pintás las filas con un tinte (`rowClassName`), el fondo de `td:first-child` debe seguir siendo opaco (ej. el tinte como `linear-gradient` sobre el color de superficie). |
+| `scrollFooter` | `boolean` | `false` | Muestra un pie pegado al borde inferior de la pantalla (`position: sticky`) con un botón ◀, un slider y un botón ▶ para desplazar la tabla en horizontal sin bajar hasta su final. Solo aparece si la tabla es más ancha que su contenedor y reemplaza la barra de scroll horizontal propia de la tabla. Ningún ancestro de la tabla debe tener `overflow: hidden/auto` entre ella y el scroll de la página (usar `overflow: clip` si hace falta recortar). |
+| `scrollFooterBgColor` | `string` | `surfaceColor` | Fondo del pie de desplazamiento. |
+| `scrollFooterBorderColor` | `string` | `borderColor` | Borde del pie de desplazamiento. |
+| `scrollControlsColor` | `string` | `'#7c9cff'` (slider) / color por defecto de `Button` | Color de los botones ◀ ▶ y del slider del pie. |
+| `scrollLeftLabel`, `scrollRightLabel`, `scrollSliderLabel` | `string` | `'Desplazar tabla a la izquierda'`, `'Desplazar tabla a la derecha'`, `'Posición horizontal de la tabla'` | Textos (tooltips / `aria-label`) del pie de desplazamiento. |
 
 **Filtro por columna (`col.filter`):**
 
@@ -2233,6 +2241,15 @@ La tabla **no filtra `data` por sí misma** — solo maneja el ciclo de valores 
   keyExtractor={(row) => row.id}
   error="No se pudieron cargar los datos."
   onRetry={() => console.log('retry clicked')}
+/>
+
+// Tabla ancha: primera columna fija + pie de desplazamiento horizontal
+<TableA
+  columns={wideColumns}
+  data={rows}
+  keyExtractor={(row) => row.id}
+  stickyFirstColumn
+  scrollFooter
 />
 
 // Con filtro por columna

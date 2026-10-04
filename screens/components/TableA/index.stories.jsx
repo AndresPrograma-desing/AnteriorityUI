@@ -114,3 +114,24 @@ export const WithColumnFilter = {
     );
   },
 };
+
+const wideColumns = [
+  { header: 'Nombre', accessor: 'name', width: 220 },
+  ...Array.from({ length: 12 }, (_, i) => ({ header: `Columna ${i + 1}`, accessor: `c${i}`, width: 140 })),
+];
+
+const wideData = Array.from({ length: 30 }, (_, row) => ({
+  id: row,
+  name: `Fila ${row + 1}`,
+  ...Object.fromEntries(Array.from({ length: 12 }, (_, i) => [`c${i}`, row * 12 + i])),
+}));
+
+export const StickyFirstColumnWithScrollFooter = {
+  args: {
+    columns: wideColumns,
+    data: wideData,
+    keyExtractor: (row) => row.id,
+    stickyFirstColumn: true,
+    scrollFooter: true,
+  },
+};

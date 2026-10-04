@@ -103,3 +103,48 @@
   color: var(--SW-red);
   font-weight: 500;
 }
+
+.root {
+  width: 100%;
+}
+
+/* Primera columna fija a la izquierda al desplazar. :where() deja especificidad 0 para que el
+   consumidor pueda pintar su propio fondo (debe seguir siendo opaco). */
+:where(.stickyFirstColumn) th:first-child,
+:where(.stickyFirstColumn) td:first-child {
+  position: sticky;
+  left: 0;
+}
+
+:where(.stickyFirstColumn) th:first-child {
+  z-index: 2;
+}
+
+:where(.stickyFirstColumn) td:first-child {
+  z-index: 1;
+  background-color: var(--tableA-surface, white);
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.12);
+}
+
+/* Pie pegado al borde inferior de la pantalla con los controles de desplazamiento horizontal. */
+.scrollFooter {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background: var(--tableA-footer-bg, var(--tableA-surface, white));
+  border: 1px solid var(--tableA-footer-border, var(--tableA-border, #e2e8f0));
+  border-radius: 0 0 12px 12px;
+}
+
+.scrollSlider {
+  flex: 0 1 320px;
+  min-width: 80px;
+  height: 6px;
+  cursor: pointer;
+  accent-color: var(--tableA-scroll-accent, #7c9cff);
+}

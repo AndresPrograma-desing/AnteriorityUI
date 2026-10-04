@@ -2,6 +2,22 @@
 
 Registro de actualizaciones relevantes hechas sobre componentes existentes de la librería (no reemplaza los changelogs de npm/tags, es un resumen legible para quien mantiene el repo).
 
+## TableA — primera columna fija y pie de desplazamiento horizontal
+
+**Componentes afectados:** `TableA`, `ScrollBar`.
+
+**Qué cambió:**
+
+- `TableA` suma `stickyFirstColumn`: la primera columna queda fija a la izquierda al desplazar la tabla en horizontal.
+- `TableA` suma `scrollFooter`: pie `position: sticky` al borde inferior de la pantalla con botones ◀ / ▶ y un slider sincronizado con el scroll. Solo aparece si la tabla es más ancha que su contenedor y reemplaza la barra horizontal propia. Colores configurables: `scrollFooterBgColor`, `scrollFooterBorderColor`, `scrollControlsColor`. Textos configurables: `scrollLeftLabel`, `scrollRightLabel`, `scrollSliderLabel`.
+- `ScrollBar` suma `hideHorizontalTrack` y `scrollAreaRef` (acceso al elemento scrolleable).
+
+**Por qué:** tablas anchas y altas obligaban a bajar hasta el pie para mover la barra horizontal, y la primera columna (el identificador de la fila) se perdía al desplazar.
+
+**Archivos tocados:** `screens/components/TableA/index.jsx`, `TableScrollFooter.jsx` (nuevo), `index.module.css`, `index.stories.jsx`; `screens/components/ScrollBar/index.jsx`; `AnteriorityUI.md`.
+
+**Compatibilidad:** cambio aditivo; las props nuevas son opcionales y desactivadas por defecto.
+
 ## MarkdownContent / MarkdownEditor — copiado rápido de código y títulos
 
 **Componentes afectados:** `MarkdownContent`, `MarkdownEditor`.
