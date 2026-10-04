@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import styles from './index.module.css';
 import Skeleton from '../Skeleton/index';
 import { AlertCircle, Inbox, Filter as FilterIcon } from 'lucide-react';
 import Button from '../Button';
 import ScrollBar from '../ScrollBar';
+import TableScrollFooter from '../../../common/table/TableScrollFooter';
 import { getNextFilterValue, getFilterOptionLabel } from './utils';
 
 const TableA = (props) => {
@@ -28,7 +29,17 @@ const TableA = (props) => {
     rowBorderColor,
     onRowClick,
     filterIconColor,
-    filterActiveColor = '#10b981'
+    filterActiveColor = '#10b981',
+    stickyFirstColumn = false,
+    stickyHeader = false,
+    maxHeight = '70vh',
+    scrollFooter = false,
+    scrollFooterBgColor,
+    scrollFooterBorderColor,
+    scrollControlsColor,
+    scrollLeftLabel = 'Desplazar tabla a la izquierda',
+    scrollRightLabel = 'Desplazar tabla a la derecha',
+    scrollSliderLabel = 'Posición horizontal de la tabla'
   } = props;
 
   const themeVars = {
@@ -39,16 +50,32 @@ const TableA = (props) => {
     '--tableA-muted-text': mutedTextColor,
     '--tableA-border': borderColor,
     '--tableA-hover': hoverColor,
-    '--tableA-row-border': rowBorderColor
+    '--tableA-row-border': rowBorderColor,
+    '--tableFooter-bg': scrollFooterBgColor ?? surfaceColor,
+    '--tableFooter-border': scrollFooterBorderColor ?? borderColor,
+    '--tableFooter-accent': scrollControlsColor
   };
+
+  const scrollAreaRef = useRef(null);
 
   const handleCycleFilter = (filter) => {
     if (!filter || !Array.isArray(filter.options) || filter.options.length === 0) return;
     filter.onChange?.(getNextFilterValue(filter.options, filter.value));
   };
 
-  return (
-    <ScrollBar horizontal vertical={false} className={styles.tableWrapper} style={themeVars}>
+  const wrapperClassName = `${styles.tableWrapper} ${stickyFirstColumn ? styles.stickyFirstColumn : ''} ${stickyHeader ? styles.stickyHeader : ''} ${scrollFooter ? styles.withFooter : ''}`;
+
+  const table = (
+    <ScrollBar
+      horizontal
+      vertical={stickyHeader}
+      hideVerticalTrack
+      maxHeight={stickyHeader ? maxHeight : undefined}
+      scrollAreaRef={scrollAreaRef}
+      hideHorizontalTrack={scrollFooter}
+      className={wrapperClassName}
+      style={themeVars}
+    >
       <table className={styles.table}>
         <thead>
           <tr>
@@ -150,6 +177,21 @@ const TableA = (props) => {
         </tbody>
       </table>
     </ScrollBar>
+  );
+
+  if (!scrollFooter) return table;
+
+  return (
+    <div className={styles.root} style={themeVars}>
+      {table}
+      <TableScrollFooter
+        scrollAreaRef={scrollAreaRef}
+        controlsColor={scrollControlsColor}
+        leftLabel={scrollLeftLabel}
+        rightLabel={scrollRightLabel}
+        sliderLabel={scrollSliderLabel}
+      />
+    </div>
   );
 };
 

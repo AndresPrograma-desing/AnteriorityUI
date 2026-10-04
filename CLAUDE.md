@@ -12,6 +12,7 @@ Guía para trabajar en este repo. Para documentación orientada a consumidores d
 index.js              → barrel: re-exporta los ~50 componentes por nombre (import { Button } from 'anteriority-ui')
 screens/components/   → ~50 componentes de UI, uno por carpeta (index.jsx + .module.css + .stories.jsx, siempre en minúscula)
 common/
+  table/              → piezas internas compartidas por TableA/TableB (TableScrollFooter); no son componentes públicos
   styles/             → variables.css (design tokens en :root) y typography.css (fuente global + import de Google Fonts)
   theme/muiTheme.js   → theme de MUI compartido (fontFamily: var(--font-sans))
   api/client.js       → cliente HTTP genérico (fetch wrapper), sin lógica de negocio ni endpoints hardcodeados
@@ -40,6 +41,10 @@ La mayoría de los componentes con color propio (fondo, texto, ícono, borde) ex
 - Si el color ya estaba inline en JSX (`style`, `sx`, `color=` de MUI), se reemplaza el literal por la prop con ese mismo valor como default de parámetro.
 - **Los componentes con sistema `variant`/`type` (Barnner, DesplegablePanel, Notification/Error, TableB) mantienen su variant tal cual** — las props de color nuevas son un override opcional por encima de la paleta que resolvería el variant.
 - Nombres reutilizados a propósito para consistencia entre componentes: `bgColor`, `textColor`, `iconColor`, `borderColor`, `accentColor`.
+
+## Convención: valores fijos en `constants.js`
+
+Cuando un componente tiene valores fijos que no son props (colores por defecto, tamaños, grosores, pasos, listas de opciones, etc.), se definen en un `constants.js` dentro de la carpeta del componente (`screens/components/<Name>/constants.js`) con `export const` en MAYÚSCULAS, y el `index.jsx` los importa (`import { DEFAULT_ACCENT } from './constants.js'`). No dejar esos literales sueltos dentro del `index.jsx`. Ejemplo: `screens/components/Slider/constants.js` (`DEFAULT_ACCENT`, `DEFAULT_THICKNESS`). Ya siguen esta convención `CalendarPicker`, `ColorPicker`, `CountdownBar`, `DesplegablePanel`, `HoursPicker`, `Sidebar` y `Swich`.
 
 ## Tipografía y theme
 

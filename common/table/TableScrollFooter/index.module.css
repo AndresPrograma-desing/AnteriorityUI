@@ -1,0 +1,18 @@
+.footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background: var(--tableFooter-bg, white);
+  border: 1px solid var(--tableFooter-border, #e2e8f0);
+  border-radius: 0 0 12px 12px;
+}
+
+.sliderWrap {
+  flex: 0 1 320px;
+  min-width: 80px;
+}

@@ -1950,6 +1950,9 @@ import ScrollBar from 'screens/components/ScrollBar';
 | `horizontal` | `boolean` | `true` | Habilita scroll/thumb horizontal. |
 | `autoHide` | `boolean` | `true` | Si es `false`, los thumbs permanecen siempre visibles. |
 | `maxHeight` | `string` \| `number` | — | Altura máxima del área scrolleable. |
+| `hideHorizontalTrack` | `boolean` | `false` | Oculta el thumb/track horizontal propio (el scroll sigue funcionando). Lo usa `TableA` cuando muestra su pie de desplazamiento. |
+| `hideVerticalTrack` | `boolean` | `false` | Oculta el thumb/track vertical propio (el scroll sigue funcionando). Lo usa `TableA`/`TableB` con `stickyHeader`. |
+| `scrollAreaRef` | `ref` \| `function` | — | Recibe el elemento del área de scroll interna, para poder leer o mover `scrollLeft`/`scrollTop` desde afuera. |
 | `className` | `string` | `''` | Clase adicional para el contenedor raíz. |
 | `contentClassName` | `string` | `''` | Clase adicional para el área de scroll interna. |
 | `style` | `object` | — | Estilos inline para el contenedor raíz. |
@@ -2059,6 +2062,42 @@ import Skeleton from 'screens/components/Skeleton/index';
   <Skeleton width="60%" height="12px" />
 </div>
 ```
+
+---
+
+### Slider
+
+Slider horizontal controlado, basado en el `Slider` de MUI, con color de acento configurable y tooltip opcional con el porcentaje. Es el que usa el pie de desplazamiento de `TableA`/`TableB`.
+
+**Import:**
+```jsx
+import Slider from 'screens/components/Slider/index';
+// también disponible como export nombrado: import { Slider } from 'screens/components/Slider/index';
+```
+
+**Uso básico:**
+```jsx
+const [value, setValue] = useState(30);
+
+<Slider value={value} onChange={setValue} showPercentage aria-label="Volumen" />
+```
+
+**Props:**
+
+| Prop | Tipo | Default | Descripción |
+|---|---|---|---|
+| `value` | `number` | `0` | Valor actual (controlado). |
+| `min` | `number` | `0` | Valor mínimo. |
+| `max` | `number` | `100` | Valor máximo. |
+| `step` | `number` | `1` | Incremento. |
+| `onChange` | `function(value: number)` | — | Se llama con el nuevo valor ya convertido a número. |
+| `disabled` | `boolean` | `false` | Deshabilita el slider. |
+| `showPercentage` | `boolean` | `false` | Muestra en el tooltip del thumb el porcentaje del recorrido (`(value - min) / (max - min)`), al arrastrar o pasar el mouse. |
+| `accentColor` | `string` | `'#7c9cff'` | Color de acento (barra rellena y thumb). |
+| `thickness` | `number` | `8` | Grosor de la línea en px (el thumb crece en proporción). |
+| `className` | `string` | `''` | Clase adicional. |
+| `style` | `object` | — | Estilos inline. |
+| `aria-label` | `string` | — | Texto accesible del slider. |
 
 ---
 
@@ -2209,6 +2248,14 @@ import TableA from 'screens/components/TableA';
 | `surfaceColor`, `headerColor`, `textColor`, `headingColor`, `mutedTextColor`, `borderColor`, `hoverColor`, `rowBorderColor` | `string` | — | Overrides de tema vía variables CSS `--tableA-*`. |
 | `filterIconColor` | `string` | — | Color del ícono de embudo cuando la columna no tiene filtro activo. |
 | `filterActiveColor` | `string` | `'#10b981'` | Color del ícono de embudo cuando `col.filter.value` tiene un valor (filtro activo). |
+| `stickyFirstColumn` | `boolean` | `false` | Deja la primera columna fija a la izquierda mientras la tabla se desplaza en horizontal. Su celda necesita fondo opaco: por defecto usa `surfaceColor`; si pintás las filas con un tinte (`rowClassName`), el fondo de `td:first-child` debe seguir siendo opaco (ej. el tinte como `linear-gradient` sobre el color de superficie). |
+| `stickyHeader` | `boolean` | `false` | Encabezado siempre visible: la tabla pasa a scrollear en vertical por dentro (hasta `maxHeight`, sin barra vertical visible) y el `<th>` queda pegado arriba con `position: sticky`. Combina bien con `scrollFooter`, que queda siempre a la vista bajo la tabla. |
+| `maxHeight` | `string` \| `number` | `'70vh'` | Alto máximo del área de la tabla cuando `stickyHeader` está activo. |
+| `scrollFooter` | `boolean` | `false` | Muestra un pie pegado al borde inferior de la pantalla (`position: sticky`) con un botón ◀, un slider y un botón ▶ para desplazar la tabla en horizontal sin bajar hasta su final. Solo aparece si la tabla es más ancha que su contenedor y reemplaza la barra de scroll horizontal propia de la tabla. Ningún ancestro de la tabla debe tener `overflow: hidden/auto` entre ella y el scroll de la página (usar `overflow: clip` si hace falta recortar). |
+| `scrollFooterBgColor` | `string` | `surfaceColor` | Fondo del pie de desplazamiento. |
+| `scrollFooterBorderColor` | `string` | `borderColor` | Borde del pie de desplazamiento. |
+| `scrollControlsColor` | `string` | `'#7c9cff'` (slider) / color por defecto de `Button` | Color de los botones ◀ ▶ y del slider del pie. |
+| `scrollLeftLabel`, `scrollRightLabel`, `scrollSliderLabel` | `string` | `'Desplazar tabla a la izquierda'`, `'Desplazar tabla a la derecha'`, `'Posición horizontal de la tabla'` | Textos (tooltips / `aria-label`) del pie de desplazamiento. |
 
 **Filtro por columna (`col.filter`):**
 
@@ -2233,6 +2280,15 @@ La tabla **no filtra `data` por sí misma** — solo maneja el ciclo de valores 
   keyExtractor={(row) => row.id}
   error="No se pudieron cargar los datos."
   onRetry={() => console.log('retry clicked')}
+/>
+
+// Tabla ancha: primera columna fija + pie de desplazamiento horizontal
+<TableA
+  columns={wideColumns}
+  data={rows}
+  keyExtractor={(row) => row.id}
+  stickyFirstColumn
+  scrollFooter
 />
 
 // Con filtro por columna
@@ -2310,6 +2366,13 @@ import TableB from 'screens/components/TableB';
 | `badgeColors` | `{ success?, warning?, danger?: { bg, color } }` | — | Overrides de color para columnas tipo badge. |
 | `filterIconColor` | `string` | — | Color del ícono de embudo sin filtro activo. |
 | `filterActiveColor` | `string` | `'#10b981'` | Color del ícono de embudo con filtro activo. |
+| `stickyFirstColumn` | `boolean` | `false` | Deja la primera columna fija a la izquierda al desplazar en horizontal. Su celda usa `surfaceColor` como fondo opaco (si pintás las filas con un tinte, el fondo de `td:first-child` debe seguir siendo opaco). Las celdas con colSpan (vacío, error, fila expandida) no se fijan. |
+| `stickyHeader` | `boolean` | `false` | Encabezado siempre visible: la tabla pasa a scrollear en vertical por dentro (hasta `maxHeight`, sin barra vertical visible) y el `<th>` queda pegado arriba con `position: sticky`. Combina bien con `scrollFooter`, que queda siempre a la vista bajo la tabla. |
+| `maxHeight` | `string` \| `number` | `'70vh'` | Alto máximo del área de la tabla cuando `stickyHeader` está activo. |
+| `scrollFooter` | `boolean` | `false` | Pie `position: sticky` al borde inferior de la pantalla con ◀, slider y ▶ para desplazar la tabla sin bajar hasta su final. Solo aparece si la tabla es más ancha que su contenedor y reemplaza la barra horizontal propia. Ningún ancestro entre la tabla y el scroll de la página debe tener `overflow: hidden/auto` (usar `overflow: clip`). |
+| `scrollFooterBgColor`, `scrollFooterBorderColor` | `string` | `surfaceColor`, `borderColor` | Fondo y borde del pie. |
+| `scrollControlsColor` | `string` | `'#7c9cff'` (slider) / color por defecto de `Button` | Color de los botones ◀ ▶ y del slider. |
+| `scrollLeftLabel`, `scrollRightLabel`, `scrollSliderLabel` | `string` | `'Desplazar tabla a la izquierda'`, `'Desplazar tabla a la derecha'`, `'Posición horizontal de la tabla'` | Textos (tooltips / `aria-label`) del pie. |
 
 **Filtro por columna (`col.filter`):** misma API que en `TableA` — ver esa sección para el detalle de `options`/`value`/`onChange`/`tooltip`. La tabla solo cicla el valor y muestra el ícono; el filtrado real de `data` lo hace el consumidor.
 

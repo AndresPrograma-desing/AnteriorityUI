@@ -49,6 +49,7 @@ export { default as ProfileAvatar } from './screens/components/Profile/Avatar/in
 export { default as ScrollBar } from './screens/components/ScrollBar/index.js';
 export { default as Sidebar } from './screens/components/Sidebar/index.js';
 export { default as Skeleton } from './screens/components/Skeleton/index.js';
+export { default as Slider } from './screens/components/Slider/index.js';
 export { default as SubSidebarLayout } from './screens/components/SubSidebarLayout/index.js';
 export { default as SummaryCard } from './screens/components/SummaryCard/index.js';
 export { default as Swich } from './screens/components/Swich/index.js';

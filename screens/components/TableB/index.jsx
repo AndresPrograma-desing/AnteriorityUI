@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import styles from './index.module.css';
 import { Inbox, ChevronDown, ChevronUp, Filter as FilterIcon } from 'lucide-react';
 import Barnner from '../Barnner';
@@ -6,6 +6,7 @@ import Button from '../Button';
 import Loading from '../Loading/index';
 import Skeleton from '../Skeleton/index';
 import ScrollBar from '../ScrollBar';
+import TableScrollFooter from '../../../common/table/TableScrollFooter';
 import { getNextFilterValue, getFilterOptionLabel } from './utils';
 
 const TableB = (props) => {
@@ -31,9 +32,20 @@ const TableB = (props) => {
     rowBorderColor,
     badgeColors,
     filterIconColor,
-    filterActiveColor = '#10b981'
+    filterActiveColor = '#10b981',
+    stickyFirstColumn = false,
+    stickyHeader = false,
+    maxHeight = '70vh',
+    scrollFooter = false,
+    scrollFooterBgColor,
+    scrollFooterBorderColor,
+    scrollControlsColor,
+    scrollLeftLabel = 'Desplazar tabla a la izquierda',
+    scrollRightLabel = 'Desplazar tabla a la derecha',
+    scrollSliderLabel = 'Posición horizontal de la tabla'
   } = props;
   const [expandedKeys, setExpandedKeys] = useState({});
+  const scrollAreaRef = useRef(null);
 
   const handleCycleFilter = (filter) => {
     if (!filter || !Array.isArray(filter.options) || filter.options.length === 0) return;
@@ -62,6 +74,9 @@ const TableB = (props) => {
     '--tableB-badge-warning-color': badgeColors?.warning?.color,
     '--tableB-badge-danger-bg': badgeColors?.danger?.bg,
     '--tableB-badge-danger-color': badgeColors?.danger?.color,
+    '--tableFooter-bg': scrollFooterBgColor ?? surfaceColor,
+    '--tableFooter-border': scrollFooterBorderColor ?? borderColor,
+    '--tableFooter-accent': scrollControlsColor,
   };
 
   const getBadgeOverrideClass = (badgeTypeValue) => {
@@ -71,8 +86,19 @@ const TableB = (props) => {
     return '';
   };
 
-  return (
-    <ScrollBar horizontal vertical={false} className={styles.tableContainer} style={themeVars}>
+  const containerClassName = `${styles.tableContainer} ${stickyFirstColumn ? styles.stickyFirstColumn : ''} ${stickyHeader ? styles.stickyHeader : ''} ${scrollFooter ? styles.withFooter : ''}`;
+
+  const table = (
+    <ScrollBar
+      horizontal
+      vertical={stickyHeader}
+      hideVerticalTrack
+      maxHeight={stickyHeader ? maxHeight : undefined}
+      scrollAreaRef={scrollAreaRef}
+      hideHorizontalTrack={scrollFooter}
+      className={containerClassName}
+      style={themeVars}
+    >
       <table className={styles.modernTable}>
         <thead>
           <tr>
@@ -216,6 +242,21 @@ const TableB = (props) => {
         </tbody>
       </table>
     </ScrollBar>
+  );
+
+  if (!scrollFooter) return table;
+
+  return (
+    <div className={styles.root} style={themeVars}>
+      {table}
+      <TableScrollFooter
+        scrollAreaRef={scrollAreaRef}
+        controlsColor={scrollControlsColor}
+        leftLabel={scrollLeftLabel}
+        rightLabel={scrollRightLabel}
+        sliderLabel={scrollSliderLabel}
+      />
+    </div>
   );
 };
 
