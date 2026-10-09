@@ -6,7 +6,7 @@
 }
 
 .hoursFrame {
-  width: 340px !important;
+  width: 320px !important;
   padding: 1.25rem !important;
   border-radius: 16px !important;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
@@ -28,37 +28,150 @@
   color: #0f172a;
 }
 
-.timeDisplaySection {
+/* Tabs Inicio / Fin (modo rango) */
+.boundaryTabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.boundaryTab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 0.5rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  background: #ffffff;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.boundaryTab:hover {
+  background-color: #f8fafc;
+}
+
+.boundaryTabActive {
+  background-color: #f8fafc;
+}
+
+.boundaryTabLabel {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.boundaryTabValue {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+/* Preview grande de la hora activa */
+.timePreview {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.4rem;
+  font-size: 2.1rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 0.75rem;
+}
+
+.timePreviewPeriod {
+  font-size: 1rem;
+  font-weight: 700;
+  opacity: 0.7;
+}
+
+/* Columnas de selección (hora / minuto) y AM-PM */
+.wheelsRow {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.75rem;
-  padding: 0.75rem;
+  gap: 0.6rem;
+  padding: 0.5rem;
   background-color: #f8fafc;
   border-radius: 12px;
   border: 1px solid #e2e8f0;
   margin-bottom: 1rem;
 }
 
-.timeColumn {
+.wheelColumn {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 0.25rem;
+  gap: 0.2rem;
+  width: 64px;
+  height: 148px;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  padding: 56px 0;
+  box-sizing: border-box;
+  mask-image: linear-gradient(to bottom, transparent, black 25%, black 75%, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, black 25%, black 75%, transparent);
+  scrollbar-width: none;
 }
 
-.timeSeparator {
-  font-size: 1.75rem;
-  font-weight: 800;
+.wheelColumn::-webkit-scrollbar {
+  display: none;
+}
+
+.wheelItem {
+  flex-shrink: 0;
+  scroll-snap-align: center;
+  padding: 0.4rem 0;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
   color: #94a3b8;
-  margin-top: -4px;
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.wheelItem:hover {
+  color: #0f172a;
+  background-color: #eef2f7;
+}
+
+.wheelItemActive {
+  color: #ffffff;
+  font-weight: 800;
+  background-color: #0f172a;
 }
 
 .periodColumn {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
-  margin-left: 0.25rem;
+  gap: 0.4rem;
+}
+
+.periodButton {
+  width: 52px;
+  padding: 0.5rem 0;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #64748b;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.periodButton:hover {
+  background-color: #f1f5f9;
+}
+
+.periodButtonActive {
+  color: #ffffff;
+  border-color: transparent;
 }
 
 .presetsSection {
@@ -80,14 +193,25 @@
   gap: 0.4rem;
 }
 
-.quickSelectGrid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.4rem;
-  margin-bottom: 1rem;
-  max-height: 140px;
-  overflow-y: auto;
-  padding-right: 0.2rem;
+.presetButton {
+  padding: 0.4rem 0.2rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #334155;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.presetButton:hover {
+  background-color: #f1f5f9;
+}
+
+.presetButtonActive {
+  color: #ffffff;
+  border-color: transparent;
 }
 
 .footer {

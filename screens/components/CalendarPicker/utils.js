@@ -1,4 +1,4 @@
-import { startOfMonth, startOfWeek, addDays } from 'date-fns';
+import { startOfMonth, startOfWeek, addDays, isBefore, isAfter, isSameDay } from 'date-fns';
 
 export const parseValueToDate = (value) => {
   if (value instanceof Date && !Number.isNaN(value.getTime())) {
@@ -23,6 +23,16 @@ export const parseValueToDate = (value) => {
   }
   return null;
 };
+
+// true si `day` cae estrictamente entre `start` y `end` (sin contar los bordes,
+// esos se marcan aparte como rangeStart/rangeEnd).
+export const isDayInRange = (day, start, end) => {
+  if (!start || !end) return false;
+  const [from, to] = isBefore(start, end) ? [start, end] : [end, start];
+  return isAfter(day, from) && isBefore(day, to);
+};
+
+export const isDaySame = (a, b) => Boolean(a && b && isSameDay(a, b));
 
 export const getDaysForMonth = (currentDate) => {
   const monthStart = startOfMonth(currentDate);

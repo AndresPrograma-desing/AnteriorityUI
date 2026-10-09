@@ -1,0 +1,71 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.controls {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.controls > :last-child {
+  flex: 1;
+  min-width: 200px;
+}
+
+.counter {
+  font-size: 0.8rem;
+  color: var(--color-text-muted, #64748b);
+  margin: 0;
+}
+
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.iconCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: var(--radius-md, 0.5rem);
+  background: var(--color-card-bg, #ffffff);
+  padding: 0.75rem;
+  width: 120px;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.iconCard > * {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.copyWrapper {
+  display: flex;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.copyWrapper > * {
+  min-width: 0;
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+}
+
+.copyWrapper * {
+  min-width: 0;
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+}
+
+.empty {
+  font-size: 0.9rem;
+  color: var(--color-text-muted, #64748b);
+}

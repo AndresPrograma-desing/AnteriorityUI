@@ -29,6 +29,8 @@ export const ProSidebar = ({
   footerContent,
   user,
   userMenuItems = [],
+  userMenuLinks = [],
+  userFooterAction,
   onItemEdit,
   onItemDelete,
   onItemPin,
@@ -298,6 +300,28 @@ export const ProSidebar = ({
                 <span className={styles.avatar}>{getInitial(user.email)}</span>
                 {!isCollapsed && <span className={styles.userEmail}>{user.email}</span>}
               </button>
+
+              {userFooterAction && !isCollapsed && (
+                <Button
+                  circle
+                  size="small"
+                  variant={Button.VARIANTS.GHOST}
+                  className={styles.userFooterActionBtn}
+                  color="transparent"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    userFooterAction.onClick && userFooterAction.onClick();
+                  }}
+                >
+                  <ModalTooltip
+                    text={userFooterAction.tooltip}
+                    position={userFooterAction.tooltipPosition ?? 'top'}
+                    style={{ width: '100%', height: '100%', justifyContent: 'center' }}
+                  >
+                    <userFooterAction.icon size={16} />
+                  </ModalTooltip>
+                </Button>
+              )}
             </div>
           )}
         </div>
@@ -327,6 +351,26 @@ export const ProSidebar = ({
               </button>
             );
           })}
+
+          {userMenuLinks.length > 0 && (
+            <div className={styles.userMenuLinks}>
+              {userMenuLinks.map((link) => (
+                <a
+                  key={link.id ?? link.label}
+                  href={link.link}
+                  target={link.target ?? '_blank'}
+                  rel="noopener noreferrer"
+                  className={styles.userMenuLinkItem}
+                  onClick={() => {
+                    setIsUserMenuOpen(false);
+                    link.onClick && link.onClick();
+                  }}
+                >
+                  {link.label}
+                </a>
+              ))}
+            </div>
+          )}
         </div>,
         document.body
       )}

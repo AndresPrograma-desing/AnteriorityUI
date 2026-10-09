@@ -73,6 +73,8 @@ Alternativa, importando el subpath directo de cada componente (útil para accede
 import Button, { VARIANTS } from 'anteriority-ui/screens/components/Button';
 ```
 
+Para íconos de marcas/tecnologías/UI (react-icons empaquetado, sin instalar nada extra), ver la sección "Icons (react-icons)" en [AnteriorityUI.md](AnteriorityUI.md).
+
 ## Estructura del proyecto
 
 ```
@@ -124,7 +126,7 @@ Componentes que ya tenían un sistema de `variant`/`type` con paletas predefinid
 
 ## Componentes
 
-Documentación completa de props y ejemplos de uso de los 50 componentes en **[AnteriorityUI.md](AnteriorityUI.md)**.
+Documentación completa de props y ejemplos de uso de los ~50 componentes en **[AnteriorityUI.md](AnteriorityUI.md)**.
 
 | Componente | Descripción |
 |---|---|
@@ -136,9 +138,11 @@ Documentación completa de props y ejemplos de uso de los 50 componentes en **[A
 | [Button](AnteriorityUI.md#button) | Botón (envoltorio de MUI Button) con variantes, loading, tooltip |
 | [CalendarComponent](AnteriorityUI.md#calendarcomponent) | Selector de fecha standalone (date picker) |
 | [CalendarPicker](AnteriorityUI.md#calendarpicker) | Selector de fecha integrado a un `TextField` |
+| [Callout](AnteriorityUI.md#callout) | Caja de aviso/notificación con variantes de color y cuerpo en Markdown |
 | [CardV1](AnteriorityUI.md#cardv1) | Tarjeta con badges, acción e indicadores de estado |
 | [ChatWindow](AnteriorityUI.md#chatwindow) | Ventana de chat completa (mensajes, input, avatar) |
 | [Checks](AnteriorityUI.md#checks) | Checkbox de permisos/ítem seleccionable |
+| [ColorPicker](AnteriorityUI.md#colorpicker) | Selector de color (HEX/RGB/HSL) con popover de saturación/matiz |
 | [Container](AnteriorityUI.md#container) | Contenedor con paginación integrada |
 | [CopyText](AnteriorityUI.md#copytext) | Texto con botón de copiar al portapapeles |
 | [CountdownBar](AnteriorityUI.md#countdownbar) | Barra de progreso con cuenta regresiva |

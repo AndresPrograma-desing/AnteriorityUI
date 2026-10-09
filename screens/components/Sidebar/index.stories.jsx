@@ -29,6 +29,17 @@ const userMenuItems = [
   { id: 'logout', label: 'Cerrar sesión', icon: LogOut, variant: 'danger', onClick: () => console.log('logout clicked') },
 ];
 
+const userMenuLinks = [
+  { id: 'privacy', label: 'Política de Privacidad', link: 'https://example.com/privacidad' },
+  { id: 'terms', label: 'Términos del Servicio', link: 'https://example.com/terminos' },
+];
+
+const userFooterAction = {
+  icon: Settings,
+  tooltip: 'Configuración',
+  onClick: () => console.log('settings clicked'),
+};
+
 const SidebarWithState = (args) => {
   const [activeId, setActiveId] = useState(args.activeId ?? groups[0].items[0].id);
   return (
@@ -48,6 +59,8 @@ export const Default = {
     groups,
     user: { email: 'jane.doe@example.com' },
     userMenuItems,
+    userMenuLinks,
+    userFooterAction,
   },
 };
 

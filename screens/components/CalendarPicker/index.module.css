@@ -6,9 +6,9 @@
 }
 
 .calendarFrame {
-  width: 330px !important;
-  padding: 1.25rem !important;
-  border-radius: 14px !important;
+  width: 356px !important;
+  padding: 1.4rem !important;
+  border-radius: 16px !important;
 }
 
 .headerTitleContainer {
@@ -62,11 +62,19 @@
   gap: 0.35rem;
 }
 
+.rangeHint {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+  text-align: center;
+  margin-bottom: 0.6rem;
+}
+
 .weekDaysGrid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
-  margin-bottom: 0.5rem;
+  gap: 6px;
+  margin-bottom: 0.6rem;
   text-align: center;
 }
 
@@ -74,8 +82,8 @@
   font-size: 0.80rem;
   font-weight: 700;
   color: #94a3b8;
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -85,7 +93,7 @@
 .daysGrid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
+  gap: 6px;
   text-align: center;
 }
 
@@ -93,8 +101,8 @@
   font-size: 0.9rem;
   font-weight: 500;
   color: #334155;
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -123,8 +131,38 @@
   box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25);
 }
 
-.selectedDay:hover {
+/* :hover tiene que empatar o superar la especificidad de
+   `.dayCell:hover:not(.otherMonth)` de arriba (0,3,0) — por eso el prefijo
+   `.dayCell.` acá y en los overrides de rango de abajo; si no, el gris de
+   hover le gana visualmente al color de selección/rango. */
+.dayCell.selectedDay:hover {
   background-color: #1e293b;
+}
+
+/* Modo rango: días intermedios con fondo tenue, extremos con círculo sólido */
+.inRange {
+  background-color: rgba(15, 23, 42, 0.08);
+  border-radius: 8px;
+}
+
+.dayCell.inRange:hover {
+  background-color: rgba(15, 23, 42, 0.14);
+}
+
+.rangeStart,
+.rangeEnd {
+  background-color: var(--cp-selected, #0f172a);
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.dayCell.rangeStart:hover,
+.dayCell.rangeEnd:hover {
+  background-color: #1e293b;
+}
+
+.rangePreviewEdge {
+  opacity: 0.6;
 }
 
 .otherMonth {
