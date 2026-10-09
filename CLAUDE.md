@@ -91,6 +91,10 @@ El paquete se publica en el registro público de npm como `anteriority-ui`, no v
 
 Cada componente en `screens/components/` tiene un `.stories.jsx` (formato CSF3) al lado de su implementación. Al agregar un componente nuevo, agregarle también su story con variantes reales (no placeholders) — son la referencia que se usa para escribir/actualizar la sección correspondiente en AnteriorityUI.md.
 
+## Regla: documentar cada modificación de componente
+
+Toda vez que se agregue, cambie o elimine una prop (o cualquier comportamiento visible) de un componente en `screens/components/`, hay que actualizar en el mismo cambio la sección correspondiente en [AnteriorityUI.md](AnteriorityUI.md) (tabla de props, ejemplos de uso, notas) — no dejarlo para después. Si la sección del componente todavía no existe, crearla siguiendo el formato de las demás (Import / Uso básico / Props / Ejemplos / Notas). Si el cambio agrega o modifica variantes visuales relevantes, reflejarlo también en el `.stories.jsx` del componente (ver [Storybook](#storybook)).
+
 ## Componentes sin implementar
 
 `screens/components/Avatar/` (`index.jsx`, `utils.js`, `index.module.css`) son archivos vacíos (0 bytes) — un stub sin terminar, no lo usa nada del código. El avatar real y usado es `screens/components/Profile/Avatar/`. No confundir los dos ni documentar el stub hasta que tenga contenido real.

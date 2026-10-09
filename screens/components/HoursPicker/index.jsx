@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Clock, X, ChevronUp, ChevronDown } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Clock, X } from 'lucide-react';
 import styles from './index.module.css';
 import TextField from '../Material-UI/Components/TextField/index';
 import Frame from '../Frame/index';
@@ -7,15 +7,54 @@ import Button from '../Button/index';
 import {
     TEXT_HOURS_PICKER,
     HOURS_LIST,
+    HOURS_LIST_24,
     MINUTES_LIST,
     QUICK_TIMES
 } from './Constants';
 import {
     parseTimeTo12h,
     format12hTo24h,
-    getDisplayTimeText,
-    getCurrentTime12h
+    formatStoredTime,
+    getCurrentTime12h,
+    parseTimeTo24h,
+    format24hToStorage,
+    formatStoredTime24h,
+    getCurrentTime24h
 } from './utils';
+
+const DEFAULT_DRAFT = { hours: 12, minutes: 0, period: 'AM' };
+const DEFAULT_DRAFT_24H = { hours: 0, minutes: 0, period: null };
+
+const WheelColumn = ({ items, selected, onSelect, formatItem, accentColor, ariaLabel }) => {
+    const itemRefs = useRef({});
+
+    useEffect(() => {
+        const node = itemRefs.current[selected];
+        if (node) node.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }, [selected]);
+
+    return (
+        <div className={styles.wheelColumn} role="listbox" aria-label={ariaLabel}>
+            {items.map((item) => {
+                const isActive = item === selected;
+                return (
+                    <button
+                        key={item}
+                        type="button"
+                        ref={(node) => { itemRefs.current[item] = node; }}
+                        role="option"
+                        aria-selected={isActive}
+                        className={`${styles.wheelItem} ${isActive ? styles.wheelItemActive : ''}`}
+                        style={isActive && accentColor ? { backgroundColor: accentColor } : undefined}
+                        onClick={() => onSelect(item)}
+                    >
+                        {formatItem(item)}
+                    </button>
+                );
+            })}
+        </div>
+    );
+};
 
 const HoursPicker = ({
     label,
@@ -24,28 +63,35 @@ const HoursPicker = ({
     onChange,
     required = false,
     disabled = false,
+    range = false,
+    format24h = false,
     selectedColor = '#10b981',
     accentColor = '#0f172a'
 }) => {
     const [isOpen, setIsOpen] = useState(false);
-    const [hours, setHours] = useState(12);
-    const [minutes, setMinutes] = useState(0);
-    const [period, setPeriod] = useState('AM');
-    const [activeTab, setActiveTab] = useState(null); // null, 'hours', 'minutes'
+    const [activeBoundary, setActiveBoundary] = useState('start');
+    const defaultDraft = format24h ? DEFAULT_DRAFT_24H : DEFAULT_DRAFT;
+    const [draft, setDraft] = useState({ start: defaultDraft, end: defaultDraft });
+    const parseTime = format24h ? parseTimeTo24h : parseTimeTo12h;
+
+    const rangeValue = range && value && typeof value === 'object' ? value : { start: '', end: '' };
 
     useEffect(() => {
-        const parsed = parseTimeTo12h(value);
-        setHours(parsed.hours);
-        setMinutes(parsed.minutes);
-        setPeriod(parsed.period);
-    }, [value, isOpen]);
+        if (range) {
+            setDraft({
+                start: parseTime(rangeValue.start),
+                end: parseTime(rangeValue.end),
+            });
+        } else {
+            setDraft((prev) => ({ ...prev, start: parseTime(value) }));
+        }
+        setActiveBoundary('start');
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [value, isOpen, range, format24h]);
 
     useEffect(() => {
         const handleKeyDown = (e) => {
-            if (e.key === 'Escape') {
-                setIsOpen(false);
-                setActiveTab(null);
-            }
+            if (e.key === 'Escape') setIsOpen(false);
         };
         if (isOpen) {
             document.body.style.overflow = 'hidden';
@@ -57,64 +103,72 @@ const HoursPicker = ({
         };
     }, [isOpen]);
 
-    const incrementHours = () => setHours(prev => (prev === 12 ? 1 : prev + 1));
-    const decrementHours = () => setHours(prev => (prev === 1 ? 12 : prev - 1));
-    const incrementMinutes = () => setMinutes(prev => (prev + 5 >= 60 ? 0 : Math.floor(prev / 5) * 5 + 5));
-    const decrementMinutes = () => setMinutes(prev => (prev - 5 < 0 ? 55 : Math.floor(prev / 5) * 5 - 5));
+    const activeDraft = draft[activeBoundary];
+
+    const updateActiveDraft = (patch) => {
+        setDraft((prev) => ({ ...prev, [activeBoundary]: { ...prev[activeBoundary], ...patch } }));
+    };
+
+    const emitChange = (nextValue) => {
+        if (typeof onChange !== 'function') return;
+        onChange({
+            target: {
+                name,
+                value: nextValue,
+                type: range ? 'time-range' : 'time',
+            },
+        });
+    };
+
+    const formatForStorage = (d) => (format24h ? format24hToStorage(d.hours, d.minutes) : format12hTo24h(d.hours, d.minutes, d.period));
 
     const handleConfirm = () => {
-        const formatted = format12hTo24h(hours, minutes, period);
-        if (typeof onChange === 'function') {
-            onChange({
-                target: {
-                    name,
-                    value: formatted,
-                    type: 'time'
-                }
+        if (range) {
+            emitChange({
+                start: formatForStorage(draft.start),
+                end: formatForStorage(draft.end),
             });
+        } else {
+            emitChange(formatForStorage(activeDraft));
         }
         setIsOpen(false);
-        setActiveTab(null);
     };
 
     const handleClear = () => {
-        if (typeof onChange === 'function') {
-            onChange({
-                target: {
-                    name,
-                    value: '',
-                    type: 'time'
-                }
-            });
-        }
+        emitChange(range ? { start: '', end: '' } : '');
         setIsOpen(false);
-        setActiveTab(null);
     };
 
     const handleSetNow = () => {
-        const now = getCurrentTime12h();
-        setHours(now.hours);
-        setMinutes(now.minutes);
-        setPeriod(now.period);
+        updateActiveDraft(format24h ? getCurrentTime24h() : getCurrentTime12h());
     };
 
     const handleQuickPreset = (preset) => {
+        if (format24h) {
+            updateActiveDraft({ hours: preset.h24, minutes: preset.m });
+            return;
+        }
         let h12 = preset.h24 % 12;
         if (h12 === 0) h12 = 12;
-        const p = preset.h24 >= 12 ? 'PM' : 'AM';
-        setHours(h12);
-        setMinutes(preset.m);
-        setPeriod(p);
+        const period = preset.h24 >= 12 ? 'PM' : 'AM';
+        updateActiveDraft({ hours: h12, minutes: preset.m, period });
     };
+
+    const formatDisplay = format24h ? formatStoredTime24h : formatStoredTime;
+    const displayText = range
+        ? [formatDisplay(rangeValue.start), formatDisplay(rangeValue.end)].filter(Boolean).join(' – ')
+        : formatDisplay(value);
 
     const headerContent = (
         <div className={styles.header}>
-            <span className={styles.modalTitle}>{TEXT_HOURS_PICKER.TITLE}</span>
+            <span className={styles.modalTitle}>
+                {range ? TEXT_HOURS_PICKER.TITLE_RANGE : TEXT_HOURS_PICKER.TITLE}
+            </span>
             <Button
                 variant="ghost"
                 size="small"
                 circle
-                onClick={() => { setIsOpen(false); setActiveTab(null); }}
+                onClick={() => setIsOpen(false)}
                 icon={X}
                 color="var(--cancel-button)"
             />
@@ -125,9 +179,13 @@ const HoursPicker = ({
         <div className={styles.inputGroup} onClick={(e) => e.stopPropagation()}>
             <TextField
                 label={label}
-                value={getDisplayTimeText(value, hours, minutes, period)}
+                value={displayText}
                 readOnly
-                placeholder={TEXT_HOURS_PICKER.PLACEHOLDER}
+                placeholder={
+                    range
+                        ? (format24h ? TEXT_HOURS_PICKER.PLACEHOLDER_RANGE_24H : TEXT_HOURS_PICKER.PLACEHOLDER_RANGE)
+                        : (format24h ? TEXT_HOURS_PICKER.PLACEHOLDER_24H : TEXT_HOURS_PICKER.PLACEHOLDER)
+                }
                 onClick={() => !disabled && setIsOpen(true)}
                 disabled={disabled}
                 required={required}
@@ -147,172 +205,98 @@ const HoursPicker = ({
             {isOpen && (
                 <Frame
                     isModal={true}
-                    onClose={() => { setIsOpen(false); setActiveTab(null); }}
+                    onClose={() => setIsOpen(false)}
                     className={styles.hoursFrame}
                 >
                     {headerContent}
 
-                    {/* MAIN TIME SELECTOR DISPLAY */}
-                    <div className={styles.timeDisplaySection}>
-                        {/* Hours Column */}
-                        <div className={styles.timeColumn}>
-                            <Button
-                                variant="ghost"
-                                size="small"
-                                circle
-                                icon={ChevronUp}
-                                onClick={incrementHours}
-                                color="inherit"
-                                title="Incrementar hora"
-                            />
-                            <Button
-                                variant={activeTab === 'hours' ? 'primary' : 'outline'}
-                                size="large"
-                                onClick={() => setActiveTab(activeTab === 'hours' ? null : 'hours')}
-                                color={activeTab === 'hours' ? selectedColor : accentColor}
-                                style={{
-                                    minWidth: '58px',
-                                    height: '54px',
-                                    fontSize: '1.5rem',
-                                    fontWeight: 800
-                                }}
-                            >
-                                {String(hours).padStart(2, '0')}
-                            </Button>
-                            <Button
-                                variant="ghost"
-                                size="small"
-                                circle
-                                icon={ChevronDown}
-                                onClick={decrementHours}
-                                color="inherit"
-                                title="Decrementar hora"
-                            />
+                    {range && (
+                        <div className={styles.boundaryTabs}>
+                            {['start', 'end'].map((boundary) => (
+                                <button
+                                    key={boundary}
+                                    type="button"
+                                    className={`${styles.boundaryTab} ${activeBoundary === boundary ? styles.boundaryTabActive : ''}`}
+                                    style={activeBoundary === boundary ? { borderColor: accentColor, color: accentColor } : undefined}
+                                    onClick={() => setActiveBoundary(boundary)}
+                                >
+                                    <span className={styles.boundaryTabLabel}>
+                                        {boundary === 'start' ? TEXT_HOURS_PICKER.LABEL_START : TEXT_HOURS_PICKER.LABEL_END}
+                                    </span>
+                                    <span className={styles.boundaryTabValue}>
+                                        {String(draft[boundary].hours).padStart(2, '0')}:{String(draft[boundary].minutes).padStart(2, '0')}{!format24h && ` ${draft[boundary].period}`}
+                                    </span>
+                                </button>
+                            ))}
                         </div>
+                    )}
 
-                        <span className={styles.timeSeparator}>:</span>
+                    <div className={styles.timePreview} style={{ color: accentColor }}>
+                        {String(activeDraft.hours).padStart(2, '0')}:{String(activeDraft.minutes).padStart(2, '0')}
+                        {!format24h && <span className={styles.timePreviewPeriod}>{activeDraft.period}</span>}
+                    </div>
 
-                        {/* Minutes Column */}
-                        <div className={styles.timeColumn}>
-                            <Button
-                                variant="ghost"
-                                size="small"
-                                circle
-                                icon={ChevronUp}
-                                onClick={incrementMinutes}
-                                color="inherit"
-                                title="Incrementar minutos"
-                            />
-                            <Button
-                                variant={activeTab === 'minutes' ? 'primary' : 'outline'}
-                                size="large"
-                                onClick={() => setActiveTab(activeTab === 'minutes' ? null : 'minutes')}
-                                color={activeTab === 'minutes' ? selectedColor : accentColor}
-                                style={{
-                                    minWidth: '58px',
-                                    height: '54px',
-                                    fontSize: '1.5rem',
-                                    fontWeight: 800
-                                }}
-                            >
-                                {String(minutes).padStart(2, '0')}
-                            </Button>
-                            <Button
-                                variant="ghost"
-                                size="small"
-                                circle
-                                icon={ChevronDown}
-                                onClick={decrementMinutes}
-                                color="inherit"
-                                title="Decrementar minutos"
-                            />
-                        </div>
-
-                        {/* Period Column (AM / PM) */}
+                    <div className={styles.wheelsRow}>
+                        <WheelColumn
+                            items={format24h ? HOURS_LIST_24 : HOURS_LIST}
+                            selected={activeDraft.hours}
+                            onSelect={(h) => updateActiveDraft({ hours: h })}
+                            formatItem={(h) => String(h).padStart(2, '0')}
+                            accentColor={selectedColor}
+                            ariaLabel="Hora"
+                        />
+                        <WheelColumn
+                            items={MINUTES_LIST}
+                            selected={activeDraft.minutes}
+                            onSelect={(m) => updateActiveDraft({ minutes: m })}
+                            formatItem={(m) => String(m).padStart(2, '0')}
+                            accentColor={selectedColor}
+                            ariaLabel="Minuto"
+                        />
+                        {!format24h && (
                         <div className={styles.periodColumn}>
-                            <Button
-                                variant={period === 'AM' ? 'primary' : 'ghost'}
-                                size="small"
-                                onClick={() => setPeriod('AM')}
-                                color={period === 'AM' ? accentColor : 'inherit'}
-                                style={{ minWidth: '48px' }}
-                            >
-                                AM
-                            </Button>
-                            <Button
-                                variant={period === 'PM' ? 'primary' : 'ghost'}
-                                size="small"
-                                onClick={() => setPeriod('PM')}
-                                color={period === 'PM' ? accentColor : 'inherit'}
-                                style={{ minWidth: '48px' }}
-                            >
-                                PM
-                            </Button>
+                            {['AM', 'PM'].map((p) => (
+                                <button
+                                    key={p}
+                                    type="button"
+                                    className={`${styles.periodButton} ${activeDraft.period === p ? styles.periodButtonActive : ''}`}
+                                    style={activeDraft.period === p ? { backgroundColor: accentColor } : undefined}
+                                    onClick={() => updateActiveDraft({ period: p })}
+                                >
+                                    {p}
+                                </button>
+                            ))}
+                        </div>
+                        )}
+                    </div>
+
+                    <div className={styles.presetsSection}>
+                        <div className={styles.presetsTitle}>{TEXT_HOURS_PICKER.QUICK_PRESETS_TITLE}</div>
+                        <div className={styles.presetsGrid}>
+                            {QUICK_TIMES.map((qt, idx) => {
+                                let isActive;
+                                if (format24h) {
+                                    isActive = activeDraft.hours === qt.h24 && activeDraft.minutes === qt.m;
+                                } else {
+                                    let h12 = qt.h24 % 12 || 12;
+                                    const p = qt.h24 >= 12 ? 'PM' : 'AM';
+                                    isActive = activeDraft.hours === h12 && activeDraft.minutes === qt.m && activeDraft.period === p;
+                                }
+                                return (
+                                    <button
+                                        key={idx}
+                                        type="button"
+                                        className={`${styles.presetButton} ${isActive ? styles.presetButtonActive : ''}`}
+                                        style={isActive ? { backgroundColor: selectedColor, borderColor: selectedColor } : undefined}
+                                        onClick={() => handleQuickPreset(qt)}
+                                    >
+                                        {format24h ? format24hToStorage(qt.h24, qt.m) : qt.label}
+                                    </button>
+                                );
+                            })}
                         </div>
                     </div>
 
-                    {/* EXPANDABLE DIRECT NUMBER SELECTION */}
-                    {activeTab === 'hours' && (
-                        <div className={styles.quickSelectGrid}>
-                            {HOURS_LIST.map(h => (
-                                <Button
-                                    key={h}
-                                    variant={hours === h ? 'primary' : 'outline'}
-                                    size="small"
-                                    onClick={() => { setHours(h); setActiveTab(null); }}
-                                    color={hours === h ? accentColor : 'inherit'}
-                                    style={{ minWidth: 'auto', padding: '4px 0' }}
-                                >
-                                    {String(h).padStart(2, '0')}
-                                </Button>
-                            ))}
-                        </div>
-                    )}
-
-                    {activeTab === 'minutes' && (
-                        <div className={styles.quickSelectGrid}>
-                            {MINUTES_LIST.map(m => (
-                                <Button
-                                    key={m}
-                                    variant={minutes === m ? 'primary' : 'outline'}
-                                    size="small"
-                                    onClick={() => { setMinutes(m); setActiveTab(null); }}
-                                    color={minutes === m ? accentColor : 'inherit'}
-                                    style={{ minWidth: 'auto', padding: '4px 0' }}
-                                >
-                                    {String(m).padStart(2, '0')}
-                                </Button>
-                            ))}
-                        </div>
-                    )}
-
-                    {/* QUICK PRESETS */}
-                    {!activeTab && (
-                        <div className={styles.presetsSection}>
-                            <div className={styles.presetsTitle}>{TEXT_HOURS_PICKER.QUICK_PRESETS_TITLE}</div>
-                            <div className={styles.presetsGrid}>
-                                {QUICK_TIMES.map((qt, idx) => {
-                                    let h12 = qt.h24 % 12 || 12;
-                                    let p = qt.h24 >= 12 ? 'PM' : 'AM';
-                                    const isActive = hours === h12 && minutes === qt.m && period === p;
-                                    return (
-                                        <Button
-                                            key={idx}
-                                            variant={isActive ? 'primary' : 'outline'}
-                                            size="small"
-                                            onClick={() => handleQuickPreset(qt)}
-                                            color={isActive ? selectedColor : 'inherit'}
-                                            style={{ fontSize: '0.72rem', padding: '4px 2px', minWidth: 'auto' }}
-                                        >
-                                            {qt.label}
-                                        </Button>
-                                    );
-                                })}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* FOOTER ACTIONS */}
                     <div className={styles.footer}>
                         <Button
                             variant="ghost"

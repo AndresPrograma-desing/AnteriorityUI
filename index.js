@@ -13,6 +13,7 @@ export { default as Breadcrumbs } from './screens/components/Breadcrumbs/index.j
 export { default as Button } from './screens/components/Button/index.js';
 export { default as CalendarComponent } from './screens/components/CalendarComponent/CustomDatePicker.js';
 export { default as CalendarPicker } from './screens/components/CalendarPicker/index.js';
+export { default as Callout } from './screens/components/Callout/index.js';
 export { default as CardV1 } from './screens/components/CardV1/index.js';
 export { default as ChatWindow } from './screens/components/ChatWindow/index.js';
 export { default as Checks } from './screens/components/Checks/index.js';
@@ -28,6 +29,7 @@ export { FormCard, FormInput, FormTextArea } from './screens/components/FormCont
 export { default as Frame } from './screens/components/Frame/index.js';
 export { default as GreenHighlight } from './screens/components/GreenHighlight/index.js';
 export { default as HoursPicker } from './screens/components/HoursPicker/index.js';
+export { default as IconCatalog } from './screens/components/IconCatalog/index.js';
 export { default as InfoTooltip } from './screens/components/InfoTooltip/index.js';
 export { default as Input } from './screens/components/Input/index.js';
 export { default as Loading } from './screens/components/Loading/index.js';

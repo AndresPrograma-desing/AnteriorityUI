@@ -10,3 +10,8 @@ export const BUTTONS = {
   TODAY: 'Hoy',
   CONFIRM: 'Confirmar Selección'
 };
+
+export const RANGE_HINTS = {
+  START: 'Seleccioná la fecha de inicio',
+  END: 'Seleccioná la fecha de fin',
+};

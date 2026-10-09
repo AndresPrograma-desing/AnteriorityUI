@@ -264,13 +264,17 @@
 /* User footer: avatar + email, opens the user menu (Ajustes, Cómo usar, Cerrar sesión, etc.) */
 .userFooter {
   position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .userFooterButton {
   display: flex;
   align-items: center;
   gap: 10px;
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   padding: 6px;
   border: none;
   background: transparent;
@@ -282,6 +286,23 @@
 
 .userFooterButton:hover {
   background-color: var(--sidebar-hover-bg);
+}
+
+/* Optional action button (ej. ajustes) al lado del perfil, para una acción
+   custom definida por quien consume el componente (ver prop userFooterAction). */
+.userFooterActionBtn {
+  flex-shrink: 0;
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  color: var(--sidebar-text-muted) !important;
+  cursor: pointer;
+}
+
+.userFooterActionBtn:hover {
+  background-color: var(--sidebar-hover-bg) !important;
+  color: var(--sidebar-text) !important;
 }
 
 .avatar {
@@ -358,6 +379,29 @@
 
 .userMenuItemDanger:hover {
   background-color: #fef2f2;
+}
+
+/* Legal/secondary links (ej. "Política de Privacidad", "Términos del Servicio"),
+   agrupados debajo de los botones de acción dentro del mismo menú de usuario. */
+.userMenuLinks {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  padding: 8px 10px 6px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.userMenuLinkItem {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  text-decoration: none;
+}
+
+.userMenuLinkItem:hover {
+  text-decoration: underline;
+  color: #334155;
 }
 
 /* Right-click context menu for sidebar items (Editar / Eliminar).
