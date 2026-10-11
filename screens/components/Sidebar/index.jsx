@@ -1,11 +1,11 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { ChevronLeft, ChevronRight, Pencil, Trash2, Pin, PinOff, GripVertical, Users } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight, Pencil, Trash2, Pin, PinOff, GripVertical, Users } from 'lucide-react';
 import Button from '../Button/index';
 import Skeleton from '../Skeleton/index';
 import styles from './index.module.css';
 import { TEXTS } from './constants';
-import { getBadgeClass, getInitial, isSidebarToggleShortcut, toggleSidebarCollapsed } from './utils';
+import { findParentIdForActiveItem, getBadgeClass, getInitial, isSidebarToggleShortcut, toggleSidebarCollapsed } from './utils';
 
 import ModalTooltip from '../ModalTooltip/ModalTooltip';
 
@@ -39,9 +39,15 @@ export const ProSidebar = ({
   avatarBgColor,
   pinnedIconColor,
   methodBadgeColors,
+  subItemActiveBgColor,
+  subItemActiveTextColor,
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(() => {
     return localStorage.getItem('sidebar_collapsed') === 'true';
+  });
+  const [expandedIds, setExpandedIds] = useState(() => {
+    const parentId = findParentIdForActiveItem(groups, activeId);
+    return parentId ? new Set([parentId]) : new Set();
   });
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [userMenuPosition, setUserMenuPosition] = useState(null);
@@ -65,6 +71,8 @@ export const ProSidebar = ({
   const themeVars = {
     ...(avatarBgColor ? { '--sidebar-avatar-bg': avatarBgColor } : {}),
     ...(pinnedIconColor ? { '--sidebar-pinned-icon': pinnedIconColor } : {}),
+    ...(subItemActiveBgColor ? { '--sidebar-subitem-active-bg': subItemActiveBgColor } : {}),
+    ...(subItemActiveTextColor ? { '--sidebar-subitem-active-text': subItemActiveTextColor } : {}),
     ...badgeThemeVars,
   };
 
@@ -101,6 +109,15 @@ export const ProSidebar = ({
   const handleDragEnd = () => {
     setDraggedItemId(null);
     setDragOverItemId(null);
+  };
+
+  const toggleExpanded = (itemId) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(itemId)) next.delete(itemId);
+      else next.add(itemId);
+      return next;
+    });
   };
 
   useLayoutEffect(() => {
@@ -236,46 +253,86 @@ export const ProSidebar = ({
 
             <div className={styles.buttonList}>
               {group.items && group.items.map((item) => {
-                const isActive = activeId === item.id;
+                const hasSubItems = Array.isArray(item.subItems) && item.subItems.length > 0;
+                const isActive = !hasSubItems && activeId === item.id;
                 const isDragging = draggedItemId === item.id;
                 const isDragOver = canReorder && dragOverItemId === item.id && !isDragging;
+                const isExpanded = hasSubItems && expandedIds.has(item.id) && !isCollapsed;
 
                 return (
-                  <Button
-                    key={item.id}
-                    fullWidth
-                    color="transparent"
-                    active={isActive}
-                    draggable={canReorder}
-                    onDragStart={canReorder ? (event) => handleDragStart(event, item) : undefined}
-                    onDragOver={canReorder ? (event) => handleDragOver(event, item) : undefined}
-                    onDragLeave={canReorder ? () => handleDragLeave(item) : undefined}
-                    onDrop={canReorder ? (event) => handleDrop(event, group.items, item) : undefined}
-                    onDragEnd={canReorder ? handleDragEnd : undefined}
-                    onClick={() => onSelect && onSelect(item)}
-                    onContextMenu={(event) => handleItemContextMenu(event, item)}
-                    className={`${styles.sidebarItemBtn} ${isActive ? styles.activeBtn : ''} ${isDragging ? styles.dragging : ''} ${isDragOver ? styles.dragOver : ''}`}
-                    ToolTip={isCollapsed ? item.label : undefined}
-                  >
-                    <div className={styles.btnLayout}>
-                      <div className={styles.leftPart}>
-                        {canReorder && !isCollapsed && (
-                          <span className={styles.dragHandle}><GripVertical size={14} /></span>
+                  <div key={item.id} className={styles.itemWithSubItems}>
+                    <Button
+                      fullWidth
+                      color="transparent"
+                      active={isActive}
+                      draggable={canReorder}
+                      onDragStart={canReorder ? (event) => handleDragStart(event, item) : undefined}
+                      onDragOver={canReorder ? (event) => handleDragOver(event, item) : undefined}
+                      onDragLeave={canReorder ? () => handleDragLeave(item) : undefined}
+                      onDrop={canReorder ? (event) => handleDrop(event, group.items, item) : undefined}
+                      onDragEnd={canReorder ? handleDragEnd : undefined}
+                      onClick={() => (hasSubItems ? toggleExpanded(item.id) : onSelect && onSelect(item))}
+                      onContextMenu={(event) => handleItemContextMenu(event, item)}
+                      className={`${styles.sidebarItemBtn} ${isActive ? styles.activeBtn : ''} ${isExpanded ? styles.expandParentOpen : ''} ${isDragging ? styles.dragging : ''} ${isDragOver ? styles.dragOver : ''}`}
+                      ToolTip={isCollapsed ? item.label : undefined}
+                    >
+                      <div className={styles.btnLayout}>
+                        <div className={styles.leftPart}>
+                          {canReorder && !isCollapsed && (
+                            <span className={styles.dragHandle}><GripVertical size={14} /></span>
+                          )}
+                          {renderLeftContent(item)}
+                          {!isCollapsed && <span className={styles.label}>{item.label}</span>}
+                          {!isCollapsed && item.pinned && (
+                            <Pin size={12} className={styles.pinnedIcon} />
+                          )}
+                        </div>
+
+                        {!isCollapsed && item.badge && (
+                          <span className={`${styles.badge} ${getBadgeClass(styles, item.badgeType)}`}>
+                            {item.badge}
+                          </span>
                         )}
-                        {renderLeftContent(item)}
-                        {!isCollapsed && <span className={styles.label}>{item.label}</span>}
-                        {!isCollapsed && item.pinned && (
-                          <Pin size={12} className={styles.pinnedIcon} />
+
+                        {!isCollapsed && hasSubItems && (
+                          <ChevronDown size={14} className={`${styles.expandChevron} ${isExpanded ? styles.expandChevronOpen : ''}`} />
                         )}
                       </div>
+                    </Button>
 
-                      {!isCollapsed && item.badge && (
-                        <span className={`${styles.badge} ${getBadgeClass(styles, item.badgeType)}`}>
-                          {item.badge}
-                        </span>
-                      )}
-                    </div>
-                  </Button>
+                    {hasSubItems && !isCollapsed && (
+                      <div className={`${styles.subItemListWrapper} ${isExpanded ? styles.subItemListWrapperOpen : ''}`}>
+                        <div className={styles.subItemList}>
+                          {item.subItems.map((subItem) => {
+                            const isSubActive = activeId === subItem.id;
+                            return (
+                              <Button
+                                key={subItem.id}
+                                fullWidth
+                                color="transparent"
+                                active={isSubActive}
+                                onClick={() => onSelect && onSelect(subItem)}
+                                className={`${styles.sidebarItemBtn} ${styles.subItemBtn} ${isSubActive ? styles.activeBtn : ''}`}
+                              >
+                                <div className={styles.btnLayout}>
+                                  <div className={styles.leftPart}>
+                                    {renderLeftContent(subItem)}
+                                    <span className={styles.label}>{subItem.label}</span>
+                                  </div>
+
+                                  {subItem.badge && (
+                                    <span className={`${styles.badge} ${getBadgeClass(styles, subItem.badgeType)}`}>
+                                      {subItem.badge}
+                                    </span>
+                                  )}
+                                </div>
+                              </Button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 );
               })}
             </div>

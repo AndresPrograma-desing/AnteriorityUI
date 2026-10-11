@@ -1,0 +1,29 @@
+.panel {
+    width: 360px;
+    padding: 1.5rem;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    min-height: 0;
+}
+
+.emptyMessage {
+    margin: 1rem 0;
+    text-align: center;
+    font-size: 0.85rem;
+    color: #94a3b8;
+}
+
+.item {
+    align-items: flex-start;
+}
+
+.itemActions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+}

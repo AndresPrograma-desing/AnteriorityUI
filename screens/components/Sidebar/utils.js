@@ -54,6 +54,23 @@ export function getInitial(value) {
 }
 
 /**
+ * Busca, dentro de los subItems de todos los items de todos los grupos, el id
+ * del item padre cuyo subItem coincide con activeId. Se usa para auto-expandir
+ * ese grupo de subopciones cuando la sección activa inicial es una subopción.
+ */
+export function findParentIdForActiveItem(groups, activeId) {
+  if (!groups || !activeId) return null;
+  for (const group of groups) {
+    for (const item of group.items || []) {
+      if (item.subItems?.some((sub) => sub.id === activeId)) {
+        return item.id;
+      }
+    }
+  }
+  return null;
+}
+
+/**
  * Retorna la clase CSS correspondiente al tipo de badge de la opción del menú.
  */
 export function getBadgeClass(styles, badgeType) {

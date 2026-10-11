@@ -86,6 +86,35 @@ export const Cerrable = {
   },
 };
 
+export const ConTimestamp = {
+  args: {
+    variant: 'neutral',
+    title: 'Nueva cita agendada',
+    children: 'Se agendó una cita para el 08/10/2026 a las 15:00.',
+    timestamp: 'Hace 5 minutos',
+  },
+};
+
+export const ClickableConOnClick = {
+  args: {
+    variant: 'neutral',
+    title: 'Click para ver el detalle',
+    children: 'Esta notificación ejecuta una función al hacer click (ej. navegar con react-router).',
+    timestamp: 'Hace 1 hora',
+    onClick: () => console.log('onClick disparado'),
+  },
+};
+
+export const ClickableConHref = {
+  args: {
+    variant: 'neutral',
+    title: 'Click para abrir el link',
+    children: 'Esta notificación se renderiza como <a> real (soporta Ctrl+click, abrir en pestaña nueva, etc).',
+    timestamp: 'Ayer',
+    href: '#destino',
+  },
+};
+
 export const ColoresPersonalizados = {
   args: {
     variant: 'info',

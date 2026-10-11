@@ -239,6 +239,80 @@
   color: var(--sidebar-text-active) !important;
 }
 
+/* Expandable items with subItems (ej. "Vacunas" -> Ver/Crear/Pendientes/Lotes) */
+.itemWithSubItems {
+  display: flex;
+  flex-direction: column;
+}
+
+.expandChevron {
+  flex-shrink: 0;
+  color: var(--sidebar-text-muted);
+  opacity: 0.7;
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
+}
+
+.expandChevronOpen {
+  transform: rotate(180deg);
+  opacity: 1;
+}
+
+.expandParentOpen {
+  color: var(--sidebar-text-active) !important;
+  font-weight: 600 !important;
+}
+
+.expandParentOpen .icon {
+  color: var(--sidebar-text-active) !important;
+}
+
+.subItemListWrapper {
+  display: grid;
+  grid-template-rows: 0fr;
+  margin-top: 0;
+  transition: grid-template-rows 0.28s cubic-bezier(0.4, 0, 0.2, 1), margin-top 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.subItemListWrapperOpen {
+  grid-template-rows: 1fr;
+  margin-top: 2px;
+}
+
+.subItemList {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-left: 29px;
+  padding: 2px 0 2px 14px;
+  border-left: 1.5px solid var(--sidebar-border);
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 0.16s ease, transform 0.16s ease;
+}
+
+.subItemListWrapperOpen .subItemList {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.22s ease 0.08s, transform 0.22s ease 0.08s;
+}
+
+.subItemBtn {
+  padding: 7px 10px !important;
+  min-height: 0 !important;
+}
+
+.subItemBtn .label {
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+
+.subItemBtn.activeBtn {
+  background-color: var(--sidebar-subitem-active-bg, #e0edff) !important;
+  color: var(--sidebar-subitem-active-text, #1d4ed8) !important;
+  font-weight: 600 !important;
+}
+
 /* Active navigation item styling */
 .activeBtn {
   background-color: var(--sidebar-hover-bg) !important;

@@ -65,6 +65,14 @@
   overflow-wrap: anywhere !important;
 }
 
+.packBadge {
+  font-size: 0.65rem;
+  color: var(--color-text-muted, #64748b);
+  background: var(--color-border, #e2e8f0);
+  border-radius: 999px;
+  padding: 0.1rem 0.5rem;
+}
+
 .empty {
   font-size: 0.9rem;
   color: var(--color-text-muted, #64748b);

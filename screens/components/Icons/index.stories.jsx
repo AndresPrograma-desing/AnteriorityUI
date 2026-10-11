@@ -1,45 +1,13 @@
 import { useMemo, useState } from 'react';
-import * as ai from './ai/index';
-import * as bi from './bi/index';
-import * as bs from './bs/index';
-import * as cg from './cg/index';
-import * as ci from './ci/index';
-import * as di from './di/index';
-import * as fa from './fa/index';
-import * as fa6 from './fa6/index';
-import * as fc from './fc/index';
-import * as fi from './fi/index';
-import * as gi from './gi/index';
-import * as go from './go/index';
-import * as gr from './gr/index';
-import * as hi from './hi/index';
-import * as hi2 from './hi2/index';
-import * as im from './im/index';
-import * as io from './io/index';
-import * as io5 from './io5/index';
-import * as lia from './lia/index';
-import * as lu from './lu/index';
-import * as md from './md/index';
-import * as pi from './pi/index';
-import * as ri from './ri/index';
-import * as rx from './rx/index';
-import * as si from './si/index';
-import * as sl from './sl/index';
-import * as tb from './tb/index';
-import * as tfi from './tfi/index';
-import * as ti from './ti/index';
-import * as vsc from './vsc/index';
-import * as wi from './wi/index';
-
-const PACKS = { ai, bi, bs, cg, ci, di, fa, fa6, fc, fi, gi, go, gr, hi, hi2, im, io, io5, lia, lu, md, pi, ri, rx, si, sl, tb, tfi, ti, vsc, wi };
-const PACK_NAMES = Object.keys(PACKS).sort();
+import { ICON_PACKS, ICON_PACK_NAMES } from './registry';
+import { findIcons } from './findIcons';
 
 export default {
   title: 'Components/Icons/Preview (todos los packs)',
 };
 
 const IconPreview = ({ pack = 'si', name = 'SiJavascript', size = 96, color = '' }) => {
-  const mod = PACKS[pack];
+  const mod = ICON_PACKS[pack];
   const Icon = mod?.[name];
   const suggestions = useMemo(() => {
     if (!mod || Icon) return [];
@@ -53,7 +21,7 @@ const IconPreview = ({ pack = 'si', name = 'SiJavascript', size = 96, color = ''
   if (!mod) {
     return (
       <p style={{ color: '#ef4444', fontSize: 14 }}>
-        Pack <code>{pack}</code> inválido. Packs disponibles: {PACK_NAMES.join(', ')}.
+        Pack <code>{pack}</code> inválido. Packs disponibles: {ICON_PACK_NAMES.join(', ')}.
       </p>
     );
   }
@@ -93,7 +61,7 @@ export const Preview = {
   argTypes: {
     pack: {
       control: 'select',
-      options: PACK_NAMES,
+      options: ICON_PACK_NAMES,
       description: 'Pack de react-icons (carpeta en screens/components/Icons/)',
     },
     name: {
@@ -113,4 +81,35 @@ export const Preview = {
 
 export const CSharpExample = {
   render: () => <IconPreview pack="tb" name="TbBrandCSharp" />,
+};
+
+const FindIconsDemo = ({ query = 'cs' }) => {
+  const [q, setQ] = useState(query);
+  const results = useMemo(() => findIcons(q), [q]);
+
+  return (
+    <div>
+      <input
+        type="text"
+        value={q}
+        onChange={(e) => setQ(e.target.value)}
+        placeholder="Buscar en todos los packs..."
+        style={{ padding: '0.5rem 0.75rem', border: '1px solid #e2e8f0', borderRadius: 8, marginBottom: '1rem', width: 280 }}
+      />
+      <p style={{ fontSize: 13, color: '#64748b' }}>{results.length} resultados en los {ICON_PACK_NAMES.length} packs</p>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
+        {results.slice(0, 100).map(({ pack, name, Icon }) => (
+          <div key={`${pack}-${name}`} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, width: 110 }}>
+            <Icon size={28} />
+            <span style={{ fontSize: 10, textAlign: 'center' }}>{name}</span>
+            <span style={{ fontSize: 9, color: '#94a3b8' }}>pack: {pack}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export const FindIconsAcrossPacks = {
+  render: () => <FindIconsDemo query="cs" />,
 };

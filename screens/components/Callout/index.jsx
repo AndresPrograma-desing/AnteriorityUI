@@ -8,10 +8,13 @@ export const Callout = ({
   variant = DEFAULT_VARIANT,
   title,
   children,
+  timestamp,
   icon,
   actions,
   onClose,
   closeLabel = 'Cerrar aviso',
+  onClick,
+  href,
   bgColor,
   textColor,
   iconColor,
@@ -31,15 +34,35 @@ export const Callout = ({
   const resolvedIcon = iconColor || palette.iconColor;
   const role = variant === 'danger' || variant === 'warning' ? 'alert' : 'status';
 
+  const isClickable = Boolean(onClick || href);
+  const Tag = href ? 'a' : 'div';
+  const clickableProps = isClickable
+    ? {
+        onClick,
+        href,
+        role: href ? undefined : 'button',
+        tabIndex: 0,
+        onKeyDown: href
+          ? undefined
+          : (e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onClick?.(e);
+              }
+            },
+      }
+    : {};
+
   return (
-    <div
-      role={role}
-      className={`${styles.callout} ${className}`}
+    <Tag
+      role={isClickable ? clickableProps.role : role}
+      className={`${styles.callout} ${isClickable ? styles.clickable : ''} ${className}`}
       style={{
         backgroundColor: resolvedBg,
         borderColor: resolvedBorder,
         ...style,
       }}
+      {...clickableProps}
     >
       {Icon && (
         <span className={styles.icon} style={{ color: resolvedIcon }}>
@@ -65,7 +88,13 @@ export const Callout = ({
           </MarkdownContent>
         )}
 
-        {actions && <div className={styles.actions}>{actions}</div>}
+        {timestamp && (
+          <div className={styles.timestamp} style={{ color: resolvedText }}>
+            {timestamp}
+          </div>
+        )}
+
+        {actions && <div className={styles.actions} onClick={(e) => e.stopPropagation()}>{actions}</div>}
       </div>
 
       {onClose && (
@@ -73,13 +102,16 @@ export const Callout = ({
           type="button"
           className={styles.closeButton}
           style={{ color: resolvedText }}
-          onClick={onClose}
+          onClick={(e) => {
+            e.stopPropagation();
+            onClose(e);
+          }}
           aria-label={closeLabel}
         >
           <X size={16} />
         </button>
       )}
-    </div>
+    </Tag>
   );
 };
 

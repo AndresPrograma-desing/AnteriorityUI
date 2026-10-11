@@ -10,6 +10,7 @@ export default function ScrollBar({
   maxHeight,
   hideHorizontalTrack = false,
   hideVerticalTrack = false,
+  reserveTrackSpace = false,
   scrollAreaRef,
   className = '',
   contentClassName = '',
@@ -34,7 +35,7 @@ export default function ScrollBar({
           if (typeof scrollAreaRef === 'function') scrollAreaRef(node);
           else if (scrollAreaRef) scrollAreaRef.current = node;
         }}
-        className={`${styles.scrollArea} ${contentClassName}`}
+        className={`${styles.scrollArea} ${reserveTrackSpace ? styles.reserveTrackSpace : ''} ${contentClassName}`}
         style={{
           overflowY: vertical ? 'auto' : 'hidden',
           overflowX: horizontal ? 'auto' : 'hidden',
