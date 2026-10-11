@@ -30,3 +30,11 @@ export const CustomClassName = {
     className: 'custom-container',
   },
 };
+
+export const CustomBorder = {
+  args: {
+    children: <p>Contenedor con borde personalizado.</p>,
+    borderColor: 'rgba(15, 23, 42, 0.2)',
+  },
+};
+

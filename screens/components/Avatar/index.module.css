@@ -1,0 +1,45 @@
+.avatar {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+  user-select: none;
+  font-family: var(--font-sans, system-ui, -apple-system, sans-serif);
+  font-weight: 600;
+  line-height: 1;
+  color: var(--avatar-text, #ffffff);
+  background-color: var(--avatar-bg, #64748b);
+  border-radius: 50%;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.shapeCircle {
+  border-radius: 50%;
+}
+
+.shapeRounded {
+  border-radius: 8px;
+}
+
+.shapeSquare {
+  border-radius: 0;
+}
+
+.avatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.avatarFallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  text-transform: uppercase;
+}

@@ -28,6 +28,7 @@ export const Breadcrumbs = ({
   className = '',
   iconColor,
   linkColor,
+  currentColor,
   separator = '/',
   maxItems,
   itemsBeforeCollapse = 1,
@@ -49,6 +50,7 @@ export const Breadcrumbs = ({
       style={{
         ...(iconColor ? { '--crumb-icon-color': iconColor } : {}),
         ...(linkColor ? { '--crumb-link-color': linkColor } : {}),
+        ...(currentColor ? { '--crumb-current-color': currentColor } : {}),
       }}
     >
       <ol className={styles.list}>

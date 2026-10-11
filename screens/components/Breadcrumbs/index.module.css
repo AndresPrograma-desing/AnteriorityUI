@@ -119,7 +119,7 @@
    (e.g. opening a session) still draws the eye. */
 .current {
   font-weight: 700;
-  color: #e6e8ec;
+  color: var(--crumb-current-color, #e6e8ec);
   animation: currentPulse 0.5s ease;
 }
 
