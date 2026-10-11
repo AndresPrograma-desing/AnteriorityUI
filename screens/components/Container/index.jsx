@@ -1,8 +1,10 @@
 import React from 'react';
 import styles from './index.module.css';
 import Paginador from '../Material-UI/Components/Paginador';
+import Barnner from '../Barnner';
 
 export default function Container({ 
+  wattermark = true,
   children, 
   className = '', 
   showPagination = false,
@@ -17,6 +19,12 @@ export default function Container({
 }) {
   return (
     <div className={`${styles.containerCard} ${className}`} {...props}>
+
+      {wattermark && 
+      <Barnner 
+      bgColor="#e1ddecff"
+      
+      >Desarrollado por AnteriorityUI</Barnner>}
       {children}
       {showPagination && (
         <div className={styles.paginationContainer}>

@@ -108,6 +108,25 @@
     z-index: 10;
 }
 
+.skeletonGroup {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
 .hiddenContent {
     visibility: hidden;
+}
+
+.contentWrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    width: 100%;
+}
+
+.scrollContent {
+    display: flex;
+    flex-direction: column;
 }

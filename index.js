@@ -44,6 +44,7 @@ export { default as Selector } from './screens/components/Material-UI/Components
 export { default as TextField } from './screens/components/Material-UI/Components/TextField/index.js';
 export { default as ModalTooltip } from './screens/components/ModalTooltip/ModalTooltip.js';
 export { default as ErrorMessage } from './screens/components/Notification/Error/ErrorMessage.js';
+export { default as NotificationsPanel } from './screens/components/NotificationsPanel/index.js';
 export { default as PasswordResetPanel } from './screens/components/PasswordResetPanel/index.js';
 export { default as PlaceholderButton } from './screens/components/PlaceholderButton/index.js';
 export { default as Profile } from './screens/components/Profile/index.js';

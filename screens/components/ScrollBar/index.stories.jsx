@@ -62,3 +62,19 @@ export const AlwaysVisible = {
     </div>
   ),
 };
+
+export const WithReservedTrackSpace = {
+  args: {
+    vertical: true,
+    horizontal: false,
+    autoHide: false,
+    reserveTrackSpace: true,
+    maxHeight: 180,
+    children: <LongContent />,
+  },
+  render: (args) => (
+    <div style={{ width: 320 }}>
+      <ScrollBar {...args} />
+    </div>
+  ),
+};

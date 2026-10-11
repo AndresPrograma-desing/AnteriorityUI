@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Home, FileText, Settings, Users, LogOut, User } from 'lucide-react';
+import { Activity, ClipboardList, Home, FileText, Settings, Users, LogOut, User } from 'lucide-react';
 import ProSidebar from './index';
 
 export default {
@@ -93,6 +93,37 @@ export const NotCollapsible = {
   args: {
     groups,
     collapsible: false,
+    user: { email: 'jane.doe@example.com' },
+    userMenuItems,
+  },
+};
+
+const groupsWithSubItems = [
+  {
+    title: 'General',
+    items: [
+      { id: 'home', label: 'Inicio', icon: Home },
+      {
+        id: 'vaccines',
+        label: 'Vacunas',
+        icon: Activity,
+        subItems: [
+          { id: 'vaccines-view', label: 'Ver vacunas' },
+          { id: 'vaccines-create', label: 'Crear vacuna' },
+          { id: 'vaccines-pending', label: 'Vacunas pendientes' },
+          { id: 'vaccines-batches', label: 'Lotes de vacunas' },
+        ],
+      },
+      { id: 'prescriptions', label: 'Gestión de Recetas', icon: ClipboardList },
+    ],
+  },
+];
+
+export const WithSubItems = {
+  render: (args) => <SidebarWithState {...args} />,
+  args: {
+    groups: groupsWithSubItems,
+    activeId: 'vaccines-view',
     user: { email: 'jane.doe@example.com' },
     userMenuItems,
   },
