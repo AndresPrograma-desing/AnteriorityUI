@@ -1,0 +1,232 @@
+.chip {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  box-sizing: border-box;
+  font-family: var(--font-sans, system-ui, -apple-system, sans-serif);
+  font-weight: 500;
+  line-height: 1;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  user-select: none;
+  vertical-align: middle;
+  background-color: var(--chip-bg, #f1f5f9);
+  color: var(--chip-text, #1e293b);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.clickable:hover {
+  background-color: var(--chip-hover-bg, #e2e8f0);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.clickable:active {
+  transform: scale(0.98);
+}
+
+.disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Tamaños */
+.sizeSmall {
+  height: 24px;
+  font-size: 0.74rem;
+  padding: 2px 8px 2px 2px;
+  gap: 6px;
+}
+
+.sizeMedium {
+  height: 32px;
+  font-size: 0.82rem;
+  padding: 3px 12px 3px 3px;
+  gap: 8px;
+}
+
+.sizeLarge {
+  height: 40px;
+  font-size: 0.92rem;
+  padding: 4px 16px 4px 4px;
+  gap: 10px;
+}
+
+/* Variantes */
+.variantFilled {
+  background-color: var(--chip-bg, #f1f5f9);
+  color: var(--chip-text, #1e293b);
+  border-color: transparent;
+}
+
+.variantOutlined {
+  background-color: var(--chip-bg, transparent);
+  color: var(--chip-text, #1e293b);
+  border-color: var(--chip-border, #cbd5e1);
+}
+
+.variantOutlined.clickable:hover {
+  background-color: rgba(15, 23, 42, 0.04);
+  border-color: #94a3b8;
+}
+
+/* Avatar container */
+.avatarWrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 50%;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Label text */
+.labelWrapper {
+  display: inline-flex;
+  align-items: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.labelText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Delete button */
+.deleteButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 2px;
+  margin-right: -4px;
+  padding: 2px;
+  border: none;
+  background: transparent;
+  color: var(--chip-delete-color, #64748b);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.deleteButton:hover {
+  background-color: rgba(0, 0, 0, 0.08);
+  color: #0f172a;
+  transform: scale(1.1);
+}
+
+/* MODO EXPAND ON HOVER:
+   El chip permanece colapsado como solo el avatar circular.
+   Al hacer hover (o focus), se expande fluidamente hacia un lado
+   revelando el nombre / label con animación elástica. */
+.expandOnHover {
+  cursor: pointer;
+  overflow: hidden;
+  max-width: 44px;
+  padding-right: 3px;
+  transition: max-width 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              padding 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 0.25s ease,
+              box-shadow 0.25s ease;
+}
+
+.expandOnHover.sizeSmall {
+  max-width: 24px;
+  padding-right: 2px;
+}
+
+.expandOnHover.sizeMedium {
+  max-width: 32px;
+  padding-right: 3px;
+}
+
+.expandOnHover.sizeLarge {
+  max-width: 40px;
+  padding-right: 4px;
+}
+
+.expandOnHover .labelWrapper {
+  max-width: 0;
+  opacity: 0;
+  transform: translateX(-10px);
+  pointer-events: none;
+  transition: max-width 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.22s ease,
+              transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.expandOnHover .deleteButton {
+  max-width: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: max-width 0.35s ease, opacity 0.2s ease;
+}
+
+/* Hover or isExpanded: expand to full width and slide label in */
+.expandOnHover:hover,
+.expandOnHover:focus-visible,
+.expandOnHover.isExpanded {
+  max-width: 360px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+.expandOnHover.sizeSmall:hover,
+.expandOnHover.sizeSmall:focus-visible,
+.expandOnHover.sizeSmall.isExpanded {
+  padding-right: 8px;
+}
+
+.expandOnHover.sizeMedium:hover,
+.expandOnHover.sizeMedium:focus-visible,
+.expandOnHover.sizeMedium.isExpanded {
+  padding-right: 12px;
+}
+
+.expandOnHover.sizeLarge:hover,
+.expandOnHover.sizeLarge:focus-visible,
+.expandOnHover.sizeLarge.isExpanded {
+  padding-right: 16px;
+}
+
+.expandOnHover:hover .labelWrapper,
+.expandOnHover:focus-visible .labelWrapper,
+.expandOnHover.isExpanded .labelWrapper {
+  max-width: 280px;
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.expandOnHover:hover .deleteButton,
+.expandOnHover:focus-visible .deleteButton,
+.expandOnHover.isExpanded .deleteButton {
+  max-width: 24px;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.expandOnHover:hover .avatarWrapper,
+.expandOnHover:focus-visible .avatarWrapper,
+.expandOnHover.isExpanded .avatarWrapper {
+  transform: scale(1.03);
+}
+
+/* Group container (replacement for Stack) */
+.chipGroup {
+  display: flex;
+  align-items: center;
+  gap: var(--chip-group-spacing, 8px);
+  flex-wrap: wrap;
+}
+
+.chipGroupColumn {
+  flex-direction: column;
+  align-items: flex-start;
+}

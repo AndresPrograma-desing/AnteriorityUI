@@ -36,6 +36,9 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
   pointer-events: none;
   z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .active .thumb {
@@ -45,6 +48,68 @@
 .inactive .thumb {
   transform: translateX(3px);
 }
+
+.thumbIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  animation: thumbIconPop 0.18s ease-out;
+}
+
+@keyframes thumbIconPop {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.trackLabel {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.62rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  user-select: none;
+  pointer-events: none;
+  color: #ffffff;
+  z-index: 1;
+  animation: trackLabelFade 0.2s ease-out;
+}
+
+.trackLabelActive {
+  left: 0;
+  width: 29px;
+  padding-left: 2px;
+}
+
+.trackLabelInactive {
+  right: 0;
+  width: 29px;
+  padding-right: 2px;
+}
+
+@keyframes trackLabelFade {
+  0% {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 
 .ripple {
   position: absolute;

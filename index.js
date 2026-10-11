@@ -6,6 +6,8 @@
 // Al agregar un componente nuevo en screens/components/, agregarlo también acá.
 
 export { default as AlertModal } from './screens/components/AlertModal/AlertModal.js';
+export { default as Avatar } from './screens/components/Avatar/index.js';
+export { default as AvatarChip, Chip, AvatarChipGroup } from './screens/components/AvatarChip/index.js';
 export { default as Badge } from './screens/components/Badge/index.js';
 export { default as Barnner } from './screens/components/Barnner/index.js';
 export { default as BlueLink } from './screens/components/BlueLink/index.js';
@@ -59,4 +61,5 @@ export { default as Swich } from './screens/components/Swich/index.js';
 export { default as TableA } from './screens/components/TableA/index.js';
 export { default as TableB } from './screens/components/TableB/index.js';
 export { default as ToggleCard } from './screens/components/ToggleCard/index.js';
+export { default as TopBar } from './screens/components/TopBar/index.js';
 export { default as UserEditPopover } from './screens/components/UserEditPopover/index.js';

@@ -95,6 +95,8 @@ Cada componente en `screens/components/` tiene un `.stories.jsx` (formato CSF3) 
 
 Toda vez que se agregue, cambie o elimine una prop (o cualquier comportamiento visible) de un componente en `screens/components/`, hay que actualizar en el mismo cambio la sección correspondiente en [AnteriorityUI.md](AnteriorityUI.md) (tabla de props, ejemplos de uso, notas) — no dejarlo para después. Si la sección del componente todavía no existe, crearla siguiendo el formato de las demás (Import / Uso básico / Props / Ejemplos / Notas). Si el cambio agrega o modifica variantes visuales relevantes, reflejarlo también en el `.stories.jsx` del componente (ver [Storybook](#storybook)).
 
-## Componentes sin implementar
+## Dos componentes de avatar distintos
 
-`screens/components/Avatar/` (`index.jsx`, `utils.js`, `index.module.css`) son archivos vacíos (0 bytes) — un stub sin terminar, no lo usa nada del código. El avatar real y usado es `screens/components/Profile/Avatar/`. No confundir los dos ni documentar el stub hasta que tenga contenido real.
+Hay dos implementaciones de avatar en el repo, ambas reales y en el barrel — no confundirlas:
+- `screens/components/Avatar/` → avatar nativo standalone (sin MUI), con generación de color/inicial automática a partir de `name`. Expuesto en el barrel como `Avatar`. Lo consume `AvatarChip`.
+- `screens/components/Profile/Avatar/` → el avatar usado dentro de `Sidebar`/`TopBar` para el menú de usuario. Expuesto en el barrel como `ProfileAvatar`.

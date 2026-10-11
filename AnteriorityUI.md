@@ -84,6 +84,92 @@ import AlertModal from '../AlertModal/AlertModal'; // export default
 
 ---
 
+### Avatar
+
+Componente de avatar nativo (sin dependencias de MUI) para fotos de perfil, iniciales de nombre o íconos, con generación automática de colores armoniosos basados en el texto/nombre e iniciales automáticas.
+
+**Import:**
+```jsx
+import Avatar from '../Avatar'; // o import { Avatar } from 'anteriority-ui'
+```
+
+**Uso básico:**
+```jsx
+<Avatar src="/foto.jpg" alt="Natacha" />
+<Avatar name="Martin Perez" />
+<Avatar>M</Avatar>
+```
+
+**Props:**
+
+| Prop | Tipo | Default | Descripción |
+|---|---|---|---|
+| `src` | string | — | URL de la imagen del avatar |
+| `alt` | string | `''` | Texto alternativo de la imagen |
+| `name` | string | `''` | Nombre usado para calcular la inicial y el color de fondo si no hay imagen |
+| `children` | node | — | Contenido libre o letra inicial directa (ej. `<Avatar>M</Avatar>`) |
+| `size` | number \| `'small'` \| `'medium'` \| `'large'` | `32` | Diámetro del avatar en píxeles |
+| `shape` | `'circle'` \| `'rounded'` \| `'square'` | `'circle'` | Forma geométrica del avatar |
+| `bgColor` | string | — | Color de fondo personalizado |
+| `textColor` | string | `'#ffffff'` | Color del texto |
+| `icon` | component | — | Icono opcional (ej. de `lucide-react`) si no hay foto ni inicial |
+
+---
+
+### AvatarChip
+
+Componente de chip/píldora con avatar, texto y acciones opcionales (sin MUI). Incluye la prop especial `expandOnHover` para mostrar inicialmente solo el avatar circular y desplegar suavemente el nombre/label hacia un lado al colocar el puntero encima. Incluye `AvatarChipGroup` para agrupar chips fácilmente reemplazando `Stack`.
+
+**Import:**
+```jsx
+import AvatarChip, { Chip, Avatar, AvatarChipGroup } from '../AvatarChip'; 
+// o import { AvatarChip, Chip, AvatarChipGroup } from 'anteriority-ui'
+```
+
+**Uso básico:**
+```jsx
+// 1. Estilo MUI Chip con Avatar y Stack
+<AvatarChipGroup direction="row" spacing={8}>
+  <Chip avatar={<Avatar>M</Avatar>} label="Avatar" />
+  <Chip
+    avatar={<Avatar alt="Natacha" src="/foto.jpg" />}
+    label="Avatar"
+    variant="outlined"
+  />
+</AvatarChipGroup>
+
+// 2. Con animación expandOnHover (solo avatar, se despliega al hover)
+<AvatarChip
+  expandOnHover
+  src="/foto.jpg"
+  label="Natacha Romanov"
+/>
+```
+
+**Props:**
+
+| Prop | Tipo | Default | Descripción |
+|---|---|---|---|
+| `avatar` | node | — | Elemento Avatar personalizado (ej. `<Avatar>M</Avatar>`) |
+| `src` | string | — | Atajo directo para la foto del avatar |
+| `name` | string | — | Atajo para el nombre (calcula iniciales y color automáticamente) |
+| `initial` | string | — | Atajo para la inicial directa del avatar (ej. `"M"`) |
+| `icon` | component | — | Atajo para icono en lugar de avatar de imagen |
+| `label` | node | — | Texto o contenido principal del chip |
+| `variant` | `'filled'` \| `'outlined'` | `'filled'` | Estilo visual del chip |
+| `size` | `'small'` \| `'medium'` \| `'large'` | `'medium'` | Tamaño del chip (`small` = 24px, `medium` = 32px, `large` = 40px) |
+| `expandOnHover` | boolean | `false` | Si es `true`, muestra solo el avatar circular y lo expande suavemente a un lado mostrando el label al colocar el puntero (hover) |
+| `collapsed` | boolean | — | Control manual del estado colapsado (opcional) |
+| `onClick` | function | — | Si se define, el chip se vuelve clickeable con hover y accesibilidad de botón |
+| `onDelete` | function | — | Si se define, renderiza un botón de eliminar (icono X) al extremo derecho |
+| `deleteIcon` | node | — | Icono personalizado para el botón de eliminar |
+| `disabled` | boolean | `false` | Deshabilita la interacción del chip |
+| `bgColor` | string | — | Color de fondo personalizado |
+| `textColor` | string | — | Color de texto personalizado |
+| `borderColor` | string | — | Color de borde personalizado |
+
+---
+
 ### Badge
 
 Etiqueta pequeña e inline para mostrar un par label/valor, opcionalmente con ícono, usada para indicadores de estado o métricas cortas.
@@ -223,6 +309,7 @@ import { Breadcrumbs } from '../Breadcrumbs/index'; // named export (también de
 | `separator` | string | `'/'` | Carácter divisor entre crumbs (ej. `'/'`, `'-'`, `'>'`) |
 | `iconColor` | string | — | Color de los íconos de los crumbs (`--crumb-icon-color`) |
 | `linkColor` | string | — | Color de los crumbs clicables (`--crumb-link-color`) |
+| `currentColor` | string | — | Color del último crumb (página actual, texto en negrita) (`--crumb-current-color`). Útil para usar `Breadcrumbs` sobre fondos claros — el default (`#e6e8ec`) está pensado para fondo oscuro. |
 | `maxItems` | number | — | Si `items.length` supera este valor, colapsa los crumbs del medio detrás de un botón "…" con un menú |
 | `itemsBeforeCollapse` | number | `1` | Cantidad de crumbs visibles antes del colapso (solo aplica si `maxItems` está seteado) |
 | `itemsAfterCollapse` | number | `1` | Cantidad de crumbs visibles después del colapso, incluyendo el actual (solo aplica si `maxItems` está seteado) |
@@ -729,7 +816,8 @@ import Container from '../Container'; // export default (index.jsx)
 | `pageSize` | number | `10` | Tamaño de página actual |
 | `pageSizeOptions` | array | `[5, 10, 20, 50]` | Opciones de tamaño de página |
 | `onPageSizeChange` | function | — | Handler de cambio de tamaño de página |
-| `...props` | — | — | Cualquier otra prop (ej. `onClick`, `id`) se pasa al `div` raíz |
+| `borderColor` | string | `'rgba(0, 0, 0, 0.08)'` | Color del borde del contenedor (`--container-border`). Por defecto un negro claro sutil. |
+| `...props` | — | — | Cualquier otra prop (ej. `onClick`, `id`, `style`) se pasa al `div` raíz |
 
 **Ejemplos:**
 ```jsx
@@ -2783,6 +2871,64 @@ function PetsTable() {
 
 > **Confirmado:** `TableB` usa una forma de columna DISTINTA a `TableA`: `{ key, label, type, badgeType(row), actions }` en vez de `{ header, accessor, render }`.
 
+### Swich
+
+Componente interruptor (toggle switch) interactivo con animación de onda (ripple), tooltip de estado y opciones visuales para mostrar íconos en el thumb (redondito blanco) o etiquetas de texto en el espacio libre del track.
+
+**Import:**
+```jsx
+import Switch from 'screens/components/Swich'; // o import { Swich } from 'anteriority-ui'
+```
+
+**Uso básico:**
+```jsx
+const [enabled, setEnabled] = useState(false);
+
+<Switch value={enabled} onChange={setEnabled} />
+```
+
+**Props:**
+
+| Prop | Tipo | Default | Descripción |
+|---|---|---|---|
+| `value` | `boolean` | `false` | Estado actual del interruptor (`true` = activo / habilitado, `false` = inactivo). |
+| `onChange` | `function(boolean)` | — | Callback invocado al alternar el estado con el nuevo valor booleano. |
+| `disabled` | `boolean` | `false` | Deshabilita la interacción del switch. |
+| `activeColor` | `string` | `'#088d4f'` | Color de fondo del switch cuando está activo. |
+| `inactiveColor` | `string` | `'#919191'` | Color de fondo del switch cuando está inactivo. |
+| `thumbColor` | `string` | `'#ffffff'` | Color del círculo deslizante (thumb / redondito blanco). |
+| `variant` | `'default'` \| `'icons'` \| `'labels'` \| `'both'` | `'default'` | Variante visual: `'icons'` muestra check/X en el thumb; `'labels'` muestra SI/NO en la parte libre del track; `'both'` activa ambos. |
+| `showIcons` / `icons` | `boolean` | `false` | Muestra un ícono de check cuando está en `true` y una X cuando está en `false` dentro del círculo blanco (thumb). |
+| `showLabels` / `labels` | `boolean` | `false` | Muestra texto descriptivo en la parte que queda libre del track (por defecto "SI" cuando está activo y "NO" cuando está inactivo). |
+| `yesText` | `string` | `'SI'` | Texto para el estado activo cuando `showLabels` está habilitado. |
+| `noText` | `string` | `'NO'` | Texto para el estado inactivo cuando `showLabels` está habilitado. |
+| `iconActiveColor` | `string` | `activeColor` | Color del ícono de check dentro del thumb. |
+| `iconInactiveColor` | `string` | `inactiveColor` | Color del ícono de X dentro del thumb. |
+| `labelActiveColor` | `string` | `'#ffffff'` | Color del texto "SI" en el track. |
+| `labelInactiveColor` | `string` | `'#ffffff'` | Color del texto "NO" en el track. |
+| `showTooltip` | `boolean` | `true` | Habilita o deshabilita el tooltip flotante de estado. Pasar `false` para no mostrar tooltip. |
+| `tooltip` | `boolean` \| `string` \| `{ enabled?, disabled? }` | — | Configura el tooltip. Si es `false`, oculta el tooltip; si es un `string`, muestra ese texto fijo; si es un objeto, permite personalizar los textos según el estado. |
+| `className` | `string` | `''` | Clase CSS adicional en el elemento `<button>`. |
+| `style` | `object` | `{}` | Estilos inline adicionales. |
+
+**Ejemplos:**
+```jsx
+// Switch con Check / X en el redondito blanco (thumb)
+<Switch value={value} onChange={setValue} showIcons />
+
+// Switch con texto SI / NO en la parte que queda libre (track)
+<Switch value={value} onChange={setValue} showLabels />
+
+// Switch con ambos
+<Switch value={value} onChange={setValue} variant="both" />
+
+// Switch sin tooltip
+<Switch value={value} onChange={setValue} showTooltip={false} />
+
+// Switch con tooltip personalizado
+<Switch value={value} onChange={setValue} tooltip="Activar notificaciones" />
+```
+
 ---
 
 ### ToggleCard
@@ -2832,6 +2978,86 @@ import ToggleCard from 'screens/components/ToggleCard';
 ```
 
 **Notas:** Es usado internamente por `PasswordResetPanel` (variant `"floating"`) para mostrar avisos flotantes de estado.
+
+---
+
+### TopBar
+
+Barra superior de navegación de 3 secciones (izquierda / centro / derecha), estilo "top nav" de apps tipo GitHub: logo + breadcrumb a la izquierda, buscador centrado con atajo de teclado, y botones de acción (casi cuadrados, con borde fino y fondo gris claro) + separador vertical + usuario con menú desplegable a la derecha. Reutiliza `Breadcrumbs` para la navegación jerárquica y `Profile/Avatar` para el avatar de usuario.
+
+**Import:**
+```jsx
+import TopBar from '../TopBar/index'; // export default
+```
+
+**Uso básico:**
+```jsx
+<TopBar
+  logo={<Logo />}
+  breadcrumbItems={[{ label: 'Mi Empresa', onClick: goHome }, { label: 'Proyecto' }]}
+  searchProps={{ value, onChange: (e) => setValue(e.target.value) }}
+  actions={[{ icon: Bell, tooltip: 'Notificaciones', badge: 3, onClick: openNotifications }]}
+  user={{ name: 'Jane Doe', email: 'jane.doe@example.com' }}
+  userMenuItems={[{ label: 'Cerrar sesión', icon: LogOut, variant: 'danger', onClick: logout }]}
+/>
+```
+
+**Props:**
+
+| Prop | Tipo | Default | Descripción |
+|---|---|---|---|
+| `logo` | node | — | Contenido del logo (ej. un `<svg>` o `<img>`), renderizado en un botón si se pasa `onLogoClick`. |
+| `onLogoClick` | `function()` | — | Si se define, el logo se vuelve clickeable. |
+| `breadcrumbItems` | array de `{ label, icon?, onClick? }` | — | Si se define y no está vacío, renderiza `Breadcrumbs` con estos items (mismo formato que el componente `Breadcrumbs`). Tiene prioridad sobre `title`. |
+| `title` | string | — | Título simple mostrado cuando no hay `breadcrumbItems`. |
+| `searchProps` | `{ value, onChange, placeholder?, shortcut?, onFocus?, onBlur? }` | — | Si se define, renderiza un input de búsqueda estilizado con ícono y badge de atajo de teclado a la derecha (ej. `/`). `shortcut: false` oculta el badge. Tiene prioridad sobre `centerContent`. |
+| `centerContent` | node | — | Contenido libre para la sección central (alternativa a `searchProps` para casos custom). |
+| `actions` | array de `{ key?, icon, tooltip?, badge?, onClick?, disabled? }` | `[]` | Botones de acción a la derecha (casi cuadrados — `border-radius: 6px`, no círculos). `icon` es un componente (ej. de `lucide-react`); `tooltip` envuelve el botón en `ModalTooltip`. `badge` es flexible: `true` muestra un punto de notificación; cualquier otro valor truthy (número o string, ej. `3`, `'Nuevo'`) se muestra como texto dentro de un pill superpuesto en la esquina; `undefined`/`false`/`null` no muestra nada. Pensado para números cortos (1-2 dígitos) o texto corto — un string largo se desborda del pill. |
+| `user` | `{ name?, email?, avatarUrl? }` | — | Si se define, muestra el avatar de usuario (`Profile/Avatar`) con menú desplegable al hacer click. |
+| `userMenuItems` | array de `{ id?, label, icon?, onClick?, variant? }` | `[]` | Items del menú de usuario (variant `'danger'` los resalta en rojo). |
+| `className` | string | `''` | Clase adicional en el `<header>` raíz. |
+| `showDivider` | boolean | `true` | Si es `true` y hay tanto `actions` (no vacío) como `user`, muestra una línea divisora vertical entre el grupo de acciones y el avatar. |
+| `bgColor` | string | — | Color de fondo de la barra (`--topbar-bg`). |
+| `textColor` | string | — | Color del texto/título y del crumb activo (`--topbar-text`, también se usa como `currentColor` de `Breadcrumbs` si no se pasa `breadcrumbCurrentColor`). |
+| `borderColor` | string | — | Color del borde inferior (`--topbar-border`). |
+| `iconColor` | string | — | Color de los íconos de acción y del buscador (`--topbar-icon`). |
+| `accentColor` | string | — | Color de foco del buscador; también default del fondo del badge si no se pasa `badgeBgColor` (`--topbar-accent`). |
+| `searchBgColor` | string | — | Color de fondo del input de búsqueda (`--topbar-search-bg`). Ajustar junto con `bgColor` en temas oscuros — sin esta prop, el buscador mantiene su fondo claro default. |
+| `actionBgColor` | string | — | Color de fondo de los botones de acción (`--topbar-action-bg`). |
+| `actionBorderColor` | string | — | Color de borde de los botones de acción (`--topbar-action-border`). Pasar `"transparent"` para quitar visualmente el borde (sigue ocupando 1px de layout). |
+| `dividerColor` | string | — | Color de la línea divisora entre acciones y usuario (`--topbar-divider`). |
+| `badgeBgColor` | string | — | Color de fondo del badge (punto o pill numérico) (`--topbar-badge-bg`). Si no se pasa, cae a `accentColor` y luego al rojo default. |
+| `badgeTextColor` | string | — | Color del texto dentro del badge numérico/texto (`--topbar-badge-text`). |
+| `breadcrumbLinkColor` | string | `'#64748b'` | Color de los crumbs clicables (pasa a `Breadcrumbs.linkColor`). El default de `Breadcrumbs` está pensado para fondo oscuro, por eso `TopBar` pisa este valor con uno legible en su tema claro default. |
+| `breadcrumbCurrentColor` | string | `'#0f172a'` | Color del crumb activo cuando no se pasa `textColor` (pasa a `Breadcrumbs.currentColor`). |
+| `loading` | boolean | `false` | Activa el estado de carga utilizando el componente `Skeleton` para logo, breadcrumbs/título, buscador y acciones, conservando la estructura y layout sin saltos visuales. |
+| `isLoading` | boolean | `false` | Alias de conveniencia para `loading`. |
+| `skeletonActionsCount` | number | `3` (o `actions.length`) | Cantidad de botones de acción a mostrar como skeleton durante el estado de carga. |
+
+
+**Ejemplos:**
+```jsx
+// Con título simple en vez de breadcrumb
+<TopBar logo={<Logo />} title="Panel de administración" actions={actions} user={user} />
+
+// Tema oscuro estilo GitHub, logrado solo con props de color
+<TopBar
+  logo={<Logo />}
+  breadcrumbItems={breadcrumbItems}
+  searchProps={searchProps}
+  actions={actions}
+  user={user}
+  bgColor="#0d1117"
+  textColor="#e6edf3"
+  borderColor="#30363d"
+  iconColor="#9198a1"
+  accentColor="#2f81f7"
+  searchBgColor="#161b22"
+  breadcrumbLinkColor="#9198a1"
+/>
+```
+
+**Notas:** El menú de usuario se renderiza vía `createPortal` a `document.body` (mismo patrón que el menú de usuario de `Sidebar`), posicionado contra el botón del avatar. `actions` son completamente genéricas — no asume ningún set fijo de íconos (notificaciones, mensajes, ayuda, etc. quedan a elección del consumidor).
 
 ---
 
