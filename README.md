@@ -73,7 +73,13 @@ Alternativa, importando el subpath directo de cada componente (útil para accede
 import Button, { VARIANTS } from 'anteriority-ui/screens/components/Button';
 ```
 
-Para íconos de marcas/tecnologías/UI (react-icons empaquetado, sin instalar nada extra), ver la sección "Icons (react-icons)" en [AnteriorityUI.md](AnteriorityUI.md).
+Para íconos de interfaz genéricos ([lucide-react](https://lucide.dev/) empaquetado, sin instalar nada extra):
+
+```jsx
+import { Home, Bell, Search } from 'anteriority-ui/lucide';
+```
+
+Para íconos de marcas/tecnologías/UI (react-icons empaquetado, sin instalar nada extra), ver la sección "Icons (react-icons)" en [AnteriorityUI.md](AnteriorityUI.md). Para buscar/listar esos íconos programáticamente sin conocer de antemano en qué pack vive cada uno, `anteriority-ui/common/icons` expone `findIcons`, `ICON_PACKS` y `ICON_PACK_NAMES` (ver [findIcons](AnteriorityUI.md#findicons)).
 
 ## Estructura del proyecto
 

@@ -417,7 +417,7 @@ import Button, { VARIANTS, SIZES, COLORS } from '../Button'; // export default +
 />
 ```
 
-**Notas:** Es un `React.forwardRef`. Expone `Button.VARIANTS`, `Button.SIZES` y `Button.COLORS` como propiedades estáticas además de los named exports.
+**Notas:** Es un `React.forwardRef`. Expone `Button.VARIANTS`, `Button.SIZES` y `Button.COLORS` como propiedades estáticas además de los named exports. Para asignarle un atajo de teclado global, envolverlo con `KeyboardShortcut` (ver sección correspondiente) en vez de una prop propia — así el mismo wrapper sirve para `Button`, `Input` o cualquier otro elemento.
 
 ---
 
@@ -1371,6 +1371,24 @@ import HoursPicker from '../HoursPicker/index'; // export default, archivo index
 
 ---
 
+### Icons (lucide-react)
+
+No es un componente con props propias, sino un re-export: `anteriority-ui/lucide` expone [lucide-react](https://lucide.dev/) completo, para que un proyecto consumidor importe cualquier ícono de lucide **sin instalar `lucide-react` por su cuenta** — queda disponible transitivamente al instalar `anteriority-ui` (ya es una `dependency` de la librería, usada internamente por la mayoría de los componentes).
+
+**Import:**
+```jsx
+import { Home, Bell, Search } from 'anteriority-ui/lucide';
+```
+
+**Uso básico:**
+```jsx
+<Home size={24} color="#0ea5e9" />
+```
+
+**Notas:** Los nombres son exactamente los que exporta `lucide-react` — ver el [buscador oficial](https://lucide.dev/icons/). Es un re-export de 1 línea (`export * from 'lucide-react'`) en [lucide.js](lucide.js), en la raíz del paquete.
+
+---
+
 ### Icons (react-icons)
 
 No es un componente con props propias, sino un mecanismo de subpaths: `anteriority-ui` empaqueta [react-icons](https://react-icons.github.io/react-icons/) completo como dependency propia (igual que `lucide-react`), para que un proyecto consumidor use cualquier ícono de cualquier pack de react-icons (Simple Icons, Font Awesome, Material Design, Bootstrap Icons, Ionicons, etc.) **sin instalar `react-icons` por su cuenta** — queda disponible transitivamente al instalar `anteriority-ui`.
@@ -1445,6 +1463,53 @@ import { IconCatalog } from 'anteriority-ui';
 ```
 
 **Notas:** El selector de pack reutiliza [Selector](#selector) y el buscador de texto reutiliza [Search](#search) (en modo `freeSolo`, sin `options`, como `TextField` libre) en vez de elementos nativos — consistente con el resto de la librería. Muestra hasta 200 resultados por búsqueda (`MAX_RESULTS` en `constants.js`) para no renderizar packs completos de miles de íconos de una sola vez. Cada resultado incluye el ícono renderizado junto a su nombre exacto envuelto en [CopyText](#copytext), para copiarlo con un clic y pegarlo directo en un import. No expone `size`/`color` como props porque es una herramienta de exploración, no un ícono para usar en UI final — una vez encontrado el nombre, se importa directo desde el subpath del pack correspondiente (ver [Icons (react-icons)](#icons-react-icons)).
+
+---
+
+### ImagePastePreview
+
+Fila de chips (miniatura + badge con label + botón de quitar) para mostrar las imágenes extraídas por el hook `usePasteImage` (`common/hooks/usePasteImage.js`). Es la pieza visual compartida por [MultilinePlaceholder](#multilineplaceholder) y [PasteImageField](#pasteimagefield) para no duplicar ese bloque entre ambos — también puede usarse standalone si se arma una integración de paste propia con el hook.
+
+**Import:**
+```jsx
+import ImagePastePreview from 'anteriority-ui/screens/components/ImagePastePreview'; // export default, archivo index.jsx
+```
+
+**Uso básico:**
+```jsx
+const { onPaste, previews, clearPreview } = usePasteImage({ onImagePaste });
+
+<textarea onPaste={onPaste} />
+<ImagePastePreview previews={previews} onRemove={clearPreview} />
+```
+
+**Props:**
+
+| Prop | Tipo | Default | Descripción |
+|---|---|---|---|
+| previews | array | — | Array de previews tal como los devuelve `usePasteImage` (`{ id, url, file }` por cada imagen). Si está vacío o es `undefined`, el componente no renderiza nada. |
+| onRemove | function | — | Callback `(id)` invocado al hacer click en el botón de quitar de un chip. |
+| label | string | `'Imagen pegada'` | Texto del badge (`Barnner`) de cada chip (y `alt` de la miniatura). |
+| removeLabel | string | `'Quitar imagen'` | `aria-label` del botón de quitar. |
+| borderColor | string | `'#e2e8f0'` | Color de borde del chip contenedor (miniatura + badge + botón). |
+| thumbBorderColor | string | `'#cbd5e1'` | Color de borde propio de la miniatura (el `<img>`). |
+| labelBgColor | string | `'#dbeafe'` | Color de fondo del badge del label (prop `bgColor` de `Barnner`). |
+| labelTextColor | string | `'#1e40af'` | Color de texto del badge del label (prop `textColor` de `Barnner`). |
+| className | string | `''` | Clase adicional para el contenedor de la lista. |
+| style | object | — | Estilos inline adicionales para el contenedor de la lista. |
+
+**Ejemplos:**
+```jsx
+<ImagePastePreview
+  previews={previews}
+  onRemove={clearPreview}
+  label="Adjunto"
+  labelBgColor="#fce7f3"
+  labelTextColor="#9d174d"
+/>
+```
+
+**Notas:** No sube ni persiste nada — es puramente presentacional; la extracción/estado vive en `usePasteImage`. El badge del label usa [Barnner](#barnner) (el mismo chip que usan las celdas de `TableB`) en vez de un chip reimplementado a mano.
 
 ---
 
@@ -1536,6 +1601,43 @@ import Input from '../Input/index'; // export default, forwardRef, archivo index
 ```
 
 **Notas:** Es un wrapper de `TextField` con `forwardRef`, por lo que la `ref` se reenvía al input nativo.
+
+---
+
+### KeyboardShortcut
+
+Envoltorio genérico que asigna un atajo de teclado global a **cualquier** `children` (`Button`, `Input`, un `<div>` propio, etc.) sin agregar markup propio al DOM — renderiza exactamente el `children` recibido, así que no altera layouts `flex`/`grid` del padre. Internamente usa el hook compartido `useKeyboardShortcut` (`common/hooks/useKeyboardShortcut.js`), el mismo que usan los atajos Ctrl/Cmd+K de `TopBar` y Ctrl/Cmd+B de `Sidebar`.
+
+**Import:**
+```jsx
+import KeyboardShortcut from 'anteriority-ui/screens/components/KeyboardShortcut'; // export default, archivo index.jsx
+```
+
+**Uso básico:**
+```jsx
+<KeyboardShortcut shortcut="ctrl+e" onTrigger={handleEdit}>
+  <Button onClick={handleEdit}>Editar</Button>
+</KeyboardShortcut>
+```
+
+**Props:**
+
+| Prop | Tipo | Default | Descripción |
+|---|---|---|---|
+| children | node | — | El elemento a envolver; se renderiza tal cual, sin wrapper adicional. |
+| shortcut | string | — | Combinación de teclas (ej. `'ctrl+e'`, `'ctrl+shift+a'`, `'cmd+k'`). `ctrl` y `cmd`/`meta` son equivalentes, para que el mismo atajo funcione en Windows/Linux y Mac sin distinguir el sistema operativo. |
+| enabled | boolean | `true` | Si es `false`, el atajo no se registra (útil para deshabilitarlo condicionalmente, ej. cuando el elemento envuelto está disabled). |
+| onTrigger | function | — | Callback invocado cuando se presiona la combinación. |
+| preventDefault | boolean | `true` | Si llama `event.preventDefault()` al disparar el atajo (evita comportamiento default del navegador en esa combinación). |
+
+**Ejemplos:**
+```jsx
+<KeyboardShortcut shortcut="ctrl+shift+f" onTrigger={() => inputRef.current?.focus()}>
+  <TextField inputRef={inputRef} label="Buscar" value={value} onChange={onChange} />
+</KeyboardShortcut>
+```
+
+**Notas:** Es intencionalmente un wrapper y no una prop de `Button` u otro componente puntual — así el mismo mecanismo sirve para cualquier elemento, incluso componentes ajenos a esta librería en un proyecto consumidor. No sube ni persiste nada; es puramente el registro/cleanup del listener de teclado vía `useKeyboardShortcut`.
 
 ---
 
@@ -1783,6 +1885,14 @@ import MultilinePlaceholder from '../Material-UI/Components/MultilinePlaceholder
 | fullWidth | boolean | `true` | Si ocupa el 100% del ancho disponible. |
 | placeholder | string | — | Placeholder del campo. |
 | bgColor | string | `'#fff'` | Color de fondo del input. |
+| onImagePaste | function | — | Callback `(files, event)` invocado cuando se pegan (Ctrl+V) una o más imágenes desde el clipboard; `files` es un array de `File` nativos listos para subir o guardar en cualquier storage (si se pega una sola imagen, el array tiene un elemento). Una imagen ya pegada antes (mismo archivo, detectado por nombre+tamaño+fecha+tipo) se ignora para no duplicarla. Si no se pasa, el paste de imágenes no se intercepta (se comporta como un textarea normal). |
+| showImagePreview | boolean | `true` | Si se muestran miniaturas de las imágenes pegadas debajo del textarea, cada una con su propio botón para quitarla. Solo aplica si se pasó `onImagePaste`. |
+| imagePreviewLabel | string | `'Imagen pegada'` | Texto del badge (`Barnner`) de cada imagen pegada (y `alt` de la miniatura). |
+| imageRemoveLabel | string | `'Quitar imagen'` | `aria-label` del botón de quitar. |
+| imagePreviewBorderColor | string | `'#e2e8f0'` | Color de borde del chip contenedor del preview (miniatura + badge + botón de quitar). |
+| imageThumbBorderColor | string | `'#cbd5e1'` | Color de borde propio de la miniatura de la imagen (el `<img>`). |
+| imageLabelBgColor | string | `'#dbeafe'` | Color de fondo del badge del label (prop `bgColor` de `Barnner`). |
+| imageLabelTextColor | string | `'#1e40af'` | Color de texto del badge del label (prop `textColor` de `Barnner`). |
 | ...props | any | — | Cualquier otra prop de `TextField` de Material-UI. |
 
 **Ejemplos:**
@@ -1792,6 +1902,16 @@ import MultilinePlaceholder from '../Material-UI/Components/MultilinePlaceholder
 ```jsx
 <MultilinePlaceholder label="Comentarios" error="Este campo es obligatorio" rows={3} value={value} onChange={onChange} />
 ```
+```jsx
+<MultilinePlaceholder
+  label="Descripción"
+  value={value}
+  onChange={onChange}
+  onImagePaste={(files) => files.forEach(saveToStorage)}
+/>
+```
+
+**Notas sobre `onImagePaste`:** la extracción de los `File` se apoya en el hook compartido `usePasteImage` (`common/hooks/usePasteImage.js`), el mismo que usa el wrapper genérico `PasteImageField`. Si el clipboard trae varias imágenes a la vez, se extraen todas (ninguna se descarta en silencio); si una imagen ya fue pegada antes (mismo archivo), se ignora para no duplicarla. El preview debajo del textarea se renderiza con [ImagePastePreview](#imagepastepreview) — el mismo componente que usa `PasteImageField` — en vez de reimplementar el chip acá; todas las props `image*` de esta tabla se reenvían a ese componente. El componente sigue aceptando `onPaste` propio (se encadena, no se pisa).
 
 ---
 
@@ -2195,6 +2315,54 @@ import PasswordResetPanel from 'screens/components/PasswordResetPanel';
 ```
 
 **Notas:** Internamente usa el hook `useAdminPasswordReset` (`hooks/useAdminPasswordReset.js`), que llama a `features/password-reset/api.js`. Para que las llamadas de red reales funcionen en una app consumidora hace falta tener configurado `configureApiClient` (`common/api/client.js`); sin esa configuración el panel igual renderiza su UI inicial/carga/error sin fallar.
+
+---
+
+### PasteImageField
+
+Wrapper genérico que agrega la capacidad de pegar (Ctrl+V) una o más imágenes desde el clipboard a **cualquier** campo de texto que se le pase como `children` (`MultilinePlaceholder`, `TextField`, un `<textarea>` plano, etc.), sin acoplar esa lógica a un componente de texto en particular. Si el clipboard pegado contiene al menos una imagen, se previene el paste normal (texto/base64) y se extraen todos los `File` nativos encontrados; si no, el campo recibe el paste normal sin cambios. Una imagen ya pegada antes (mismo archivo) se ignora para no duplicarla. La extracción/preview vive en el hook `usePasteImage` (`common/hooks/usePasteImage.js`), reutilizable también sin este wrapper.
+
+**Import:**
+```jsx
+import PasteImageField from 'anteriority-ui/screens/components/PasteImageField'; // export default, archivo index.jsx
+```
+
+**Uso básico:**
+```jsx
+<PasteImageField onImagePaste={(files) => files.forEach(saveToStorage)}>
+  <MultilinePlaceholder label="Descripción" value={value} onChange={onChange} />
+</PasteImageField>
+```
+
+**Props:**
+
+| Prop | Tipo | Default | Descripción |
+|---|---|---|---|
+| children | node | — | El campo de texto a envolver (debe aceptar/reenviar `onPaste`, como `MultilinePlaceholder`, `TextField` o un `<textarea>`/`<input>` nativo). |
+| onImagePaste | function | — | Callback `(files, event)` invocado cuando se pegan una o más imágenes; `files` es un array de `File` nativos listos para subir o guardar en cualquier storage (un elemento si se pegó una sola imagen). Una imagen ya pegada antes (mismo archivo, detectado por nombre+tamaño+fecha+tipo) se excluye del array. |
+| disabled | boolean | `false` | Si es `true`, ignora el paste de imágenes (el campo sigue aceptando paste de texto normal). |
+| showPreview | boolean | `true` | Si muestra una miniatura propia por cada imagen pegada, con botón para quitarla individualmente. |
+| previewLabel | string | `'Imagen pegada'` | Texto junto a cada miniatura (y `alt` de la imagen). |
+| removeLabel | string | `'Quitar imagen'` | `aria-label` del botón de quitar preview. |
+| borderColor | string | `'#e2e8f0'` | Color de borde del chip contenedor del preview (miniatura + label + botón de quitar). |
+| thumbBorderColor | string | `'#cbd5e1'` | Color de borde propio de la miniatura de la imagen (el `<img>`). |
+| labelBgColor | string | `'#dbeafe'` | Color de fondo del chip del label ("Imagen pegada"). |
+| labelTextColor | string | `'#1e40af'` | Color de texto del chip del label. |
+| ...props | any | — | Cualquier otra prop se pasa al `div` contenedor (`className`, `style`, etc.). |
+
+**Ejemplos:**
+```jsx
+<PasteImageField onImagePaste={(files) => setLastFiles(files)}>
+  <TextField label="Comentario" value={value} onChange={onChange} />
+</PasteImageField>
+```
+```jsx
+<PasteImageField showPreview={false} onImagePaste={(files) => files.forEach(uploadFile)}>
+  <MultilinePlaceholder label="Notas" rows={3} value={value} onChange={onChange} />
+</PasteImageField>
+```
+
+**Notas:** No sube ni persiste las imágenes por sí mismo — solo las extrae del clipboard y las entrega vía `onImagePaste` para que el consumidor decida qué hacer (subir a un backend, guardar en `localStorage`/IndexedDB, etc.). Si se pegan varias imágenes a la vez, se extraen todas (ninguna se descarta en silencio). El preview se renderiza con [ImagePastePreview](#imagepastepreview) — el mismo componente que usa `MultilinePlaceholder` — en vez de un chip reimplementado acá; todas las props de color/label de esta tabla se reenvían a ese componente. El hook subyacente `usePasteImage({ onImagePaste, disabled })` (`common/hooks/usePasteImage.js`) puede usarse directamente si se prefiere conectar `onPaste` a mano en vez de usar este wrapper.
 
 ---
 
@@ -2701,6 +2869,7 @@ import TableA from 'screens/components/TableA';
 | `stickyFirstColumn` | `boolean` | `false` | Deja la primera columna fija a la izquierda mientras la tabla se desplaza en horizontal. Su celda necesita fondo opaco: por defecto usa `surfaceColor`; si pintás las filas con un tinte (`rowClassName`), el fondo de `td:first-child` debe seguir siendo opaco (ej. el tinte como `linear-gradient` sobre el color de superficie). |
 | `stickyHeader` | `boolean` | `false` | Encabezado siempre visible: la tabla pasa a scrollear en vertical por dentro (hasta `maxHeight`, sin barra vertical visible) y el `<th>` queda pegado arriba con `position: sticky`. Combina bien con `scrollFooter`, que queda siempre a la vista bajo la tabla. |
 | `maxHeight` | `string` \| `number` | `'70vh'` | Alto máximo del área de la tabla cuando `stickyHeader` está activo. |
+| `width` | `string` \| `number` | — | Ancho total de la tabla (`<table>`), ej. `'480px'` o `600`. Sin esta prop la tabla sigue ocupando el 100% del contenedor, igual que antes — es para el caso contrario, cuando se quiere que la tabla NO se estire a todo el ancho disponible. No afecta el ancho del contenedor/wrapper, que sigue siendo 100%. |
 | `scrollFooter` | `boolean` | `false` | Muestra un pie pegado al borde inferior de la pantalla (`position: sticky`) con un botón ◀, un slider y un botón ▶ para desplazar la tabla en horizontal sin bajar hasta su final. Solo aparece si la tabla es más ancha que su contenedor y reemplaza la barra de scroll horizontal propia de la tabla. Ningún ancestro de la tabla debe tener `overflow: hidden/auto` entre ella y el scroll de la página (usar `overflow: clip` si hace falta recortar). |
 | `scrollFooterBgColor` | `string` | `surfaceColor` | Fondo del pie de desplazamiento. |
 | `scrollFooterBorderColor` | `string` | `borderColor` | Borde del pie de desplazamiento. |
@@ -2770,9 +2939,12 @@ function UsersTable() {
 
   return <TableA columns={columns} data={filteredData} keyExtractor={(row) => row.id} />;
 }
+
+// Ancho total fijo en vez de ocupar todo el contenedor
+<TableA columns={columns} data={data} keyExtractor={(row) => row.id} width="480px" />
 ```
 
-> **Importante:** `TableA` usa columnas con forma `{ header, accessor, align, width, render, filter }` y filas como objetos planos accedidos por `accessor`. Ver `TableB` abajo — su forma es distinta, no son intercambiables.
+> **Importante:** `TableA` usa columnas con forma `{ header, accessor, align, width, render, filter }` y filas como objetos planos accedidos por `accessor`. Ver `TableB` abajo — su forma es distinta, no son intercambiables. No confundir `width` a nivel tabla (prop de arriba) con `width` a nivel columna (`col.width`, dentro de `columns`) — son dos cosas distintas.
 
 ---
 
@@ -2819,6 +2991,7 @@ import TableB from 'screens/components/TableB';
 | `stickyFirstColumn` | `boolean` | `false` | Deja la primera columna fija a la izquierda al desplazar en horizontal. Su celda usa `surfaceColor` como fondo opaco (si pintás las filas con un tinte, el fondo de `td:first-child` debe seguir siendo opaco). Las celdas con colSpan (vacío, error, fila expandida) no se fijan. |
 | `stickyHeader` | `boolean` | `false` | Encabezado siempre visible: la tabla pasa a scrollear en vertical por dentro (hasta `maxHeight`, sin barra vertical visible) y el `<th>` queda pegado arriba con `position: sticky`. Combina bien con `scrollFooter`, que queda siempre a la vista bajo la tabla. |
 | `maxHeight` | `string` \| `number` | `'70vh'` | Alto máximo del área de la tabla cuando `stickyHeader` está activo. |
+| `width` | `string` \| `number` | — | Ancho total de la tabla (`<table>`), ej. `'480px'` o `600`. Sin esta prop la tabla sigue ocupando el 100% del contenedor, igual que antes — es para el caso contrario, cuando se quiere que la tabla NO se estire a todo el ancho disponible. No afecta el ancho del contenedor/wrapper, que sigue siendo 100%. No confundir con `col.width` (ancho de una columna puntual, dentro de `columns`). |
 | `scrollFooter` | `boolean` | `false` | Pie `position: sticky` al borde inferior de la pantalla con ◀, slider y ▶ para desplazar la tabla sin bajar hasta su final. Solo aparece si la tabla es más ancha que su contenedor y reemplaza la barra horizontal propia. Ningún ancestro entre la tabla y el scroll de la página debe tener `overflow: hidden/auto` (usar `overflow: clip`). |
 | `scrollFooterBgColor`, `scrollFooterBorderColor` | `string` | `surfaceColor`, `borderColor` | Fondo y borde del pie. |
 | `scrollControlsColor` | `string` | `'#7c9cff'` (slider) / color por defecto de `Button` | Color de los botones ◀ ▶ y del slider. |
@@ -3033,6 +3206,12 @@ import TopBar from '../TopBar/index'; // export default
 | `loading` | boolean | `false` | Activa el estado de carga utilizando el componente `Skeleton` para logo, breadcrumbs/título, buscador y acciones, conservando la estructura y layout sin saltos visuales. |
 | `isLoading` | boolean | `false` | Alias de conveniencia para `loading`. |
 | `skeletonActionsCount` | number | `3` (o `actions.length`) | Cantidad de botones de acción a mostrar como skeleton durante el estado de carga. |
+| `actionHover` | boolean | `true` | Controla si los botones de acción tienen efecto hover. Pasar `false` para quitar/desactivar el hover por completo. |
+| `actionHoverBgColor` | string | `'#e2e8f0'` | Color de fondo en hover para los botones de acción (`--topbar-action-hover-bg`). |
+| `actionHoverTextColor` | string | `'#0f172a'` | Color de texto/icono en hover para los botones de acción (`--topbar-action-hover-text`). |
+| `actionHoverBorderColor` | string | `'#e2e8f0'` | Color del borde en hover para los botones de acción (`--topbar-action-hover-border`). |
+| `actionRippleColor` | string | `'rgba(15, 23, 42, 0.28)'` | Color de la animación de onda (ripple/olas) al hacer click en los botones de acción (`--topbar-action-ripple`). |
+
 
 
 **Ejemplos:**
@@ -3057,7 +3236,7 @@ import TopBar from '../TopBar/index'; // export default
 />
 ```
 
-**Notas:** El menú de usuario se renderiza vía `createPortal` a `document.body` (mismo patrón que el menú de usuario de `Sidebar`), posicionado contra el botón del avatar. `actions` son completamente genéricas — no asume ningún set fijo de íconos (notificaciones, mensajes, ayuda, etc. quedan a elección del consumidor).
+**Notas:** El menú de usuario se renderiza vía `createPortal` a `document.body` (mismo patrón que el menú de usuario de `Sidebar`), posicionado contra el botón del avatar. `actions` son completamente genéricas — no asume ningún set fijo de íconos (notificaciones, mensajes, ayuda, etc. quedan a elección del consumidor). El atajo de teclado Ctrl/Cmd+K para abrir el `CommandPalette` (`useCommandPaletteShortcut` en `utils.js`) usa el hook genérico `useKeyboardShortcut` (`common/hooks/useKeyboardShortcut.js`), reutilizable para registrar cualquier otro atajo global (`{ key, ctrlOrMeta, shift, alt, enabled, onTrigger }`) sin reimplementar el listener de teclado a mano en cada componente nuevo.
 
 ---
 
@@ -3100,3 +3279,72 @@ import UserEditPopover from 'screens/components/UserEditPopover';
 ```
 
 **Notas:** Al guardar, llama a `updateUserName` de `features/user-profile/api.js` y a `getUserId` de `common/storage/LocalStorage.js`. Para que la petición real funcione en una app consumidora es necesario tener configurado `configureApiClient` (`common/api/client.js`); si la llamada falla, el componente igual invoca `onSuccess` con el nombre local como fallback para pruebas.
+
+---
+
+### NotificationsPanel
+
+Panel de notificaciones y mensajes con soporte para scroll interno, descartado de ítems, acciones por ítem, estados de carga (Skeleton y Spinner) y un estado vacío (*empty state*) espacioso y personalizable. Si el título o el mensaje hacen referencia a mensajes/correo, detecta el contexto automáticamente y muestra los íconos de sobre correspondientes.
+
+**Import:**
+```jsx
+import NotificationsPanel from 'screens/components/NotificationsPanel';
+// o desde el barrel:
+import { NotificationsPanel } from 'anteriority-ui';
+```
+
+**Uso básico (con notificaciones):**
+```jsx
+<NotificationsPanel
+  title="Notificaciones"
+  notifications={[
+    {
+      id: 1,
+      title: 'Nueva cita agendada',
+      message: 'Se agendó una cita para mañana a las 15:00.',
+      timestamp: 'Hace 5 minutos',
+    },
+  ]}
+  onDismiss={(id) => handleDismiss(id)}
+/>
+```
+
+**Uso estado vacío (Mensajes / Screenshot):**
+```jsx
+<NotificationsPanel
+  title="Mensajes"
+  emptyMessage="No tienes mensajes."
+  notifications={[]}
+/>
+```
+
+**Props:**
+
+| Prop | Tipo | Default | Descripción |
+|---|---|---|---|
+| `title` | `string` | `'Notificaciones'` | Título del panel. Si contiene palabras como "mensaje", "mail" o "chat", adapta los íconos por defecto a correo. |
+| `icon` | `ReactNode` | `<Bell size={20} />` \| `<Mail size={20} />` | Ícono del encabezado. Si no se pasa, se deduce según el contexto del título. |
+| `notifications` | `Array<NotificationItem>` | `[]` | Lista de notificaciones a mostrar. Si está vacía, muestra el contenedor de estado vacío. |
+| `onDismiss` | `function(id)` | — | Callback invocado cuando el usuario descarta una notificación. |
+| `emptyTitle` | `string` | — | Título opcional para el estado vacío (ej. `"Bandeja limpia"`). |
+| `emptyMessage` | `string` | `'No tenés notificaciones nuevas.'` | Mensaje descriptivo del estado vacío. |
+| `emptyIcon` | `ReactNode \| ReactComponent \| boolean` | Auto (`MailX` o `BellOff`) | Ícono central del estado vacío. Pasar `false` para ocultarlo. |
+| `emptyIconSize` | `number` | `46` | Tamaño en píxeles del ícono del estado vacío. |
+| `emptyIconColor` | `string` | `'#94a3b8'` | Color del ícono del estado vacío. |
+| `emptyTextColor` | `string` | `'#64748b'` | Color del texto del estado vacío. |
+| `emptyMinHeight` | `number \| string` | `200` | Altura mínima del contenedor de estado vacío en píxeles. |
+| `maxHeight` | `number \| string` | `380` | Altura máxima del contenido con scroll interno. |
+| `dismissLabel` | `string` | `'Quitar notificación'` | Tooltip/aria-label para el botón de descartar. |
+| `isModal` | `boolean` | `false` | Renderiza el panel dentro de un modal. |
+| `onClose` | `function` | — | Callback al cerrar el panel cuando se usa en modo modal. |
+| `isLoading` | `boolean` | `false` | Muestra estado de carga. |
+| `loadingType` | `'skeleton' \| 'spinner'` | `'skeleton'` | Tipo de indicador de carga. |
+| `loadingVariant` | `string` | — | Variante del spinner (`'bars'`, `'dots'`, etc.). |
+| `skeletonCount` | `number` | `3` | Cantidad de skeletons a renderizar. |
+| `bgColor` | `string` | — | Color de fondo del panel (`--frame-bg`). |
+| `iconColor` | `string` | — | Color del ícono del encabezado (`--frame-icon-color`). |
+| `itemBgColor` | `string` | — | Fondo por defecto de las tarjetas de notificación. |
+| `itemBorderColor` | `string` | — | Borde por defecto de las tarjetas de notificación. |
+| `itemIconColor` | `string` | — | Color del ícono por defecto de las tarjetas. |
+| `textColor` | `string` | — | Color de texto principal. |
+

@@ -1,19 +1,20 @@
-import React, { useLayoutEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
-import { Search } from 'lucide-react';
-import Button from '../Button/index';
+import React, { useCallback, useState } from 'react';
 import Breadcrumbs from '../Breadcrumbs/index';
-import ModalTooltip from '../ModalTooltip/ModalTooltip';
-import UserAvatar from '../Profile/Avatar/index';
 import Skeleton from '../Skeleton/index';
+import CommandPalette from '../CommandPalette/index';
+import Button from '../Button/index';
+import KeyboardShortcut from '../KeyboardShortcut/index';
+import SearchBar from './components/SearchBar/index';
+import TopBarActions from './components/TopBarActions/index';
+import UserMenu from './components/UserMenu/index';
+import NavLinks from './components/NavLinks/index';
 import styles from './index.module.css';
+import { buildThemeVars, hasActionHoverEnabled, hasCenterSearch } from './utils.js';
 import {
-    DEFAULT_SEARCH_PLACEHOLDER,
-    DEFAULT_SEARCH_SHORTCUT,
-    DEFAULT_USER_MENU_LABEL,
     DEFAULT_BREADCRUMB_LINK_COLOR,
     DEFAULT_BREADCRUMB_CURRENT_COLOR,
     DEFAULT_SKELETON_ACTIONS_COUNT,
+    DEFAULT_COMMAND_PALETTE_PLACEHOLDER,
 } from './constants.js';
 
 function TopBar(props) {
@@ -45,53 +46,81 @@ function TopBar(props) {
         loading = false,
         isLoading = false,
         skeletonActionsCount,
+        actionHover = true,
+        showActionHover = true,
+        disableActionHover = false,
+        actionHoverBgColor,
+        actionHoverTextColor,
+        actionHoverBorderColor,
+        actionRippleColor,
+        commandItems,
+        commandPaletteShortcut = true,
+        commandPalettePlaceholder = DEFAULT_COMMAND_PALETTE_PLACEHOLDER,
+        onCommandPaletteOpen,
+        onCommandPaletteClose,
+        paletteBgColor,
+        paletteTextColor,
+        paletteBorderColor,
+        paletteIconColor,
+        paletteAccentColor,
+        paletteCategoryColor,
+        commandPaletteLoading = false,
+        commandPaletteLoadingType,
+        commandPaletteLoadingVariant,
+        commandPaletteSkeletonCount,
+        commandPaletteClearQueryOnClose = false,
+        navLinks,
+        navLinkColor,
+        navLinkActiveColor,
+        ctaButton,
     } = props;
 
     const isTopBarLoading = Boolean(loading || isLoading);
-    const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-    const [userMenuPosition, setUserMenuPosition] = useState(null);
-    const userButtonRef = useRef(null);
-    const userMenuRef = useRef(null);
+    const hasGlobalHover = hasActionHoverEnabled({ actionHover, showActionHover, disableActionHover });
+    const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
 
-    const themeVars = {
-        ...(bgColor ? { '--topbar-bg': bgColor } : {}),
-        ...(textColor ? { '--topbar-text': textColor } : {}),
-        ...(borderColor ? { '--topbar-border': borderColor } : {}),
-        ...(iconColor ? { '--topbar-icon': iconColor } : {}),
-        ...(actionBgColor ? { '--topbar-action-bg': actionBgColor } : {}),
-        ...(actionBorderColor ? { '--topbar-action-border': actionBorderColor } : {}),
-        ...(accentColor ? { '--topbar-accent': accentColor } : {}),
-        ...(searchBgColor ? { '--topbar-search-bg': searchBgColor } : {}),
-        ...(dividerColor ? { '--topbar-divider': dividerColor } : {}),
-        ...(badgeBgColor ? { '--topbar-badge-bg': badgeBgColor } : {}),
-        ...(badgeTextColor ? { '--topbar-badge-text': badgeTextColor } : {}),
-    };
+    const openCommandPalette = useCallback(() => {
+        setIsCommandPaletteOpen(true);
+        onCommandPaletteOpen && onCommandPaletteOpen();
+    }, [onCommandPaletteOpen]);
 
-    useLayoutEffect(() => {
-        if (!isUserMenuOpen || !userButtonRef.current) return;
-        const rect = userButtonRef.current.getBoundingClientRect();
-        setUserMenuPosition({
-            top: rect.bottom + 8,
-            right: window.innerWidth - rect.right,
+    const closeCommandPalette = useCallback(() => {
+        setIsCommandPaletteOpen(false);
+        onCommandPaletteClose && onCommandPaletteClose();
+    }, [onCommandPaletteClose]);
+
+    const toggleCommandPalette = useCallback(() => {
+        setIsCommandPaletteOpen((prev) => {
+            const next = !prev;
+            if (next) onCommandPaletteOpen && onCommandPaletteOpen();
+            else onCommandPaletteClose && onCommandPaletteClose();
+            return next;
         });
-    }, [isUserMenuOpen]);
+    }, [onCommandPaletteOpen, onCommandPaletteClose]);
 
-    React.useEffect(() => {
-        if (!isUserMenuOpen) return undefined;
-        const handlePointerDown = (event) => {
-            if (userMenuRef.current?.contains(event.target)) return;
-            if (userButtonRef.current?.contains(event.target)) return;
-            setIsUserMenuOpen(false);
-        };
-        document.addEventListener('mousedown', handlePointerDown);
-        return () => document.removeEventListener('mousedown', handlePointerDown);
-    }, [isUserMenuOpen]);
+    const themeVars = buildThemeVars({
+        bgColor,
+        textColor,
+        borderColor,
+        iconColor,
+        actionBgColor,
+        actionBorderColor,
+        actionHoverBgColor,
+        actionHoverTextColor,
+        actionHoverBorderColor,
+        actionRippleColor,
+        accentColor,
+        searchBgColor,
+        dividerColor,
+        badgeBgColor,
+        badgeTextColor,
+    });
 
     if (isTopBarLoading) {
         const actionsCount = skeletonActionsCount !== undefined
             ? skeletonActionsCount
             : ('actions' in props && Array.isArray(props.actions) ? props.actions.length : DEFAULT_SKELETON_ACTIONS_COUNT);
-        const hasCenterSearch = centerContent ? false : searchProps !== false && searchProps !== null;
+        const showCenterSearchSkeleton = hasCenterSearch({ centerContent, searchProps, commandItems });
         const hasCenterContent = Boolean(centerContent);
         const hasUser = user !== null && user !== false && ('user' in props ? Boolean(props.user) : true);
         const hasLogo = logo !== null && logo !== false;
@@ -128,7 +157,7 @@ function TopBar(props) {
                 </div>
 
                 <div className={styles.centerSection}>
-                    {hasCenterSearch ? (
+                    {showCenterSearchSkeleton ? (
                         <div className={styles.searchWrapper}>
                             <Skeleton width="100%" height="36px" radius="8px" />
                         </div>
@@ -157,6 +186,11 @@ function TopBar(props) {
     }
 
     return (
+        <KeyboardShortcut
+            shortcut="ctrl+k"
+            enabled={commandItems !== undefined && commandPaletteShortcut !== false}
+            onTrigger={toggleCommandPalette}
+        >
         <header className={`${styles.topbar} ${className}`} style={themeVars}>
             <div className={styles.leftSection}>
                 {logo && (
@@ -183,116 +217,67 @@ function TopBar(props) {
             </div>
 
             <div className={styles.centerSection}>
-                {centerContent ? (
-                    centerContent
-                ) : searchProps ? (
-                    <div className={styles.searchWrapper}>
-                        <Search size={16} className={styles.searchIcon} />
-                        <input
-                            type="text"
-                            className={styles.searchInput}
-                            placeholder={searchProps.placeholder ?? DEFAULT_SEARCH_PLACEHOLDER}
-                            value={searchProps.value}
-                            onChange={searchProps.onChange}
-                            onFocus={searchProps.onFocus}
-                            onBlur={searchProps.onBlur}
-                        />
-                        {searchProps.shortcut !== false && (
-                            <kbd className={styles.searchShortcut}>
-                                {searchProps.shortcut ?? DEFAULT_SEARCH_SHORTCUT}
-                            </kbd>
-                        )}
-                    </div>
-                ) : null}
+                {navLinks && navLinks.length > 0 ? (
+                    <NavLinks
+                        navLinks={navLinks}
+                        navLinkColor={navLinkColor}
+                        navLinkActiveColor={navLinkActiveColor}
+                    />
+                ) : (
+                    <SearchBar
+                        centerContent={centerContent}
+                        searchProps={searchProps}
+                        commandItems={commandItems}
+                        commandPaletteShortcut={commandPaletteShortcut}
+                        commandPalettePlaceholder={commandPalettePlaceholder}
+                        onOpenCommandPalette={openCommandPalette}
+                    />
+                )}
             </div>
 
             <div className={styles.rightSection}>
-                {actions.map((action, index) => {
-                    const Icon = action.icon;
-                    const hasBadge = action.badge !== undefined && action.badge !== null && action.badge !== false;
-                    const isDotBadge = action.badge === true;
-                    const button = (
-                        <span key={action.key ?? index} className={styles.actionBtnWrapper}>
-                            <Button
-                                size="small"
-                                variant={Button.VARIANTS.GHOST}
-                                color="transparent"
-                                className={styles.actionBtn}
-                                onClick={action.onClick}
-                                disabled={action.disabled}
-                                style={{ minWidth: 0, padding: '7px' }}
-                            >
-                                {Icon && <Icon size={18} />}
-                            </Button>
-                            {hasBadge && (
-                                <span className={`${styles.actionBadge} ${isDotBadge ? styles.actionBadgeDot : styles.actionBadgeCount}`}>
-                                    {!isDotBadge && action.badge}
-                                </span>
-                            )}
-                        </span>
-                    );
-
-                    return action.tooltip ? (
-                        <ModalTooltip key={action.key ?? index} text={action.tooltip} position="bottom">
-                            {button}
-                        </ModalTooltip>
-                    ) : (
-                        button
-                    );
-                })}
+                <TopBarActions actions={actions} hasGlobalHover={hasGlobalHover} />
 
                 {showDivider && actions.length > 0 && user && (
                     <span className={styles.actionsDivider} aria-hidden="true" />
                 )}
 
-                {user && (
-                    <div className={styles.userSection}>
-                        <button
-                            type="button"
-                            ref={userButtonRef}
-                            className={styles.userButton}
-                            onClick={() => setIsUserMenuOpen((prev) => !prev)}
-                            aria-label={DEFAULT_USER_MENU_LABEL}
-                        >
-                            <UserAvatar src={user.avatarUrl} name={user.name || user.email} size={28} />
-                        </button>
+                <UserMenu user={user} userMenuItems={userMenuItems} />
 
-                        {isUserMenuOpen && userMenuPosition && createPortal(
-                            <div
-                                ref={userMenuRef}
-                                className={styles.userMenu}
-                                style={{ top: userMenuPosition.top, right: userMenuPosition.right }}
-                            >
-                                {(user.name || user.email) && (
-                                    <div className={styles.userMenuHeader}>
-                                        {user.name && <div className={styles.userMenuName}>{user.name}</div>}
-                                        {user.email && <div className={styles.userMenuEmail}>{user.email}</div>}
-                                    </div>
-                                )}
-                                {userMenuItems.map((menuItem) => {
-                                    const MenuIcon = menuItem.icon;
-                                    return (
-                                        <button
-                                            key={menuItem.id ?? menuItem.label}
-                                            type="button"
-                                            className={`${styles.userMenuItem} ${menuItem.variant === 'danger' ? styles.userMenuItemDanger : ''}`}
-                                            onClick={() => {
-                                                setIsUserMenuOpen(false);
-                                                menuItem.onClick && menuItem.onClick();
-                                            }}
-                                        >
-                                            {MenuIcon && <MenuIcon size={16} />}
-                                            <span>{menuItem.label}</span>
-                                        </button>
-                                    );
-                                })}
-                            </div>,
-                            document.body
-                        )}
-                    </div>
+                {ctaButton && (
+                    <Button
+                        size={ctaButton.size || 'small'}
+                        variant={ctaButton.variant || Button.VARIANTS.PRIMARY}
+                        color={ctaButton.color}
+                        onClick={ctaButton.onClick}
+                        className={styles.ctaButton}
+                        style={ctaButton.style}
+                    >
+                        {ctaButton.label}
+                    </Button>
                 )}
             </div>
+
+            {commandItems !== undefined && (
+                <CommandPalette
+                    open={isCommandPaletteOpen}
+                    onClose={closeCommandPalette}
+                    items={commandItems}
+                    bgColor={paletteBgColor}
+                    textColor={paletteTextColor}
+                    borderColor={paletteBorderColor}
+                    iconColor={paletteIconColor}
+                    accentColor={paletteAccentColor}
+                    categoryColor={paletteCategoryColor}
+                    isLoading={commandPaletteLoading}
+                    loadingType={commandPaletteLoadingType}
+                    loadingVariant={commandPaletteLoadingVariant}
+                    skeletonCount={commandPaletteSkeletonCount}
+                    clearQueryOnClose={commandPaletteClearQueryOnClose}
+                />
+            )}
         </header>
+        </KeyboardShortcut>
     );
 }
 

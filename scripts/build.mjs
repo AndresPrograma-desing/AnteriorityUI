@@ -11,6 +11,7 @@ import { fileURLToPath } from 'node:url';
 const rootDir = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const outDir = path.join(rootDir, 'dist');
 const sourceDirs = ['screens', 'common', 'features', 'hooks'];
+const rootEntryFiles = ['index.js', 'lucide.js'];
 
 const isSourceFile = (file) => /\.(jsx|js)$/.test(file) && !/\.stories\.jsx$/.test(file);
 
@@ -32,7 +33,7 @@ async function main() {
   await rm(outDir, { recursive: true, force: true });
   await mkdir(outDir, { recursive: true });
 
-  const allFiles = [path.join(rootDir, 'index.js')];
+  const allFiles = rootEntryFiles.map((file) => path.join(rootDir, file));
   for (const dir of sourceDirs) {
     const abs = path.join(rootDir, dir);
     try {

@@ -129,3 +129,15 @@ export const StickyFirstColumnWithScrollFooter = {
     scrollFooter: true,
   },
 };
+
+// `width` fija el ancho total de la tabla (no solo del contenedor, que sigue
+// siendo 100% del espacio disponible) — útil para que no se estire a todo el
+// ancho de la pantalla cuando hay pocas columnas.
+export const FixedWidth = {
+  args: {
+    columns,
+    data,
+    rowKey: 'id',
+    width: '480px',
+  },
+};

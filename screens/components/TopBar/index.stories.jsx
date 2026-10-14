@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Bell, MessageCircle, HelpCircle, LogOut, User, Settings } from 'lucide-react';
+import { Bell, MessageCircle, HelpCircle, LogOut, User, Settings, Folder, FileText } from 'lucide-react';
 import { SiPubg } from 'react-icons/si';
 import TopBar from './index.jsx';
 
@@ -22,6 +22,16 @@ const actions = [
   { key: 'messages', icon: MessageCircle, tooltip: 'Mensajes', badge: 2, onClick: () => console.log('messages') },
   { key: 'notifications', icon: Bell, tooltip: 'Notificaciones', badge: 3, onClick: () => console.log('notifications') },
   { key: 'help', icon: HelpCircle, tooltip: 'Ayuda', onClick: () => console.log('help') },
+];
+
+const commandItems = [
+  { id: 's1', label: 'Gubernamentales-API', category: 'Sesiones', icon: Folder, onSelect: () => console.log('Gubernamentales-API') },
+  { id: 's2', label: 'Proyecto', category: 'Sesiones', icon: Folder, onSelect: () => console.log('Proyecto') },
+  { id: 'p1', label: 'EDENOR', category: 'Proyectos', icon: Folder, onSelect: () => console.log('EDENOR') },
+  { id: 'p2', label: 'reunir', category: 'Proyectos', icon: Folder, onSelect: () => console.log('reunir') },
+  { id: 'p3', label: 'PROYECTO', category: 'Proyectos', icon: Folder, onSelect: () => console.log('PROYECTO') },
+  { id: 'p4', label: 'Kortech-Camuzzi', category: 'Proyectos', icon: Folder, onSelect: () => console.log('Kortech-Camuzzi') },
+  { id: 'd1', label: 'Informe mensual.pdf', category: 'Documentos', icon: FileText, description: 'Modificado hoy', onSelect: () => console.log('doc') },
 ];
 
 const userMenuItems = [
@@ -247,4 +257,180 @@ export const LoadingToggleInteractive = {
     );
   },
 };
+
+export const ActionHoverDisabled = {
+  render: (args) => <SearchWithState {...args} />,
+  args: {
+    logo: <Logo />,
+    breadcrumbItems,
+    actions,
+    user: { name: 'Jane Doe', email: 'jane.doe@example.com' },
+    actionHover: false,
+  },
+};
+
+export const ActionCustomHoverAndRipple = {
+  render: (args) => <SearchWithState {...args} />,
+  args: {
+    logo: <Logo />,
+    breadcrumbItems,
+    actions,
+    user: { name: 'Jane Doe', email: 'jane.doe@example.com' },
+    actionHoverBgColor: '#dbeafe',
+    actionHoverTextColor: '#1d4ed8',
+    actionRippleColor: 'rgba(29, 78, 216, 0.4)',
+  },
+};
+
+export const PerActionHoverConfig = {
+  render: (args) => <SearchWithState {...args} />,
+  args: {
+    logo: <Logo />,
+    breadcrumbItems,
+    actions: [
+      { key: 'messages', icon: MessageCircle, tooltip: 'Hover deshabilitado en este botón', badge: 2, hover: false },
+      { key: 'notifications', icon: Bell, tooltip: 'Hover verde con ola verde', badge: 3, hoverBgColor: '#dcfce7', hoverTextColor: '#15803d', rippleColor: 'rgba(21, 128, 61, 0.4)' },
+      { key: 'help', icon: HelpCircle, tooltip: 'Hover violeta con ola violeta', hoverBgColor: '#f3e8ff', hoverTextColor: '#7e22ce', rippleColor: 'rgba(126, 34, 206, 0.4)' },
+    ],
+    user: { name: 'Jane Doe', email: 'jane.doe@example.com' },
+  },
+};
+
+// El buscador central abre un modal tipo "command palette" (Spotlight) al
+// hacer click o al presionar Ctrl+K (Cmd+K en Mac) en cualquier parte de la
+// página. Los resultados se agrupan por `category` y se filtran por texto.
+export const WithCommandPalette = {
+  args: {
+    logo: <Logo />,
+    breadcrumbItems,
+    commandItems,
+    actions,
+    user: { name: 'Jane Doe', email: 'jane.doe@example.com' },
+    userMenuItems,
+  },
+};
+
+export const CommandPaletteCustomColors = {
+  args: {
+    logo: <Logo />,
+    breadcrumbItems,
+    commandItems,
+    actions,
+    user: { name: 'Jane Doe', email: 'jane.doe@example.com' },
+    userMenuItems,
+    paletteBgColor: '#ffffff',
+    paletteTextColor: '#0f172a',
+    paletteBorderColor: '#e2e8f0',
+    paletteIconColor: '#64748b',
+    paletteAccentColor: '#2563eb',
+    paletteCategoryColor: '#94a3b8',
+  },
+};
+
+// Simula resultados que tardan en llegar (ej. búsqueda remota): al abrir la
+// paleta con Ctrl+K o con click, se ve el loading (spinner o skeleton) por
+// un momento antes de mostrar los resultados reales.
+const CommandPaletteLoadingDemo = (args) => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  return (
+    <TopBar
+      {...args}
+      commandPaletteLoading={isLoading}
+      onCommandPaletteOpen={() => {
+        setIsLoading(true);
+        setTimeout(() => setIsLoading(false), 1200);
+      }}
+    />
+  );
+};
+
+export const CommandPaletteLoadingSpinner = {
+  render: (args) => <CommandPaletteLoadingDemo {...args} />,
+  args: {
+    logo: <Logo />,
+    breadcrumbItems,
+    commandItems,
+    actions,
+    user: { name: 'Jane Doe', email: 'jane.doe@example.com' },
+    userMenuItems,
+  },
+};
+
+export const CommandPaletteLoadingSkeleton = {
+  render: (args) => <CommandPaletteLoadingDemo {...args} />,
+  args: {
+    logo: <Logo />,
+    breadcrumbItems,
+    commandItems,
+    actions,
+    user: { name: 'Jane Doe', email: 'jane.doe@example.com' },
+    userMenuItems,
+    commandPaletteLoadingType: 'skeleton',
+    commandPaletteSkeletonCount: 5,
+  },
+};
+
+// Navbar para landing pages públicas (no app logueada): `navLinks` reemplaza
+// al buscador central, cada link puede tener `dropdownContent` para abrir un
+// mega-menu que se desliza hacia abajo debajo de toda la barra, y `ctaButton`
+// agrega un botón de acción a la derecha. `bgColor="transparent"` deja ver el
+// fondo de la página detrás (útil sobre un hero con imagen/gradiente).
+const megaMenuColumns = (
+  <div style={{ display: 'flex', gap: 48, padding: '28px 48px', maxWidth: 960, margin: '0 auto' }}>
+    <div>
+      <h4 style={{ margin: '0 0 12px 0', fontSize: '0.8rem', color: '#94a3b8', textTransform: 'uppercase' }}>Diseño</h4>
+      <p style={{ margin: '0 0 8px 0', cursor: 'pointer' }}>UX/UI Design</p>
+      <p style={{ margin: '0 0 8px 0', cursor: 'pointer' }}>Design Systems</p>
+    </div>
+    <div>
+      <h4 style={{ margin: '0 0 12px 0', fontSize: '0.8rem', color: '#94a3b8', textTransform: 'uppercase' }}>Desarrollo</h4>
+      <p style={{ margin: '0 0 8px 0', cursor: 'pointer' }}>Frontend</p>
+      <p style={{ margin: '0 0 8px 0', cursor: 'pointer' }}>Backend</p>
+    </div>
+  </div>
+);
+
+const navLinks = [
+  { id: 'inicio', label: 'Inicio', href: '#' },
+  { id: 'cursos', label: 'Cursos', dropdownContent: megaMenuColumns },
+  { id: 'mentores', label: 'Mentores', href: '#' },
+  { id: 'nosotros', label: 'Sobre nosotros', href: '#' },
+  { id: 'contacto', label: 'Contacto', href: '#' },
+];
+
+export const PublicNavbar = {
+  args: {
+    logo: <Logo />,
+    navLinks,
+    ctaButton: {
+      label: 'Regístrate ahora',
+      onClick: () => console.log('cta click'),
+      style: { borderRadius: '999px' },
+    },
+  },
+};
+
+export const PublicNavbarTransparentDark = {
+  render: (args) => (
+    <div style={{ background: 'linear-gradient(135deg, #0f172a, #1e293b)', padding: '0 0 120px 0' }}>
+      <TopBar {...args} />
+    </div>
+  ),
+  args: {
+    logo: <Logo />,
+    navLinks,
+    ctaButton: {
+      label: 'Regístrate',
+      onClick: () => console.log('cta click'),
+      style: { borderRadius: '999px' },
+    },
+    bgColor: 'transparent',
+    textColor: '#f8fafc',
+    borderColor: 'transparent',
+    navLinkColor: 'rgba(248, 250, 252, 0.75)',
+    navLinkActiveColor: '#ffffff',
+  },
+};
+
 

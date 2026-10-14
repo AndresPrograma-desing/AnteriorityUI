@@ -1,4 +1,4 @@
-import { ICON_PACKS, ICON_PACK_NAMES } from './registry';
+import { ICON_PACKS, ICON_PACK_NAMES } from './registry.js';
 
 // Busca `query` (substring, case-insensitive) en el nombre de ícono de TODOS los packs
 // de react-icons empaquetados, sin que el caller necesite saber de antemano en qué pack
