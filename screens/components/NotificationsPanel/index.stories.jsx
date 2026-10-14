@@ -47,6 +47,26 @@ export const Empty = {
   },
 };
 
+export const EmptyMessages = {
+  name: 'Empty (Mensajes - Screenshot)',
+  args: {
+    title: 'Mensajes',
+    emptyMessage: 'No tienes mensajes.',
+    notifications: [],
+  },
+};
+
+export const EmptyCustom = {
+  args: {
+    title: 'Bandeja de entrada',
+    emptyTitle: 'Todo al día',
+    emptyMessage: 'No tienes notificaciones pendientes en este momento.',
+    emptyIconSize: 52,
+    emptyIconColor: '#38bdf8',
+    notifications: [],
+  },
+};
+
 export const Dismissible = {
   render: (args) => {
     const [items, setItems] = useState(baseNotifications);

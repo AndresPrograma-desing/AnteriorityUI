@@ -33,6 +33,7 @@ const TableA = (props) => {
     stickyFirstColumn = false,
     stickyHeader = false,
     maxHeight = '70vh',
+    width,
     scrollFooter = false,
     scrollFooterBgColor,
     scrollFooterBorderColor,
@@ -76,7 +77,7 @@ const TableA = (props) => {
       className={wrapperClassName}
       style={themeVars}
     >
-      <table className={styles.table}>
+      <table className={styles.table} style={width ? { width } : undefined}>
         <thead>
           <tr>
             {columns.map((col, idx) => (

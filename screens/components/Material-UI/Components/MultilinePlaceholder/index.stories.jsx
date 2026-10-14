@@ -43,3 +43,21 @@ export const WithError = {
     rows: 3,
   },
 };
+
+export const WithImagePaste = {
+  render: () => {
+    const [value, setValue] = useState('');
+    return (
+      <div style={{ width: 360 }}>
+        <MultilinePlaceholder
+          label="Descripción"
+          placeholder="Escribe o pega una imagen (Ctrl+V)..."
+          rows={4}
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          onImagePaste={(files) => console.log('Imágenes extraídas:', files)}
+        />
+      </div>
+    );
+  },
+};

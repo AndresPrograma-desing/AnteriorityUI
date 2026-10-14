@@ -1,0 +1,47 @@
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border: 1px solid var(--image-paste-preview-border, #e2e8f0);
+  border-radius: 8px;
+  background-color: #f8fafc;
+  width: fit-content;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.thumb {
+  width: 36px;
+  height: 36px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid var(--image-paste-preview-thumb-border, #cbd5e1);
+  flex-shrink: 0;
+}
+
+.removeButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: none;
+  border-radius: 50%;
+  background-color: transparent;
+  color: #64748b;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.removeButton:hover {
+  background-color: #e2e8f0;
+  color: #0f172a;
+}

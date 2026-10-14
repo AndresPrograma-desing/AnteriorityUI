@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bell } from 'lucide-react';
+import { Bell, BellOff, Mail, MailX } from 'lucide-react';
 import Frame from '../Frame/index';
 import Button from '../Button/index';
 import Callout from '../Callout/index';
@@ -9,14 +9,22 @@ import {
     DEFAULT_EMPTY_MESSAGE,
     DEFAULT_MAX_HEIGHT,
     DEFAULT_DISMISS_LABEL,
+    DEFAULT_EMPTY_ICON_SIZE,
+    DEFAULT_EMPTY_MIN_HEIGHT,
 } from './constants.js';
 
 function NotificationsPanel({
     title = DEFAULT_TITLE,
-    icon = <Bell size={20} />,
+    icon,
     notifications = [],
     onDismiss,
+    emptyTitle,
     emptyMessage = DEFAULT_EMPTY_MESSAGE,
+    emptyIcon,
+    emptyIconSize = DEFAULT_EMPTY_ICON_SIZE,
+    emptyIconColor,
+    emptyTextColor,
+    emptyMinHeight = DEFAULT_EMPTY_MIN_HEIGHT,
     maxHeight = DEFAULT_MAX_HEIGHT,
     dismissLabel = DEFAULT_DISMISS_LABEL,
     isModal = false,
@@ -35,10 +43,40 @@ function NotificationsPanel({
 }) {
     const hasNotifications = notifications.length > 0;
 
+    const isMessageContext =
+        (typeof title === 'string' && /mensaje|mail|chat/i.test(title)) ||
+        (typeof emptyMessage === 'string' && /mensaje|mail|chat/i.test(emptyMessage));
+
+    let renderedEmptyIcon = null;
+    if (emptyIcon !== false && emptyIcon !== null) {
+        if (React.isValidElement(emptyIcon)) {
+            renderedEmptyIcon = emptyIcon;
+        } else if (typeof emptyIcon === 'function') {
+            const IconComponent = emptyIcon;
+            renderedEmptyIcon = <IconComponent size={emptyIconSize} strokeWidth={1.5} />;
+        } else {
+            const DefaultEmptyIcon = isMessageContext ? MailX : BellOff;
+            renderedEmptyIcon = <DefaultEmptyIcon size={emptyIconSize} strokeWidth={1.5} />;
+        }
+    }
+
+    const resolvedHeaderIcon =
+        icon !== undefined
+            ? icon
+            : isMessageContext
+                ? <Mail size={20} />
+                : <Bell size={20} />;
+
+    const emptyContainerStyle = {
+        ...(emptyMinHeight ? { minHeight: typeof emptyMinHeight === 'number' ? `${emptyMinHeight}px` : emptyMinHeight } : {}),
+        ...(emptyIconColor ? { '--notifications-empty-icon': emptyIconColor } : {}),
+        ...(emptyTextColor ? { '--notifications-empty-text': emptyTextColor } : {}),
+    };
+
     return (
         <Frame
             title={title}
-            icon={icon}
+            icon={resolvedHeaderIcon}
             isModal={isModal}
             onClose={onClose}
             isLoading={isLoading}
@@ -53,7 +91,15 @@ function NotificationsPanel({
         >
             <div className={styles.list}>
                 {!hasNotifications ? (
-                    <p className={styles.emptyMessage}>{emptyMessage}</p>
+                    <div className={styles.emptyContainer} style={emptyContainerStyle}>
+                        {renderedEmptyIcon && (
+                            <div className={styles.emptyIconWrapper}>
+                                {renderedEmptyIcon}
+                            </div>
+                        )}
+                        {emptyTitle && <h4 className={styles.emptyTitle}>{emptyTitle}</h4>}
+                        <p className={styles.emptyMessage}>{emptyMessage}</p>
+                    </div>
                 ) : (
                     notifications.map((notification) => (
                         <Callout

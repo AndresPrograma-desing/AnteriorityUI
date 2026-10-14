@@ -27,14 +27,6 @@ export function filterMenuGroups(groups, query) {
 }
 
 /**
- * Determina si un evento de teclado corresponde al atajo Ctrl/Cmd+B para
- * colapsar o expandir el sidebar.
- */
-export function isSidebarToggleShortcut(event) {
-  return (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'b';
-}
-
-/**
  * Invierte el estado de colapso del sidebar y lo persiste en localStorage.
  * Usado tanto por el botón de toggle como por el atajo de teclado.
  */

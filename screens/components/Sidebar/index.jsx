@@ -3,9 +3,10 @@ import { createPortal } from 'react-dom';
 import { ChevronDown, ChevronLeft, ChevronRight, Pencil, Trash2, Pin, PinOff, GripVertical, Users } from 'lucide-react';
 import Button from '../Button/index';
 import Skeleton from '../Skeleton/index';
+import KeyboardShortcut from '../KeyboardShortcut/index';
 import styles from './index.module.css';
 import { TEXTS } from './constants';
-import { findParentIdForActiveItem, getBadgeClass, getInitial, isSidebarToggleShortcut, toggleSidebarCollapsed } from './utils';
+import { findParentIdForActiveItem, getBadgeClass, getInitial, toggleSidebarCollapsed } from './utils';
 
 import ModalTooltip from '../ModalTooltip/ModalTooltip';
 
@@ -150,17 +151,6 @@ export const ProSidebar = ({
   }, [isUserMenuOpen]);
 
   useEffect(() => {
-    if (!collapsible) return undefined;
-    const handleToggleShortcut = (event) => {
-      if (!isSidebarToggleShortcut(event)) return;
-      event.preventDefault();
-      setIsCollapsed(toggleSidebarCollapsed);
-    };
-    document.addEventListener('keydown', handleToggleShortcut);
-    return () => document.removeEventListener('keydown', handleToggleShortcut);
-  }, [collapsible]);
-
-  useEffect(() => {
     if (!contextMenu) return undefined;
     const handlePointerDown = (event) => {
       if (contextMenuRef.current?.contains(event.target)) return;
@@ -198,6 +188,11 @@ export const ProSidebar = ({
   };
 
   return (
+    <KeyboardShortcut
+      shortcut="ctrl+b"
+      enabled={collapsible}
+      onTrigger={() => setIsCollapsed(toggleSidebarCollapsed)}
+    >
     <aside
       className={`${styles.sidebar} ${isCollapsed ? styles.collapsed : ''} ${className}`}
       style={themeVars}
@@ -494,6 +489,7 @@ export const ProSidebar = ({
         document.body
       )}
     </aside>
+    </KeyboardShortcut>
   );
 };
 

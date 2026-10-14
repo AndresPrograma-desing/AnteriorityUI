@@ -16,7 +16,7 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    flex-shrink: 0;
+    flex: 1;
     min-width: 0;
 }
 
@@ -76,6 +76,60 @@
     align-items: center;
     width: 100%;
     max-width: 420px;
+    border: none;
+    padding: 0;
+    background: transparent;
+    font-family: inherit;
+    cursor: default;
+}
+
+button.searchWrapper {
+    cursor: pointer;
+    text-align: left;
+}
+
+.navLinks {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+}
+
+.navLinkWrapper {
+    position: relative;
+    display: flex;
+}
+
+.navLink {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border: none;
+    background: transparent;
+    padding: 0;
+    color: var(--topbar-navlink-color, var(--topbar-text, #0f172a));
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.navLink:hover,
+.navLinkOpen {
+    color: var(--topbar-navlink-active, var(--topbar-accent, #0ea5e9));
+}
+
+.navLinkChevron {
+    transition: transform 0.15s ease;
+}
+
+.navLinkChevronOpen {
+    transform: rotate(180deg);
+}
+
+.ctaButton {
+    flex-shrink: 0;
 }
 
 .searchIcon {
@@ -130,8 +184,10 @@
 .rightSection {
     display: flex;
     align-items: center;
+    justify-content: flex-end;
     gap: 4px;
-    flex-shrink: 0;
+    flex: 1;
+    min-width: 0;
 }
 
 .actionBtnWrapper {
@@ -141,15 +197,39 @@
 
 .actionBtn {
     border-radius: 6px !important;
-    color: var(--topbar-icon, #475569) !important;
-    background-color: var(--topbar-action-bg, #f1f5f9) !important;
-    border: 1px solid var(--topbar-action-border, #e2e8f0) !important;
+    color: var(--action-icon-color, var(--topbar-icon, #475569)) !important;
+    background-color: var(--action-bg-color, var(--topbar-action-bg, #f1f5f9)) !important;
+    border: 1px solid var(--action-border-color, var(--topbar-action-border, #e2e8f0)) !important;
+    position: relative !important;
+    overflow: hidden !important;
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease !important;
 }
 
-.actionBtn:hover {
-    background-color: var(--topbar-hover-bg, #e2e8f0) !important;
-    color: var(--topbar-text, #0f172a) !important;
+/* Animación de ondas (ripple) visible y definida */
+.actionBtn :global(.MuiTouchRipple-root) {
+    color: var(--action-ripple-color, var(--topbar-action-ripple, rgba(15, 23, 42, 0.28))) !important;
+    border-radius: inherit !important;
+    overflow: hidden !important;
 }
+
+.actionBtn :global(.MuiTouchRipple-rippleVisible) {
+    opacity: 0.35 !important;
+}
+
+/* Hover habilitado (personalizable) */
+.actionBtnWithHover:hover {
+    background-color: var(--action-hover-bg, var(--topbar-action-hover-bg, var(--topbar-hover-bg, #e2e8f0))) !important;
+    color: var(--action-hover-text, var(--topbar-action-hover-text, var(--topbar-text, #0f172a))) !important;
+    border-color: var(--action-hover-border, var(--topbar-action-hover-border, var(--topbar-action-border, #e2e8f0))) !important;
+}
+
+/* Hover quitado/desactivado */
+.actionBtnNoHover:hover {
+    background-color: var(--action-bg-color, var(--topbar-action-bg, #f1f5f9)) !important;
+    color: var(--action-icon-color, var(--topbar-icon, #475569)) !important;
+    border-color: var(--action-border-color, var(--topbar-action-border, #e2e8f0)) !important;
+}
+
 
 .actionBadge {
     position: absolute;

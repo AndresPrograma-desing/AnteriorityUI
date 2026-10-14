@@ -1,0 +1,11 @@
+export const DEFAULT_PLACEHOLDER = 'Buscar...';
+export const DEFAULT_EMPTY_MESSAGE = 'No se encontraron resultados.';
+export const DEFAULT_SHORTCUT_LABEL = 'ESC para cerrar';
+export const DEFAULT_MAX_HEIGHT = 360;
+export const DEFAULT_CLOSE_LABEL = 'Cerrar búsqueda';
+export const FOLDER_ICON_SIZE = 18;
+export const CLEAR_ICON_SIZE = 16;
+export const SEARCH_ICON_SIZE = 18;
+export const DEFAULT_LOADING_TYPE = 'spinner';
+export const DEFAULT_LOADING_VARIANT = 'default';
+export const DEFAULT_SKELETON_COUNT = 4;

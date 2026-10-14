@@ -5,10 +5,10 @@ import { VARIANTS, SIZES, COLORS } from './utils';
 import styles from './index.module.css';
 import ModalTooltip from '../ModalTooltip/ModalTooltip';
 
-const Button = React.forwardRef(({ 
-  children, 
-  variant = 'primary', 
-  size = 'medium', 
+const Button = React.forwardRef(({
+  children,
+  variant = 'primary',
+  size = 'medium',
   active = false,
   fullWidth = false,
   icon: Icon,

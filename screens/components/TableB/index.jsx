@@ -36,6 +36,7 @@ const TableB = (props) => {
     stickyFirstColumn = false,
     stickyHeader = false,
     maxHeight = '70vh',
+    width,
     scrollFooter = false,
     scrollFooterBgColor,
     scrollFooterBorderColor,
@@ -99,13 +100,18 @@ const TableB = (props) => {
       className={containerClassName}
       style={themeVars}
     >
-      <table className={styles.modernTable}>
+      <table className={styles.modernTable} style={width ? { width } : undefined}>
         <thead>
           <tr>
             {columns.map((col, idx) => (
               <th
                 key={col.key || idx}
-                style={{ textAlign: col.align || 'left' }}
+                style={{
+                  textAlign: col.align || 'left',
+                  width: col.width,
+                  minWidth: col.width,
+                  maxWidth: col.width,
+                }}
               >
                 {col.filter ? (
                   <div
@@ -135,7 +141,15 @@ const TableB = (props) => {
             Array.from({ length: skeletonRows }).map((_, rowIdx) => (
               <tr key={`skeleton-${rowIdx}`}>
                 {columns.map((col, colIdx) => (
-                  <td key={col.key || colIdx} style={{ textAlign: col.align || 'left', width: col.width }}>
+                  <td
+                    key={col.key || colIdx}
+                    style={{
+                      textAlign: col.align || 'left',
+                      width: col.width,
+                      minWidth: col.width,
+                      maxWidth: col.width,
+                    }}
+                  >
                     <Skeleton height="14px" width={col.align === 'right' || col.align === 'center' ? '60%' : '85%'} />
                   </td>
                 ))}
@@ -183,9 +197,14 @@ const TableB = (props) => {
                   style={{ cursor: canExpand ? 'pointer' : 'default' }}
                 >
                   {columns.map((col, colIndex) => (
-                    <td 
+                    <td
                       key={col.key || colIndex}
-                      style={{ textAlign: col.align || 'left', width: col.width }}
+                      style={{
+                        textAlign: col.align || 'left',
+                        width: col.width,
+                        minWidth: col.width,
+                        maxWidth: col.width,
+                      }}
                     >
                       {col.type === 'actions' && col.actions ? (
                         <div className={styles.actionButtons} style={{ justifyContent: col.align || 'flex-start' }}>

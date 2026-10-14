@@ -10,12 +10,42 @@
     min-height: 0;
 }
 
-.emptyMessage {
-    margin: 1rem 0;
+.emptyContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     text-align: center;
-    font-size: 0.85rem;
-    color: #94a3b8;
+    min-height: 200px;
+    padding: 2.25rem 1.5rem;
+    box-sizing: border-box;
 }
+
+.emptyIconWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--notifications-empty-icon, #94a3b8);
+    margin-bottom: 0.85rem;
+}
+
+.emptyTitle {
+    margin: 0 0 0.35rem 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--notifications-empty-title, #1e293b);
+}
+
+.emptyMessage {
+    margin: 0;
+    text-align: center;
+    font-size: 0.95rem;
+    font-weight: 400;
+    line-height: 1.45;
+    color: var(--notifications-empty-text, #64748b);
+    max-width: 260px;
+}
+
 
 .item {
     align-items: flex-start;
