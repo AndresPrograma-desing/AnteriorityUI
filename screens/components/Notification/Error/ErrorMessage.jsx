@@ -2,12 +2,12 @@ import React from 'react';
 import { AlertCircle, CheckCircle } from 'lucide-react';
 import styles from './ErrorMessage.module.css';
 
-const ErrorMessage = ({ message, title = "Atención", variant = "danger", bgColor, borderColor, style }) => {
+const ErrorMessage = ({ message, title = "Atención", variant = "danger", bgColor, borderColor, style, className = '' }) => {
   if (!message) return null;
 
   return (
     <div
-      className={`${styles.errorBanner} ${styles[variant] || ''}`}
+      className={`${styles.errorBanner} ${styles[variant] || ''} ${className}`.trim()}
       style={{
         ...(bgColor ? { '--errormessage-bg': bgColor } : {}),
         ...(borderColor ? { '--errormessage-border': borderColor } : {}),

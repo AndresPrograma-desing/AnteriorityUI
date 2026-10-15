@@ -1,9 +1,9 @@
 import React from 'react';
 import styles from './FormControls.module.css';
 
-export function FormCard({ icon: Icon, title, children, headerActions, iconColor }) {
+export function FormCard({ icon: Icon, title, children, headerActions, iconColor, className = '', style }) {
     return (
-        <div className={styles.card}>
+        <div className={`${styles.card} ${className}`.trim()} style={style}>
             <div className={styles.cardHeader}>
                 <div className={styles.cardTitle}>
                     {Icon && (

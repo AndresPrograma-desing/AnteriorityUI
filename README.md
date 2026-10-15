@@ -59,6 +59,12 @@ pnpm add react react-dom @mui/material @emotion/react @emotion/styled
    });
    ```
 
+4. (Opcional) Si vas a usar `SchemaForm`, agregá `@rjsf/core` y un validador (ej. `@rjsf/validator-ajv8`) — ver [AnteriorityUI.md#schemaform](AnteriorityUI.md#schemaform):
+
+   ```bash
+   pnpm add @rjsf/core @rjsf/validator-ajv8
+   ```
+
 ## Importar componentes
 
 Todos los componentes están indexados en el entry point principal — no hace falta conocer el subpath de cada uno:
@@ -132,7 +138,7 @@ Componentes que ya tenían un sistema de `variant`/`type` con paletas predefinid
 
 ## Componentes
 
-Documentación completa de props y ejemplos de uso de los ~50 componentes en **[AnteriorityUI.md](AnteriorityUI.md)**.
+Documentación completa de props y ejemplos de uso de los ~50 componentes en **[AnteriorityUI.md](AnteriorityUI.md)** (también disponible en formato navegable en [context-hub-memory](https://context-hub-memory.vercel.app/share/sessions/7b8538aa-4563-4a34-b5f4-6c372deb3345), misma documentación).
 
 | Componente | Descripción |
 |---|---|
@@ -178,6 +184,7 @@ Documentación completa de props y ejemplos de uso de los ~50 componentes en **[
 | [PlaceholderButton](AnteriorityUI.md#placeholderbutton) | Botón que se convierte en input al hacer click |
 | [Profile](AnteriorityUI.md#profile) | Header de perfil de usuario |
 | [Profile/Avatar](AnteriorityUI.md#avatar-profileavatar) | Avatar con estado (online/offline) |
+| [SchemaForm](AnteriorityUI.md#schemaform) | Formulario generado desde un JSON Schema (wrapper de rjsf) |
 | [ScrollBar](AnteriorityUI.md#scrollbar) | Contenedor con scrollbar estilizada |
 | [Sidebar](AnteriorityUI.md#sidebar) | Barra lateral de navegación completa |
 | [Skeleton](AnteriorityUI.md#skeleton) | Placeholders de carga (shimmer) |

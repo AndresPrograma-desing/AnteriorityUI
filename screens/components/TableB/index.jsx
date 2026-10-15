@@ -43,7 +43,9 @@ const TableB = (props) => {
     scrollControlsColor,
     scrollLeftLabel = 'Desplazar tabla a la izquierda',
     scrollRightLabel = 'Desplazar tabla a la derecha',
-    scrollSliderLabel = 'Posición horizontal de la tabla'
+    scrollSliderLabel = 'Posición horizontal de la tabla',
+    className = '',
+    style
   } = props;
   const [expandedKeys, setExpandedKeys] = useState({});
   const scrollAreaRef = useRef(null);
@@ -78,6 +80,7 @@ const TableB = (props) => {
     '--tableFooter-bg': scrollFooterBgColor ?? surfaceColor,
     '--tableFooter-border': scrollFooterBorderColor ?? borderColor,
     '--tableFooter-accent': scrollControlsColor,
+    ...style,
   };
 
   const getBadgeOverrideClass = (badgeTypeValue) => {
@@ -87,7 +90,7 @@ const TableB = (props) => {
     return '';
   };
 
-  const containerClassName = `${styles.tableContainer} ${stickyFirstColumn ? styles.stickyFirstColumn : ''} ${stickyHeader ? styles.stickyHeader : ''} ${scrollFooter ? styles.withFooter : ''}`;
+  const containerClassName = `${styles.tableContainer} ${stickyFirstColumn ? styles.stickyFirstColumn : ''} ${stickyHeader ? styles.stickyHeader : ''} ${scrollFooter ? styles.withFooter : ''} ${scrollFooter ? '' : className}`.trim();
 
   const table = (
     <ScrollBar
@@ -266,7 +269,7 @@ const TableB = (props) => {
   if (!scrollFooter) return table;
 
   return (
-    <div className={styles.root} style={themeVars}>
+    <div className={`${styles.root} ${className}`.trim()} style={themeVars}>
       {table}
       <TableScrollFooter
         scrollAreaRef={scrollAreaRef}

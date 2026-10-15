@@ -18,17 +18,21 @@ export default function Paginador({
   pageSize,
   pageSizeOptions = [5, 10, 20, 50],
   onPageSizeChange,
-  ...props 
+  className = '',
+  style,
+  ...props
 }) {
   return (
-    <Box 
-      sx={{ 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: pageSize && onPageSizeChange ? 'space-between' : 'flex-end', 
-        width: '100%', 
-        mt: 3, 
-        mb: 1 
+    <Box
+      className={className || undefined}
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: pageSize && onPageSizeChange ? 'space-between' : 'flex-end',
+        width: '100%',
+        mt: 3,
+        mb: 1,
+        ...style,
       }}
     >
       {/* ado Izquierdo: Select de Filas */}

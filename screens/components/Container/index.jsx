@@ -16,22 +16,26 @@ export default function Container({
   pageSize = 10,
   pageSizeOptions = [5, 10, 20, 50],
   onPageSizeChange,
+  bgImage,
+  blurBackground = false,
   style,
-  ...props 
+  ...props
 }) {
   const containerStyle = {
     ...(borderColor ? { '--container-border': borderColor } : {}),
+    ...(bgImage ? { '--container-bg-image': `url(${bgImage})` } : {}),
+    ...(bgImage && blurBackground ? { '--container-bg-blur': 'blur(12px)' } : {}),
     ...style,
   };
 
   return (
     <div
-      className={`${styles.containerCard} ${className}`}
+      className={`${styles.containerCard} ${bgImage ? styles.hasBgImage : ''} ${className}`}
       style={Object.keys(containerStyle).length ? containerStyle : undefined}
       {...props}
     >
 
-      {wattermark && 
+      {wattermark &&
       <Barnner 
       bgColor="#e1ddecff"
       

@@ -8,7 +8,9 @@ const InfoTooltip = ({
   icon: Icon = HelpCircle, 
   iconSize = 18, 
   iconColor = "#94a3b8",
-  width = "280px" 
+  width = "280px",
+  className = '',
+  style
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef(null);
@@ -25,7 +27,7 @@ const InfoTooltip = ({
   }, [isOpen]);
 
   return (
-    <div className={styles.container} ref={containerRef}>
+    <div className={`${styles.container} ${className}`.trim()} style={style} ref={containerRef}>
       <button 
         type="button" 
         className={styles.triggerButton}

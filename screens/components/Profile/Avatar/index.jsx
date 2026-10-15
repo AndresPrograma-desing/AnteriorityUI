@@ -18,21 +18,25 @@ export default function UserAvatar({
   isActive = null,
   fallbackBgColor,
   activeStatusColor = '#10b981',
-  inactiveStatusColor = '#ef4444'
+  inactiveStatusColor = '#ef4444',
+  className = '',
+  style
 }) {
   const [isFullViewOpen, setIsFullViewOpen] = useState(false);
 
   if (loading) {
     return (
-      <div 
-        style={{ 
-          width: size, 
-          height: size, 
-          display: 'flex', 
-          alignItems: 'center', 
+      <div
+        className={className || undefined}
+        style={{
+          width: size,
+          height: size,
+          display: 'flex',
+          alignItems: 'center',
           justifyContent: 'center',
           backgroundColor: '#f3f4f6',
-          borderRadius: '50%'
+          borderRadius: '50%',
+          ...style
         }}
       >
         <Loading size="small" />
@@ -64,9 +68,10 @@ export default function UserAvatar({
   return (
     <>
       <div 
-        className={`${styles.avatarWrapper} 
-        ${editable ? styles.editable : ''} 
-        ${viewable && src ? styles.viewable : ''}`} 
+        className={`${styles.avatarWrapper}
+        ${editable ? styles.editable : ''}
+        ${viewable && src ? styles.viewable : ''}
+        ${className}`.trim()}
         onClick={(e) => {
           if (editable) {
             if (typeof onEditClick === 'function') {
@@ -82,6 +87,7 @@ export default function UserAvatar({
           position: 'relative',
           display: 'inline-flex',
           ...(fallbackBgColor ? { '--avatar-fallback-bg': fallbackBgColor } : {}),
+          ...style,
         }}
       >
         {editable ? (

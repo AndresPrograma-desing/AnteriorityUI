@@ -42,6 +42,7 @@ export const ProSidebar = ({
   methodBadgeColors,
   subItemActiveBgColor,
   subItemActiveTextColor,
+  style,
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(() => {
     return localStorage.getItem('sidebar_collapsed') === 'true';
@@ -75,6 +76,7 @@ export const ProSidebar = ({
     ...(subItemActiveBgColor ? { '--sidebar-subitem-active-bg': subItemActiveBgColor } : {}),
     ...(subItemActiveTextColor ? { '--sidebar-subitem-active-text': subItemActiveTextColor } : {}),
     ...badgeThemeVars,
+    ...style,
   };
 
   const handleDragStart = (event, item) => {

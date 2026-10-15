@@ -31,6 +31,8 @@ const PlaceholderButton = ({
 
   focusColor,
   unitBgColor,
+  className = '',
+  style,
 }) => {
   const [value, setValue] = useState(initialValue);
   const [isSaving, setIsSaving] = useState(false);
@@ -85,10 +87,11 @@ const PlaceholderButton = ({
 
   return (
     <div
-      className={`${styles.configContainer} ${disabled ? styles.disabledContainer : ''}`}
+      className={`${styles.configContainer} ${disabled ? styles.disabledContainer : ''} ${className}`.trim()}
       style={{
         ...(focusColor ? { '--placeholderbutton-focus': focusColor } : {}),
         ...(unitBgColor ? { '--placeholderbutton-unit-bg': unitBgColor } : {}),
+        ...style,
       }}
     >
       <div className={styles.inputGroup}>

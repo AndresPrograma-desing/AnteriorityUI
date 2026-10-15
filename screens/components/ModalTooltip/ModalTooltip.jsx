@@ -10,6 +10,7 @@ const ModalTooltip = ({
   style,
   bgColor,
   textColor,
+  className = '',
   ...props
 }) => {
   const [visible, setVisible] = useState(false);
@@ -85,7 +86,7 @@ const ModalTooltip = ({
   return (
     <span
       ref={triggerRef}
-      className={styles.container}
+      className={`${styles.container} ${className}`.trim()}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       style={{

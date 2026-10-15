@@ -45,7 +45,8 @@ const DrawPanel = ({
   borderColor = '#e2e8f0',
   hasUnsavedChanges,
   closeConfirmMessage = 'Vuelve a hacer clic fuera para cerrar sin guardar',
-  anchor = 'right'
+  anchor = 'right',
+  style
 }) => {
   const [render, setRender] = useState(isOpen);
   const [pendingClose, setPendingClose] = useState(false);
@@ -129,7 +130,7 @@ const DrawPanel = ({
     >
       <div
         className={`${panelClass} ${animClass} ${className}`}
-        style={{ maxWidth: width, backgroundColor: panelColor }}
+        style={{ maxWidth: width, backgroundColor: panelColor, ...style }}
         onClick={(e) => e.stopPropagation()}
       >
         {pendingClose && (

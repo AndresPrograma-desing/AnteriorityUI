@@ -15,6 +15,8 @@ export default function MenuPopover({
   bgColor = '#ffffffff',
   textColor = '#000000ff',
   dangerColor = '#ef4444',
+  className = '',
+  style,
 }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -35,7 +37,7 @@ export default function MenuPopover({
   };
 
   return (
-    <div style={{ width: '100%' }}>
+    <div className={className} style={{ width: '100%', ...style }}>
       <Button
         id={`menu-button-${item.label}`}
         variant={Button.VARIANTS.GHOST}

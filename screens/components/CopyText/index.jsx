@@ -3,7 +3,7 @@ import { Copy, Check } from 'lucide-react';
 import ModalTooltip from '../ModalTooltip/ModalTooltip';
 import styles from './index.module.css'; 
 
-export default function CopyableText({ text, bgColor, borderColor, textColor }) {
+export default function CopyableText({ text, bgColor, borderColor, textColor, className = '', style }) {
 
   const [copied, setCopied] = useState(false);
 
@@ -22,12 +22,13 @@ export default function CopyableText({ text, bgColor, borderColor, textColor }) 
   return (
     <ModalTooltip text={copied ? "¡Copiado!" : "Haga clic para copiar"}>
       <span
-        className={styles.copyableContainer}
+        className={`${styles.copyableContainer} ${className}`.trim()}
         onClick={handleCopy}
         style={{
           ...(bgColor ? { '--copytext-bg': bgColor } : {}),
           ...(borderColor ? { '--copytext-border': borderColor } : {}),
           ...(textColor ? { '--copytext-text': textColor } : {}),
+          ...style,
         }}
       >
         <span className={styles.copyableText}>{text}</span>

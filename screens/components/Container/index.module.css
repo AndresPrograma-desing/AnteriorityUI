@@ -15,6 +15,23 @@
   flex-direction: column;
 }
 
+.hasBgImage::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background-image: var(--container-bg-image);
+  background-size: cover;
+  background-position: center;
+  filter: var(--container-bg-blur, none);
+  z-index: 0;
+}
+
+.hasBgImage > * {
+  position: relative;
+  z-index: 1;
+}
+
 @media (max-width: 768px) {
   .containerCard {
     max-width: 100%;

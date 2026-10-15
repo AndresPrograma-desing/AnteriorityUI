@@ -40,7 +40,9 @@ const TableA = (props) => {
     scrollControlsColor,
     scrollLeftLabel = 'Desplazar tabla a la izquierda',
     scrollRightLabel = 'Desplazar tabla a la derecha',
-    scrollSliderLabel = 'Posición horizontal de la tabla'
+    scrollSliderLabel = 'Posición horizontal de la tabla',
+    className = '',
+    style
   } = props;
 
   const themeVars = {
@@ -54,7 +56,8 @@ const TableA = (props) => {
     '--tableA-row-border': rowBorderColor,
     '--tableFooter-bg': scrollFooterBgColor ?? surfaceColor,
     '--tableFooter-border': scrollFooterBorderColor ?? borderColor,
-    '--tableFooter-accent': scrollControlsColor
+    '--tableFooter-accent': scrollControlsColor,
+    ...style
   };
 
   const scrollAreaRef = useRef(null);
@@ -64,7 +67,7 @@ const TableA = (props) => {
     filter.onChange?.(getNextFilterValue(filter.options, filter.value));
   };
 
-  const wrapperClassName = `${styles.tableWrapper} ${stickyFirstColumn ? styles.stickyFirstColumn : ''} ${stickyHeader ? styles.stickyHeader : ''} ${scrollFooter ? styles.withFooter : ''}`;
+  const wrapperClassName = `${styles.tableWrapper} ${stickyFirstColumn ? styles.stickyFirstColumn : ''} ${stickyHeader ? styles.stickyHeader : ''} ${scrollFooter ? styles.withFooter : ''} ${scrollFooter ? '' : className}`.trim();
 
   const table = (
     <ScrollBar
@@ -183,7 +186,7 @@ const TableA = (props) => {
   if (!scrollFooter) return table;
 
   return (
-    <div className={styles.root} style={themeVars}>
+    <div className={`${styles.root} ${className}`.trim()} style={themeVars}>
       {table}
       <TableScrollFooter
         scrollAreaRef={scrollAreaRef}

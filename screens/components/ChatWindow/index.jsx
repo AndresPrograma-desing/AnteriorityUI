@@ -54,7 +54,9 @@ export default function ChatWindow({
   isLoading = false,
   placeholder = "Escribe tu mensaje aquí...",
   accentColor,
-  accentColorDark
+  accentColorDark,
+  className = '',
+  style
 }) {
   const [inputText, setInputText] = useState('');
   const [anchorEl, setAnchorEl] = useState(null);
@@ -121,10 +123,11 @@ export default function ChatWindow({
 
   return (
     <div
-      className={styles.chatWindowContainer}
+      className={`${styles.chatWindowContainer} ${className}`.trim()}
       style={{
         ...(accentColor ? { '--chat-accent': accentColor } : {}),
         ...(accentColorDark ? { '--chat-accent-dark': accentColorDark } : {}),
+        ...style,
       }}
     >
       {showHeader && (

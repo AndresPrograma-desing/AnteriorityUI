@@ -3,7 +3,7 @@ import { Sparkles, Copy, Check } from 'lucide-react';
 import styles from './index.module.css';
 import Button from '../Button/index';
 
-const SummaryCard = ({ title, text, enableCopy = false, gradientStart, gradientEnd, headerColor }) => {
+const SummaryCard = ({ title, text, enableCopy = false, gradientStart, gradientEnd, headerColor, className = '', style }) => {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
@@ -19,11 +19,12 @@ const SummaryCard = ({ title, text, enableCopy = false, gradientStart, gradientE
 
   return (
     <div
-      className={styles.iaSummaryCard}
+      className={`${styles.iaSummaryCard} ${className}`.trim()}
       style={{
         ...(gradientStart ? { '--summarycard-gradient-start': gradientStart } : {}),
         ...(gradientEnd ? { '--summarycard-gradient-end': gradientEnd } : {}),
         ...(headerColor ? { '--summarycard-header-color': headerColor } : {}),
+        ...style,
       }}
     >
       <div className={styles.iaSummaryHeader}>

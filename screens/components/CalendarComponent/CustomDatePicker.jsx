@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight, CalendarDays, X, ChevronDown } from 'lucide-
 import styles from './CustomDatePicker.module.css';
 import TextField from '../Material-UI/Components/TextField/index';
 
-const CustomDatePicker = ({ label, name, value, onChange, required = false, disabled = false, selectedColor, accentColor }) => {
+const CustomDatePicker = ({ label, name, value, onChange, required = false, disabled = false, selectedColor, accentColor, className = '', style }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [isOpen, setIsOpen] = useState(false);
   const [showSelectors, setShowSelectors] = useState(false);
@@ -118,11 +118,12 @@ const CustomDatePicker = ({ label, name, value, onChange, required = false, disa
 
   return (
     <div
-      className={styles.inputGroup}
+      className={`${styles.inputGroup} ${className}`.trim()}
       onClick={(e) => e.stopPropagation()}
       style={{
         ...(selectedColor ? { '--cdp-selected': selectedColor } : {}),
         ...(accentColor ? { '--cdp-accent': accentColor } : {}),
+        ...style,
       }}
     >
       <TextField
