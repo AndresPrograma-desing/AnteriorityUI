@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from 'react';
+import { Menu, Search, MoreHorizontal, X } from 'lucide-react';
 import Breadcrumbs from '../Breadcrumbs/index';
 import Skeleton from '../Skeleton/index';
 import CommandPalette from '../CommandPalette/index';
@@ -8,6 +9,7 @@ import SearchBar from './components/SearchBar/index';
 import TopBarActions from './components/TopBarActions/index';
 import UserMenu from './components/UserMenu/index';
 import NavLinks from './components/NavLinks/index';
+import MobileActionsPanel from './components/MobileActionsPanel/index';
 import styles from './index.module.css';
 import { buildThemeVars, hasActionHoverEnabled, hasCenterSearch } from './utils.js';
 import {
@@ -15,6 +17,11 @@ import {
     DEFAULT_BREADCRUMB_CURRENT_COLOR,
     DEFAULT_SKELETON_ACTIONS_COUNT,
     DEFAULT_COMMAND_PALETTE_PLACEHOLDER,
+    DEFAULT_MOBILE_MENU_LABEL,
+    DEFAULT_MOBILE_ACTIONS_LABEL,
+    DEFAULT_MOBILE_SEARCH_LABEL,
+    DEFAULT_MOBILE_SEARCH_CLOSE_LABEL,
+    DEFAULT_SEARCH_PLACEHOLDER,
 } from './constants.js';
 
 function TopBar(props) {
@@ -73,11 +80,15 @@ function TopBar(props) {
         navLinkColor,
         navLinkActiveColor,
         ctaButton,
+        onMenuClick,
+        mobileMenuLabel = DEFAULT_MOBILE_MENU_LABEL,
     } = props;
 
     const isTopBarLoading = Boolean(loading || isLoading);
     const hasGlobalHover = hasActionHoverEnabled({ actionHover, showActionHover, disableActionHover });
     const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+    const [isMobileActionsOpen, setIsMobileActionsOpen] = useState(false);
+    const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
 
     const openCommandPalette = useCallback(() => {
         setIsCommandPaletteOpen(true);
@@ -97,6 +108,17 @@ function TopBar(props) {
             return next;
         });
     }, [onCommandPaletteOpen, onCommandPaletteClose]);
+
+    const hasMobileSearch = hasCenterSearch({ centerContent, searchProps, commandItems }) && !(navLinks && navLinks.length > 0);
+    const hasPendingActionBadge = actions.some((action) => action.badge !== undefined && action.badge !== null && action.badge !== false);
+
+    const handleMobileSearchClick = () => {
+        if (commandItems !== undefined) {
+            openCommandPalette();
+        } else {
+            setIsMobileSearchOpen(true);
+        }
+    };
 
     const themeVars = buildThemeVars({
         bgColor,
@@ -128,6 +150,12 @@ function TopBar(props) {
         return (
             <header className={`${styles.topbar} ${className}`} style={themeVars} aria-busy="true">
                 <div className={styles.leftSection}>
+                    {onMenuClick && (
+                        <button type="button" className={styles.mobileMenuButton} disabled aria-hidden="true">
+                            <Menu size={20} />
+                        </button>
+                    )}
+
                     {hasLogo && (
                         <Skeleton width="32px" height="32px" radius="8px" />
                     )}
@@ -193,6 +221,17 @@ function TopBar(props) {
         >
         <header className={`${styles.topbar} ${className}`} style={themeVars}>
             <div className={styles.leftSection}>
+                {onMenuClick && (
+                    <button
+                        type="button"
+                        className={styles.mobileMenuButton}
+                        onClick={onMenuClick}
+                        aria-label={mobileMenuLabel}
+                    >
+                        <Menu size={20} />
+                    </button>
+                )}
+
                 {logo && (
                     <button
                         type="button"
@@ -236,6 +275,33 @@ function TopBar(props) {
             </div>
 
             <div className={styles.rightSection}>
+                {hasMobileSearch && (
+                    <button
+                        type="button"
+                        className={styles.mobileSearchButton}
+                        onClick={handleMobileSearchClick}
+                        aria-label={DEFAULT_MOBILE_SEARCH_LABEL}
+                    >
+                        <Search size={18} />
+                    </button>
+                )}
+
+                {actions.length > 0 && (
+                    <span className={styles.mobileActionsButtonWrapper}>
+                        <button
+                            type="button"
+                            className={styles.mobileActionsButton}
+                            onClick={() => setIsMobileActionsOpen(true)}
+                            aria-label={DEFAULT_MOBILE_ACTIONS_LABEL}
+                        >
+                            <MoreHorizontal size={18} />
+                        </button>
+                        {hasPendingActionBadge && (
+                            <span className={`${styles.actionBadge} ${styles.actionBadgeDot}`} />
+                        )}
+                    </span>
+                )}
+
                 <TopBarActions actions={actions} hasGlobalHover={hasGlobalHover} />
 
                 {showDivider && actions.length > 0 && user && (
@@ -275,6 +341,37 @@ function TopBar(props) {
                     skeletonCount={commandPaletteSkeletonCount}
                     clearQueryOnClose={commandPaletteClearQueryOnClose}
                 />
+            )}
+
+            {actions.length > 0 && (
+                <MobileActionsPanel
+                    open={isMobileActionsOpen}
+                    onClose={() => setIsMobileActionsOpen(false)}
+                    actions={actions}
+                />
+            )}
+
+            {isMobileSearchOpen && searchProps && (
+                <div className={styles.mobileSearchOverlay}>
+                    <input
+                        type="text"
+                        autoFocus
+                        className={styles.mobileSearchOverlayInput}
+                        placeholder={searchProps.placeholder ?? DEFAULT_SEARCH_PLACEHOLDER}
+                        value={searchProps.value}
+                        onChange={searchProps.onChange}
+                        onFocus={searchProps.onFocus}
+                        onBlur={searchProps.onBlur}
+                    />
+                    <button
+                        type="button"
+                        className={styles.mobileSearchOverlayClose}
+                        onClick={() => setIsMobileSearchOpen(false)}
+                        aria-label={DEFAULT_MOBILE_SEARCH_CLOSE_LABEL}
+                    >
+                        <X size={18} />
+                    </button>
+                </div>
             )}
         </header>
         </KeyboardShortcut>

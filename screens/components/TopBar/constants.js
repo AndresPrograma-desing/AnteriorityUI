@@ -5,4 +5,9 @@ export const DEFAULT_BREADCRUMB_LINK_COLOR = '#64748b';
 export const DEFAULT_BREADCRUMB_CURRENT_COLOR = '#0f172a';
 export const DEFAULT_SKELETON_ACTIONS_COUNT = 3;
 export const DEFAULT_COMMAND_PALETTE_PLACEHOLDER = 'Buscar...';
+export const DEFAULT_MOBILE_MENU_LABEL = 'Abrir menú';
+export const DEFAULT_MOBILE_ACTIONS_PANEL_TITLE = 'Acciones';
+export const DEFAULT_MOBILE_ACTIONS_LABEL = 'Más acciones';
+export const DEFAULT_MOBILE_SEARCH_LABEL = 'Buscar';
+export const DEFAULT_MOBILE_SEARCH_CLOSE_LABEL = 'Cerrar búsqueda';
 

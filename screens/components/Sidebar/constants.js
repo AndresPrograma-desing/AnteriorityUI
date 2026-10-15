@@ -12,5 +12,6 @@ export const TEXTS = {
   leaveItem: "Salir",
   pinItem: "Fijar",
   unpinItem: "Desfijar",
-  collaboratorsItem: "Colaboradores"
+  collaboratorsItem: "Colaboradores",
+  closeMobileMenu: "Cerrar menú"
 };

@@ -2902,6 +2902,8 @@ import Sidebar from 'screens/components/Sidebar/index';
 
 **Notas:** Persiste el estado colapsado en `localStorage` bajo la clave `sidebar_collapsed`. Los subitems no soportan drag & drop (`onReorderItems`), menú contextual (`onItemEdit`/`onItemDelete`/`onItemPin`/`onItemCollaborators`) ni colapsado individual persistido — solo navegación simple vía `onSelect`. Cuando el sidebar está colapsado (`isCollapsed`), los grupos con `subItems` se muestran colapsados y sin chevron (igual que cualquier item simple, con tooltip); hay que expandir el sidebar para ver/navegar los subitems. `onSearch`/`filterMenuGroups` matchea por `label` del item padre o de cualquiera de sus `subItems`, pero si matchea, se muestra el item completo con **todos** sus subitems (no solo el que matcheó).
 
+**Responsive (mobile):** por debajo de 767px de viewport, el sidebar se comporta como un drawer: queda oculto fuera de pantalla y aparece un botón flotante con ícono de hamburguesa (esquina superior izquierda) para abrirlo. Al abrirse, se desliza como overlay a ancho completo (280px, hasta 85vw) sobre un backdrop oscuro; se cierra al tocar el backdrop, al presionar Escape, al tocar la X del propio drawer, o automáticamente al seleccionar un item (`onSelect`). El botón de colapsar (`collapsible`) se oculta en este modo, ya que no aplica a un drawer full-width. No requiere ninguna prop nueva — la detección de mobile es automática vía `matchMedia`.
+
 ---
 
 ### Skeleton
@@ -3529,6 +3531,8 @@ import TopBar from '../TopBar/index'; // export default
 ```
 
 **Notas:** El menú de usuario se renderiza vía `createPortal` a `document.body` (mismo patrón que el menú de usuario de `Sidebar`), posicionado contra el botón del avatar. `actions` son completamente genéricas — no asume ningún set fijo de íconos (notificaciones, mensajes, ayuda, etc. quedan a elección del consumidor). El atajo de teclado Ctrl/Cmd+K para abrir el `CommandPalette` (`useCommandPaletteShortcut` en `utils.js`) usa el hook genérico `useKeyboardShortcut` (`common/hooks/useKeyboardShortcut.js`), reutilizable para registrar cualquier otro atajo global (`{ key, ctrlOrMeta, shift, alt, enabled, onTrigger }`) sin reimplementar el listener de teclado a mano en cada componente nuevo.
+
+**Responsive:** `leftSection` (logo + breadcrumb/título) se encoge primero y trunca con ellipsis; `rightSection` (acciones + divisor + avatar + `ctaButton`) nunca se encoge, para que los botones nunca queden apretados ni se superpongan entre sí. Por debajo de 1023px el buscador central se angosta, por debajo de 767px se oculta por completo (el consumidor puede ofrecer una lupa en `actions` para ese breakpoint) y el header pasa a `flex-wrap` como red de seguridad si aun así no entra todo en una fila; por debajo de 479px se reducen aún más los paddings de los botones de acción y el ancho máximo de breadcrumb/título.
 
 ---
 
