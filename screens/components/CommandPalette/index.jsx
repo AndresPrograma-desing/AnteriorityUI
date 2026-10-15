@@ -36,6 +36,7 @@ function CommandPalette({
     query: controlledQuery,
     onQueryChange,
     className = '',
+    style,
     bgColor,
     textColor,
     borderColor,
@@ -133,6 +134,7 @@ function CommandPalette({
         ...(iconColor ? { '--palette-icon': iconColor } : {}),
         ...(accentColor ? { '--palette-accent': accentColor } : {}),
         ...(categoryColor ? { '--palette-category': categoryColor } : {}),
+        ...style,
     };
 
     let flatIndex = -1;

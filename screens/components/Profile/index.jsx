@@ -2,14 +2,15 @@ import React from 'react';
 import UserAvatar from './Avatar/index';
 import { Pencil } from 'lucide-react';
 
-export default function UserProfileHeader({ username, avatarUrl, onEditClick, textColor = '#ffffff' }) {
+export default function UserProfileHeader({ username, avatarUrl, onEditClick, textColor = '#ffffff', className = '', style }) {
   return (
-    <div style={{ 
-      display: 'inline-flex', 
-      alignItems: 'center', 
+    <div className={className || undefined} style={{
+      display: 'inline-flex',
+      alignItems: 'center',
       gap: '12px',
       height: '100%',
-      verticalAlign: 'middle'
+      verticalAlign: 'middle',
+      ...style
     }}>
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <UserAvatar 

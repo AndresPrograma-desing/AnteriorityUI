@@ -12,14 +12,16 @@ const DesplegablePanel = ({
   isOpen = false,
   onToggle,
   action,
-  children
+  children,
+  className = '',
+  style
 }) => {
   const handleRowClick = () => {
     if (onToggle) onToggle();
   };
 
   return (
-    <div className={styles.panelContainer}>
+    <div className={`${styles.panelContainer} ${className}`.trim()} style={style}>
       <div 
         className={styles.settingRow} 
         onClick={handleRowClick}

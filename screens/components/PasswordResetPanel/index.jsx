@@ -21,6 +21,8 @@ export default function PasswordResetPanel({
   pendingColor = DEFAULT_PENDING_COLOR,
   acceptedColor = DEFAULT_ACCEPTED_COLOR,
   expiredColor = DEFAULT_EXPIRED_COLOR,
+  className,
+  style,
 }) {
   const { 
     requestPasswordReset, 
@@ -133,6 +135,8 @@ export default function PasswordResetPanel({
       cancelText="Cancelar"
       loading={pwdLoading || requestLoading}
       formId="changePwdForm"
+      className={className}
+      style={style}
     >
       {showPwdToast && (
         <ToggleCard

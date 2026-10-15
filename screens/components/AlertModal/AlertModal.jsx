@@ -160,6 +160,8 @@ export default function AlertModal({
   titleBorderColor,
   errorTextColor,
   errorBgColor,
+  className = '',
+  style,
 }) {
   if (!open) return null;
 
@@ -170,11 +172,12 @@ export default function AlertModal({
     ...(titleBorderColor ? { '--alertmodal-title-border': titleBorderColor } : {}),
     ...(errorTextColor ? { '--alertmodal-error-text': errorTextColor } : {}),
     ...(errorBgColor ? { '--alertmodal-error-bg': errorBgColor, '--alertmodal-error-border': errorBgColor } : {}),
+    ...style,
   };
 
   const content = (
     <div data-test="alert-modal" className={styles.modalOverlay} onClick={onClose || (() => { })}>
-      <div className={styles.modalBox} style={themeVars} onClick={(e) => e.stopPropagation()}>
+      <div className={`${styles.modalBox} ${className}`.trim()} style={themeVars} onClick={(e) => e.stopPropagation()}>
         <h3 className={styles.modalTitle}>
           {showWarningIcon && <TriangleAlert className={styles.warningIcon} />}
           {title}</h3>

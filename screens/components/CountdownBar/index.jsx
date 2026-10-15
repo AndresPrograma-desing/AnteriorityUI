@@ -15,7 +15,9 @@ export default function CountdownBar({
   value,
   increment = false,
   isOverlay = false,
-  overlayMessage
+  overlayMessage,
+  className = '',
+  style
 }) {
   const timerState = useCountdown(active && value === undefined, duration, onComplete, expiresAt, totalDuration);
   
@@ -35,7 +37,7 @@ export default function CountdownBar({
     : `${remainingTime}s restantes`;
 
   const barContent = (
-    <div className={styles.wrapper} style={{ width }}>
+    <div className={`${styles.wrapper} ${className}`.trim()} style={{ width, ...style }}>
       <div 
         className={styles.container} 
         style={{ height }}

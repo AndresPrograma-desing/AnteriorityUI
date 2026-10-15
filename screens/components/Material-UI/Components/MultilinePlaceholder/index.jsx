@@ -36,6 +36,8 @@ const MultilinePlaceholder = forwardRef(({
   imageLabelBgColor = DEFAULT_IMAGE_LABEL_BG_COLOR,
   imageLabelTextColor = DEFAULT_IMAGE_LABEL_TEXT_COLOR,
   onPaste,
+  wrapperClassName = '',
+  wrapperStyle,
   ...props
 }, ref) => {
   const formattedLabel = typeof label === 'string' ? formatHighlightedText(label) : label;
@@ -54,7 +56,7 @@ const MultilinePlaceholder = forwardRef(({
   const { inputProps, ...restProps } = props;
 
   return (
-    <div>
+    <div className={wrapperClassName || undefined} style={wrapperStyle}>
       <MuiTextField
         label={formattedLabel}
         value={value}

@@ -7,7 +7,7 @@ import { updateUserName } from '../../../features/user-profile/api';
 import { getUserId } from '../../../common/storage/LocalStorage';
 import Button from '../Button/index'
 
-const UserEditPopover = ({ open, anchorEl, onClose, currentName, onSuccess, bgColor, saveColor, cancelColor }) => {
+const UserEditPopover = ({ open, anchorEl, onClose, currentName, onSuccess, bgColor, saveColor, cancelColor, className = '', style }) => {
   const [tempUserName, setTempUserName] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -61,7 +61,7 @@ const UserEditPopover = ({ open, anchorEl, onClose, currentName, onSuccess, bgCo
         }
       }}
     >
-      <div className={styles.container}>
+      <div className={`${styles.container} ${className}`.trim()} style={style}>
         <h4 className={styles.header}>Editar Nombre</h4>
         <div className={styles.inputWrapper}>
           <InputWithIcon

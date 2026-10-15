@@ -817,6 +817,8 @@ import Container from '../Container'; // export default (index.jsx)
 | `pageSizeOptions` | array | `[5, 10, 20, 50]` | Opciones de tamaño de página |
 | `onPageSizeChange` | function | — | Handler de cambio de tamaño de página |
 | `borderColor` | string | `'rgba(0, 0, 0, 0.08)'` | Color del borde del contenedor (`--container-border`). Por defecto un negro claro sutil. |
+| `bgImage` | string | — | URL de una imagen de fondo, renderizada detrás del contenido (capa independiente del `backdrop-filter` existente) |
+| `blurBackground` | boolean | `false` | Difumina la imagen de `bgImage` (no afecta el `backdrop-filter` del contenido, que sigue activo siempre por compatibilidad) |
 | `...props` | — | — | Cualquier otra prop (ej. `onClick`, `id`, `style`) se pasa al `div` raíz |
 
 **Ejemplos:**
@@ -831,7 +833,14 @@ import Container from '../Container'; // export default (index.jsx)
 >
   <p>Lista de resultados paginados.</p>
 </Container>
+
+<Container bgImage="/fondo.jpg" blurBackground style={{ minHeight: '100vh' }}>
+  <p>Contenedor usado como fondo de pantalla completa, con imagen difuminada detrás.</p>
+</Container>
 ```
+
+**Notas:**
+- Para usar `Container` como fondo de pantalla completa, combinar con `style={{ minHeight: '100vh', maxWidth: 'none' }}` (el `max-width: 1300px` por defecto está pensado para secciones de contenido, no para fondos).
 
 ---
 
@@ -2546,6 +2555,254 @@ import ScrollBar from 'screens/components/ScrollBar';
 
 ---
 
+### SchemaForm
+
+Renderiza un formulario completo a partir de un JSON Schema (+ `uiSchema` opcional), usando los widgets ya existentes de la librería (`Input`, `Checks`, `Swich`, `Selector`, `CalendarPicker`, `FormTextArea`) para cada tipo de campo, en vez de los inputs default de rjsf. Pensado para usarse como `children` de cualquier contenedor (ej. `DrawPanel`): el contenedor no sabe que adentro hay un `SchemaForm`, solo le llega el schema correspondiente a cada caso (login, alta de usuario, etc.).
+
+Es un wrapper de [`@rjsf/core`](https://rjsf-team.github.io/react-jsonschema-form/docs/) — requiere `@rjsf/core` como peer dependency (opcional: solo hace falta instalarlo si se usa este componente) y un validador (ej. `@rjsf/validator-ajv8`) pasado explícitamente por prop, para no atar la librería a un validador en particular.
+
+**Import:**
+```jsx
+import SchemaForm from '../SchemaForm'; // export default (index.jsx)
+```
+
+**Uso básico:**
+```jsx
+import validator from '@rjsf/validator-ajv8';
+
+const schema = {
+  type: 'object',
+  required: ['email', 'password'],
+  properties: {
+    email: { type: 'string', title: 'Email', format: 'email' },
+    password: { type: 'string', title: 'Contraseña' },
+  },
+};
+
+<SchemaForm
+  schema={schema}
+  validator={validator}
+  formData={formData}
+  onChange={setFormData}
+  onSubmit={(data) => login(data)}
+  submitText="Ingresar"
+/>
+```
+
+**Props:**
+
+| Prop | Tipo | Default | Descripción |
+|---|---|---|---|
+| `schema` | object | — | JSON Schema que describe los campos del formulario |
+| `uiSchema` | object | — | `uiSchema` de rjsf: qué widget usar por campo (`'ui:widget'`), opciones de cada uno (`'ui:options'`), orden, etc. |
+| `formData` | object | — | Valores actuales del formulario (controlado) |
+| `validator` | object | — | **Requerido.** Validador de rjsf, ej. el export default de `@rjsf/validator-ajv8` |
+| `widgets` | object | — | Widgets adicionales/override, mergeados sobre los widgets default de `SchemaForm` |
+| `fields` | object | — | `fields` custom de rjsf (para `ObjectField`/`ArrayField` a medida) |
+| `formId` | string | — | `id` del `<form>`; útil para disparar el submit desde un botón externo (ej. el footer de `DrawPanel`) |
+| `onChange` | function | — | `(formData, rjsfEvent) => void`, en cada cambio de cualquier campo |
+| `onSubmit` | function | — | `(formData, rjsfEvent) => void`, al enviar el formulario válido |
+| `onError` | function | — | Callback de errores de validación de rjsf |
+| `showSubmitButton` | boolean | `true` | Si no hay `children`, muestra un botón de submit (`Button` primario) |
+| `submitText` | string | `'Enviar'` | Texto del botón de submit default |
+| `disabled` | boolean | `false` | Deshabilita todos los campos |
+| `readonly` | boolean | `false` | Vuelve todos los campos de solo lectura |
+| `className` | string | `''` | Clase adicional en el `<form>` |
+| `style` | object | — | Estilos inline en el `<form>` |
+| `children` | node | — | Si se define, reemplaza el botón de submit default (ej. para poner acciones propias, o nada si los botones ya los provee un contenedor externo como `DrawPanel`) |
+
+**Widgets incluidos** (seleccionables desde `uiSchema` con `'ui:widget': '<Nombre>'`):
+
+| Widget | Usa | Tipo de campo típico |
+|---|---|---|
+| `TextWidget` | `Input` | `string` (default) |
+| `NumberWidget` | `Input` (`numeric`) | `number` / `integer` (default) |
+| `TextareaWidget` | `FormTextArea` | `string` largo (ej. `'ui:widget': 'TextareaWidget'`) |
+| `CheckboxWidget` | `Swich` | `boolean` (default — ver nota debajo) |
+| `SwitchWidget` | `Swich` | `boolean` como toggle, alias explícito de `CheckboxWidget` |
+| `ChecksWidget` | `Checks` | `boolean` con el look de checkbox tachable (ej. `'ui:widget': 'ChecksWidget'`) |
+| `CheckboxesWidget` | `Checks` (uno por opción) | `array` de `string` con `enum` + `uniqueItems` (selección múltiple; ej. `'ui:widget': 'CheckboxesWidget'` con `'ui:options': { enumOptions }`) |
+| `SelectWidget` | `Selector` | `string` con `enum` (default cuando hay `enum`; **no soporta selección múltiple**, usar `CheckboxesWidget` para eso) |
+| `DateWidget` | `CalendarPicker` | `string` con `format: 'date'` (ej. `'ui:widget': 'DateWidget'`) |
+| `FileWidget` | botón de subida + `ImagePastePreview` | `string` con `format: 'data-url'` (archivo/imagen única), o `array` de esos con `format: 'data-url'` (múltiples, detectado automáticamente por rjsf) — ver nota de archivos debajo |
+| `EmailWidget` / `URLWidget` | `Input` (`type="email"`/`"url"`) | `string` con `format: 'email'` / `format: 'uri'` (rjsf los resuelve por `format` con prioridad sobre `TextWidget`, por eso necesitan su propio mapeo) |
+| `PasswordWidget` | `Input` (`type="password"`) | `string` con `'ui:widget': 'password'` (shorthand de rjsf) |
+
+**Nota sobre `boolean`:** `Checks` tacha el label al marcarlo (pensado para listas de permisos/to-do), lo cual se ve mal en un campo booleano suelto de formulario. Por eso el widget registrado como `CheckboxWidget` (el que rjsf usa por default para todo `boolean`) es en realidad un `Swich`; para el look de checkbox clásico hay que pedirlo explícito con `'ui:widget': 'ChecksWidget'`.
+
+**Nota sobre archivos (`FileWidget`):** el valor que entrega `onChange` es un data-URL en base64 (string), o un array de data-URLs si el campo es `array`/`'ui:options': { multiple: true }` — no un `File` nativo del browser. Restringir el tipo de archivo con `'ui:options': { accept: 'image/*' }` (mismo formato que el atributo HTML `accept`). El preview reusa `ImagePastePreview` (el mismo chip que usan `PasteImageField`/`MultilinePlaceholder`).
+
+**Schema de referencia completo:** este `schema` + `uiSchema` ejercitan todos los tipos/formatos que `SchemaForm` sabe interpretar — útil como plantilla para armar uno propio o para ver de un vistazo qué forma de JSON Schema produce cada widget.
+
+```js
+const schema = {
+  type: 'object',
+  required: ['nombre', 'email'],
+  properties: {
+    nombre: {
+      type: 'string',
+      title: 'Nombre',
+      minLength: 2,
+      maxLength: 50,
+      description: 'Texto corto → TextWidget (Input)',
+    },
+    bio: {
+      type: 'string',
+      title: 'Biografía',
+      description: 'Texto largo → TextareaWidget si se pide en uiSchema (FormTextArea)',
+    },
+    edad: {
+      type: 'integer',
+      title: 'Edad',
+      minimum: 18,
+      maximum: 99,
+      description: 'number/integer → NumberWidget (Input numeric)',
+    },
+    email: {
+      type: 'string',
+      format: 'email',
+      title: 'Email',
+      description: "format: 'email' → EmailWidget (Input type=email)",
+    },
+    password: {
+      type: 'string',
+      title: 'Contraseña',
+      description: "ui:widget: 'password' → PasswordWidget (Input type=password)",
+    },
+    sitioWeb: {
+      type: 'string',
+      format: 'uri',
+      title: 'Sitio web',
+      description: "format: 'uri' → URLWidget (Input type=url)",
+    },
+    activo: {
+      type: 'boolean',
+      title: 'Cuenta activa',
+      default: true,
+      description: 'boolean (default) → CheckboxWidget, que en SchemaForm es un Swich',
+    },
+    recibirNotificaciones: {
+      type: 'boolean',
+      title: 'Recibir notificaciones',
+      description: "boolean + ui:widget: 'ChecksWidget' → look de checkbox clásico (Checks)",
+    },
+    pais: {
+      type: 'string',
+      title: 'País',
+      enum: ['ar', 'uy', 'br'],
+      description: 'string + enum → SelectWidget (Selector, single-select)',
+    },
+    roles: {
+      type: 'array',
+      title: 'Roles',
+      items: { type: 'string', enum: ['admin', 'editor', 'viewer'] },
+      minItems: 1,
+      uniqueItems: true,
+      description: "array de enum + ui:widget: 'CheckboxesWidget' → selección múltiple (Checks)",
+    },
+    nacimiento: {
+      type: 'string',
+      format: 'date',
+      title: 'Fecha de nacimiento',
+      description: "format: 'date' + ui:widget: 'DateWidget' → CalendarPicker",
+    },
+    avatar: {
+      type: 'string',
+      format: 'data-url',
+      title: 'Foto de perfil',
+      description: "format: 'data-url' → FileWidget, un solo archivo (data-URL en base64)",
+    },
+    adjuntos: {
+      type: 'array',
+      title: 'Archivos adjuntos',
+      items: { type: 'string', format: 'data-url' },
+      description: "array de format: 'data-url' → FileWidget con multiple=true (detectado solo por rjsf)",
+    },
+    direccion: {
+      type: 'object',
+      title: 'Dirección',
+      properties: {
+        calle: { type: 'string', title: 'Calle' },
+        ciudad: { type: 'string', title: 'Ciudad' },
+        codigoPostal: {
+          type: 'string',
+          title: 'Código postal',
+          pattern: '^[0-9]{4,6}$',
+        },
+      },
+      required: ['calle', 'ciudad'],
+      description: 'object anidado → ObjectFieldTemplate, recursivo (cada property usa su propio widget)',
+    },
+  },
+};
+
+const uiSchema = {
+  bio: { 'ui:widget': 'TextareaWidget' },
+  password: { 'ui:widget': 'password' },
+  recibirNotificaciones: { 'ui:widget': 'ChecksWidget' },
+  roles: {
+    'ui:widget': 'CheckboxesWidget',
+    'ui:options': {
+      enumOptions: [
+        { value: 'admin', label: 'Admin' },
+        { value: 'editor', label: 'Editor' },
+        { value: 'viewer', label: 'Viewer' },
+      ],
+    },
+  },
+  nacimiento: { 'ui:widget': 'DateWidget' },
+  avatar: { 'ui:options': { accept: 'image/*' } },
+  adjuntos: { 'ui:options': { multiple: true } },
+};
+
+<SchemaForm schema={schema} uiSchema={uiSchema} formData={formData} validator={validator} onChange={setFormData} onSubmit={handleSave} />
+```
+
+**Ejemplos:**
+```jsx
+// Formulario de perfil con textarea, select y fecha, dentro de un DrawPanel
+const schema = {
+  type: 'object',
+  required: ['nombre'],
+  properties: {
+    nombre: { type: 'string', title: 'Nombre' },
+    bio: { type: 'string', title: 'Biografía' },
+    pais: { type: 'string', title: 'País', enum: ['ar', 'uy', 'br'] },
+    nacimiento: { type: 'string', title: 'Fecha de nacimiento', format: 'date' },
+  },
+};
+
+const uiSchema = {
+  bio: { 'ui:widget': 'TextareaWidget' },
+  pais: {
+    'ui:options': {
+      enumOptions: [
+        { value: 'ar', label: 'Argentina' },
+        { value: 'uy', label: 'Uruguay' },
+        { value: 'br', label: 'Brasil' },
+      ],
+    },
+  },
+};
+
+<DrawPanel isOpen={open} onClose={handleClose} title="Editar perfil" showActions formId="profile-form" onConfirm={() => {}}>
+  <SchemaForm
+    formId="profile-form"
+    schema={schema}
+    uiSchema={uiSchema}
+    formData={formData}
+    validator={validator}
+    onChange={setFormData}
+    onSubmit={handleSave}
+    showSubmitButton={false}
+  />
+</DrawPanel>
+```
+
+**Notas:** Si se omite `validator`, el componente tira un error explícito en vez de fallar silenciosamente (rjsf lo requiere para validar `schema`). Los widgets propios pueden extenderse o pisarse por campo vía la prop `widgets` (se mergean sobre los default) sin perder el resto. Al igual que el resto de componentes con `children` libre, no se acopla a `DrawPanel` ni a ningún contenedor — cualquier componente puede envolverlo. `templates.ButtonTemplates.SubmitButton` está pisado con un componente que no renderiza nada: `@rjsf/core` agrega su propio botón de submit nativo (sin estilo) además de cualquier `children`/botón que se le pase al `<Form>`, así que sin ese override quedarían dos submits — el de `SchemaForm` y el default de rjsf.
+
+---
+
 ### Sidebar
 
 Barra lateral de navegación colapsable con grupos de items, subitems anidados y colapsables (ej. "Vacunas" → Ver/Crear/Pendientes/Lotes), badges por método HTTP, menú de usuario, menú contextual por item (editar/eliminar/fijar/colaboradores) y reordenamiento por drag & drop.
@@ -3100,6 +3357,41 @@ const [enabled, setEnabled] = useState(false);
 
 // Switch con tooltip personalizado
 <Switch value={value} onChange={setValue} tooltip="Activar notificaciones" />
+```
+
+---
+
+### Text
+
+Bloque de texto genérico (título o párrafo) para usar dentro de layouts como `Container` o `Frame` cuando se necesita meter texto suelto sin armar un componente nuevo. La `variant` define tanto el tag HTML semántico (`h1`/`h2`/`h3`/`p`/`span`) como su tamaño de fuente por defecto.
+
+**Import:**
+```jsx
+import Text from '../Text'; // export default (index.jsx)
+```
+
+**Uso básico:**
+```jsx
+<Text variant="h2">Título de la sección</Text>
+<Text>Texto de párrafo normal.</Text>
+```
+
+**Props:**
+
+| Prop | Tipo | Default | Descripción |
+|---|---|---|---|
+| `children` | node | — | Contenido del texto |
+| `variant` | `'h1' \| 'h2' \| 'h3' \| 'body' \| 'caption'` | `'body'` | Define el tag HTML (`h1`/`h2`/`h3`/`p`/`span`) y el tamaño/peso de fuente |
+| `color` | string | — | Color del texto (`--text-color`) |
+| `align` | `'left' \| 'center' \| 'right'` | `'left'` | Alineación del texto (`text-align`) |
+| `className` | string | `''` | Clase CSS adicional |
+| `style` | object | — | Estilos inline adicionales, mergeados con los internos |
+
+**Ejemplos:**
+```jsx
+<Text variant="h1">Título principal</Text>
+<Text variant="h3" color="#2563eb" align="center">Subtítulo centrado</Text>
+<Text variant="caption">Nota aclaratoria</Text>
 ```
 
 ---

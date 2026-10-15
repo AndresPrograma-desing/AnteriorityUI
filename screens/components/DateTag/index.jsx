@@ -2,7 +2,7 @@ import React from 'react';
 import { Calendar } from 'lucide-react';
 import styles from './index.module.css';
 
-export default function DateTag({ date, bgColor, textColor, iconColor, style = {} }) {
+export default function DateTag({ date, bgColor, textColor, iconColor, style = {}, className = '' }) {
   if (!date) return null;
 
   let formattedDate = '';
@@ -25,7 +25,7 @@ export default function DateTag({ date, bgColor, textColor, iconColor, style = {
   };
 
   return (
-    <div className={styles.tag} style={customStyles}>
+    <div className={`${styles.tag} ${className}`.trim()} style={customStyles}>
       <Calendar size={14} color={iconColor || textColor || 'var(--tag-text, #475569)'} />
       <span>{formattedDate}</span>
     </div>

@@ -13,7 +13,9 @@ const Filter = ({
     width = '350px',
     title = 'Filtros',
     activeFiltersCount = 0,
-    badgeColor
+    badgeColor,
+    className = '',
+    style
 }) => {
     const [isOpen, setIsOpen] = useState(false);
 
@@ -27,7 +29,7 @@ const Filter = ({
     };
 
     return (
-        <div className={styles.filterWrapper}>
+        <div className={`${styles.filterWrapper} ${className}`.trim()} style={style}>
             <div className={styles.filterBar}>
                 <div className={styles.actions}>
                     <div className={styles.filterButtonWrapper}>

@@ -8,10 +8,12 @@ export default function SubSidebarLayout({
   activeItemId,
   onItemClick,
   children,
-  bgColor
+  bgColor,
+  className = '',
+  style
 }) {
   return (
-    <div className={styles.layoutWrapper}>
+    <div className={`${styles.layoutWrapper} ${className}`.trim()} style={style}>
       <aside
         className={styles.subSidebar}
         style={{

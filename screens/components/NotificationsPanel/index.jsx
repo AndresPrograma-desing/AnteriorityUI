@@ -34,6 +34,7 @@ function NotificationsPanel({
     loadingVariant,
     skeletonCount,
     className = '',
+    style,
     bgColor,
     iconColor,
     itemBgColor,
@@ -86,6 +87,7 @@ function NotificationsPanel({
             scrollable={hasNotifications}
             maxHeight={maxHeight}
             className={`${styles.panel} ${className}`}
+            style={style}
             bgColor={bgColor}
             iconColor={iconColor}
         >

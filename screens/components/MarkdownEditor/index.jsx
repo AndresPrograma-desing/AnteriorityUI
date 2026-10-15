@@ -26,6 +26,8 @@ export const MarkdownEditor = ({
   defaultHeight = 320,
   labels = {},
   activeColor,
+  className = '',
+  style,
 }) => {
   const {
     editorTab = 'Editor',
@@ -222,8 +224,8 @@ export const MarkdownEditor = ({
 
   return (
     <div
-      className={styles.editorContainer}
-      style={activeColor ? { '--markdown-editor-active': activeColor } : undefined}
+      className={`${styles.editorContainer} ${className}`.trim()}
+      style={{ ...(activeColor ? { '--markdown-editor-active': activeColor } : {}), ...style }}
     >
       <div className={styles.toolbar}>
         <div className={styles.toolbarGroup}>

@@ -17,8 +17,10 @@ const ToggleCard = ({
   titleColor,
   descriptionColor,
   iconColor,
+  className = '',
+  style,
 }) => {
-  const containerClass = `${styles.toggleContainer} ${variant === 'floating' ? styles.floatingVariant : ''}`;
+  const containerClass = `${styles.toggleContainer} ${variant === 'floating' ? styles.floatingVariant : ''} ${className}`.trim();
 
   const formattedTitle = typeof title === 'string' ? formatHighlightedText(title) : title;
   const formattedDescription = typeof description === 'string' ? formatHighlightedText(description) : description;
@@ -31,6 +33,7 @@ const ToggleCard = ({
         ...(backgroundColor && { backgroundColor }),
         ...(borderColor && { borderColor }),
         ...(onClick && { cursor: 'pointer' }),
+        ...style,
       }}
     >
       <div className={styles.content}>

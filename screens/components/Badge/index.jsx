@@ -11,10 +11,11 @@ const Badge = ({
   labelColor,
   valueColor,
   style = {},
+  className = '',
 }) => {
   return (
     <div
-      className={styles.badgeContainer}
+      className={`${styles.badgeContainer} ${className}`.trim()}
       style={{
         ...(bgColor ? { '--badge-bg': bgColor } : {}),
         ...(borderColor ? { '--badge-border': borderColor } : {}),

@@ -20,7 +20,9 @@ const CalendarPicker = ({
   range = false,
   inputSx,
   selectedColor,
-  accentColor
+  accentColor,
+  className = '',
+  style
 }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [isOpen, setIsOpen] = useState(false);
@@ -225,7 +227,7 @@ const CalendarPicker = ({
   );
 
   return (
-    <div className={styles.inputGroup} onClick={(e) => e.stopPropagation()}>
+    <div className={`${styles.inputGroup} ${className}`.trim()} onClick={(e) => e.stopPropagation()} style={style}>
       <TextField
         label={label}
         value={displayText}

@@ -38,3 +38,20 @@ export const CustomBorder = {
   },
 };
 
+export const WithBackgroundImage = {
+  args: {
+    children: <p style={{ color: '#fff' }}>Contenedor con imagen de fondo.</p>,
+    bgImage: 'https://picsum.photos/seed/anteriority/1300/700',
+    style: { minHeight: '400px' },
+  },
+};
+
+export const WithBlurredBackground = {
+  args: {
+    children: <p style={{ color: '#fff' }}>Contenedor con imagen de fondo difuminada.</p>,
+    bgImage: 'https://picsum.photos/seed/anteriority/1300/700',
+    blurBackground: true,
+    style: { minHeight: '400px' },
+  },
+};
+

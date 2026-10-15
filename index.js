@@ -55,6 +55,7 @@ export { default as PasteImageField } from './screens/components/PasteImageField
 export { default as PlaceholderButton } from './screens/components/PlaceholderButton/index.js';
 export { default as Profile } from './screens/components/Profile/index.js';
 export { default as ProfileAvatar } from './screens/components/Profile/Avatar/index.js';
+export { default as SchemaForm } from './screens/components/SchemaForm/index.js';
 export { default as ScrollBar } from './screens/components/ScrollBar/index.js';
 export { default as Sidebar } from './screens/components/Sidebar/index.js';
 export { default as Skeleton } from './screens/components/Skeleton/index.js';
@@ -64,6 +65,9 @@ export { default as SummaryCard } from './screens/components/SummaryCard/index.j
 export { default as Swich } from './screens/components/Swich/index.js';
 export { default as TableA } from './screens/components/TableA/index.js';
 export { default as TableB } from './screens/components/TableB/index.js';
+export { default as Text } from './screens/components/Text/index.js';
 export { default as ToggleCard } from './screens/components/ToggleCard/index.js';
 export { default as TopBar } from './screens/components/TopBar/index.js';
 export { default as UserEditPopover } from './screens/components/UserEditPopover/index.js';
+export { registerAnteriority } from './screens/plasmic/index.js';
+export { default as Radio } from './screens/components/Radio/index.js';
