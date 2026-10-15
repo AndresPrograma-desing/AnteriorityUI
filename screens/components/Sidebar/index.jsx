@@ -1,6 +1,6 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { ChevronDown, ChevronLeft, ChevronRight, Pencil, Trash2, Pin, PinOff, GripVertical, Users } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight, X, Pencil, Trash2, Pin, PinOff, GripVertical, Users } from 'lucide-react';
 import Button from '../Button/index';
 import Skeleton from '../Skeleton/index';
 import KeyboardShortcut from '../KeyboardShortcut/index';
@@ -42,11 +42,17 @@ export const ProSidebar = ({
   methodBadgeColors,
   subItemActiveBgColor,
   subItemActiveTextColor,
+  isMobileOpen = false,
+  onCloseMobile,
   style,
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(() => {
     return localStorage.getItem('sidebar_collapsed') === 'true';
   });
+  // El drawer mobile siempre se ve expandido (con labels), aunque el usuario
+  // haya colapsado el sidebar en su última sesión de escritorio — el collapse
+  // es un concepto de ancho fijo que no aplica a un drawer full-width.
+  const effectiveCollapsed = isCollapsed && !isMobileOpen;
   const [expandedIds, setExpandedIds] = useState(() => {
     const parentId = findParentIdForActiveItem(groups, activeId);
     return parentId ? new Set([parentId]) : new Set();
@@ -129,9 +135,9 @@ export const ProSidebar = ({
     setUserMenuPosition({
       bottom: window.innerHeight - rect.top + 8,
       left: rect.left,
-      width: isCollapsed ? 220 : rect.width,
+      width: effectiveCollapsed ? 220 : rect.width,
     });
-  }, [isUserMenuOpen, isCollapsed]);
+  }, [isUserMenuOpen, effectiveCollapsed]);
 
   useEffect(() => {
     if (!isUserMenuOpen) return undefined;
@@ -176,6 +182,20 @@ export const ProSidebar = ({
     setContextMenu({ x: event.clientX, y: event.clientY, item });
   };
 
+  useEffect(() => {
+    if (!isMobileOpen) return undefined;
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') onCloseMobile && onCloseMobile();
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isMobileOpen, onCloseMobile]);
+
+  const handleSelect = (item) => {
+    onSelect && onSelect(item);
+    onCloseMobile && onCloseMobile();
+  };
+
   const renderLeftContent = (item) => {
     const Icon = item.icon;
     if (Icon) {
@@ -195,13 +215,29 @@ export const ProSidebar = ({
       enabled={collapsible}
       onTrigger={() => setIsCollapsed(toggleSidebarCollapsed)}
     >
+    {isMobileOpen && (
+      <div className={styles.mobileBackdrop} onClick={onCloseMobile} />
+    )}
+
+    <div
+      className={`${styles.sidebarWrapper} ${isMobileOpen ? styles.mobileOpen : ''}`}
+    >
     <aside
-      className={`${styles.sidebar} ${isCollapsed ? styles.collapsed : ''} ${className}`}
+      className={`${styles.sidebar} ${effectiveCollapsed ? styles.collapsed : ''} ${className}`}
       style={themeVars}
     >
+      <button
+        type="button"
+        className={styles.mobileCloseBtn}
+        onClick={onCloseMobile}
+        aria-label={TEXTS.closeMobileMenu}
+      >
+        <X size={16} />
+      </button>
+
       {(headerContent || collapsible) && (
         <div className={styles.sidebarHeader}>
-          {!isCollapsed && headerContent && (
+          {!effectiveCollapsed && headerContent && (
             <div className={styles.headerContent}>{headerContent}</div>
           )}
 
@@ -215,11 +251,11 @@ export const ProSidebar = ({
               color="transparent"
             >
               <ModalTooltip
-                key={isCollapsed}
-                text={isCollapsed ? TEXTS.openMenu : TEXTS.closeMenu}
+                key={effectiveCollapsed}
+                text={effectiveCollapsed ? TEXTS.openMenu : TEXTS.closeMenu}
                 position="bottom"
               >
-                {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+                {effectiveCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
               </ModalTooltip>
             </Button>
           )}
@@ -235,7 +271,7 @@ export const ProSidebar = ({
                   <div className={styles.btnLayout}>
                     <div className={styles.leftPart}>
                       <Skeleton circle width={20} height={20} />
-                      {!isCollapsed && <Skeleton width={`${60 + (idx % 3) * 15}%`} height="12px" />}
+                      {!effectiveCollapsed && <Skeleton width={`${60 + (idx % 3) * 15}%`} height="12px" />}
                     </div>
                   </div>
                 </div>
@@ -244,7 +280,7 @@ export const ProSidebar = ({
           </div>
         ) : groups && groups.map((group, gIdx) => (
           <div key={gIdx} className={styles.menuGroup}>
-            {group.title && !isCollapsed && (
+            {group.title && !effectiveCollapsed && (
               <span className={styles.groupTitle}>{group.title}</span>
             )}
 
@@ -254,7 +290,7 @@ export const ProSidebar = ({
                 const isActive = !hasSubItems && activeId === item.id;
                 const isDragging = draggedItemId === item.id;
                 const isDragOver = canReorder && dragOverItemId === item.id && !isDragging;
-                const isExpanded = hasSubItems && expandedIds.has(item.id) && !isCollapsed;
+                const isExpanded = hasSubItems && expandedIds.has(item.id) && !effectiveCollapsed;
 
                 return (
                   <div key={item.id} className={styles.itemWithSubItems}>
@@ -268,36 +304,36 @@ export const ProSidebar = ({
                       onDragLeave={canReorder ? () => handleDragLeave(item) : undefined}
                       onDrop={canReorder ? (event) => handleDrop(event, group.items, item) : undefined}
                       onDragEnd={canReorder ? handleDragEnd : undefined}
-                      onClick={() => (hasSubItems ? toggleExpanded(item.id) : onSelect && onSelect(item))}
+                      onClick={() => (hasSubItems ? toggleExpanded(item.id) : handleSelect(item))}
                       onContextMenu={(event) => handleItemContextMenu(event, item)}
                       className={`${styles.sidebarItemBtn} ${isActive ? styles.activeBtn : ''} ${isExpanded ? styles.expandParentOpen : ''} ${isDragging ? styles.dragging : ''} ${isDragOver ? styles.dragOver : ''}`}
-                      ToolTip={isCollapsed ? item.label : undefined}
+                      ToolTip={effectiveCollapsed ? item.label : undefined}
                     >
                       <div className={styles.btnLayout}>
                         <div className={styles.leftPart}>
-                          {canReorder && !isCollapsed && (
+                          {canReorder && !effectiveCollapsed && (
                             <span className={styles.dragHandle}><GripVertical size={14} /></span>
                           )}
                           {renderLeftContent(item)}
-                          {!isCollapsed && <span className={styles.label}>{item.label}</span>}
-                          {!isCollapsed && item.pinned && (
+                          {!effectiveCollapsed && <span className={styles.label}>{item.label}</span>}
+                          {!effectiveCollapsed && item.pinned && (
                             <Pin size={12} className={styles.pinnedIcon} />
                           )}
                         </div>
 
-                        {!isCollapsed && item.badge && (
+                        {!effectiveCollapsed && item.badge && (
                           <span className={`${styles.badge} ${getBadgeClass(styles, item.badgeType)}`}>
                             {item.badge}
                           </span>
                         )}
 
-                        {!isCollapsed && hasSubItems && (
+                        {!effectiveCollapsed && hasSubItems && (
                           <ChevronDown size={14} className={`${styles.expandChevron} ${isExpanded ? styles.expandChevronOpen : ''}`} />
                         )}
                       </div>
                     </Button>
 
-                    {hasSubItems && !isCollapsed && (
+                    {hasSubItems && !effectiveCollapsed && (
                       <div className={`${styles.subItemListWrapper} ${isExpanded ? styles.subItemListWrapperOpen : ''}`}>
                         <div className={styles.subItemList}>
                           {item.subItems.map((subItem) => {
@@ -308,7 +344,7 @@ export const ProSidebar = ({
                                 fullWidth
                                 color="transparent"
                                 active={isSubActive}
-                                onClick={() => onSelect && onSelect(subItem)}
+                                onClick={() => handleSelect(subItem)}
                                 className={`${styles.sidebarItemBtn} ${styles.subItemBtn} ${isSubActive ? styles.activeBtn : ''}`}
                               >
                                 <div className={styles.btnLayout}>
@@ -339,7 +375,7 @@ export const ProSidebar = ({
 
       {(footerContent || user?.email) && (
         <div className={styles.footerGroup}>
-          {footerContent && !isCollapsed && (
+          {footerContent && !effectiveCollapsed && (
             <div className={styles.footerContent}>{footerContent}</div>
           )}
 
@@ -352,10 +388,10 @@ export const ProSidebar = ({
                 onClick={() => setIsUserMenuOpen((prev) => !prev)}
               >
                 <span className={styles.avatar}>{getInitial(user.email)}</span>
-                {!isCollapsed && <span className={styles.userEmail}>{user.email}</span>}
+                {!effectiveCollapsed && <span className={styles.userEmail}>{user.email}</span>}
               </button>
 
-              {userFooterAction && !isCollapsed && (
+              {userFooterAction && !effectiveCollapsed && (
                 <Button
                   circle
                   size="small"
@@ -491,6 +527,7 @@ export const ProSidebar = ({
         document.body
       )}
     </aside>
+    </div>
     </KeyboardShortcut>
   );
 };

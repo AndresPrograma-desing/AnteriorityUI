@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Bell, MessageCircle, HelpCircle, LogOut, User, Settings, Folder, FileText } from 'lucide-react';
+import { Bell, MessageCircle, HelpCircle, LogOut, User, Settings, Folder, FileText, Home, FolderKanban } from 'lucide-react';
 import { SiPubg } from 'react-icons/si';
 import TopBar from './index.jsx';
+import ProSidebar from '../Sidebar/index.jsx';
 
 export default {
   title: 'Components/TopBar',
@@ -153,10 +154,13 @@ export const LogoVariants = {
   ),
 };
 
-// Por debajo de 1024px el buscador se achica, por debajo de 768px se oculta
-// (el consumidor puede ofrecer una lupa en `actions` para ese breakpoint), y
-// el breadcrumb/título truncan con max-width en vez de desbordar. Reducí el
-// ancho del viewport de este preview en Storybook para ver la transición.
+// Por debajo de 1024px el buscador se achica; por debajo de 768px el buscador
+// central se reemplaza por un botón de lupa (abre CommandPalette si hay
+// `commandItems`, o un input expandido si hay `searchProps`), y las `actions`
+// individuales se reemplazan por un botón "···" que las agrupa en un panel
+// lateral (MobileActionsPanel). El breadcrumb/título truncan con max-width en
+// vez de desbordar. Achicá la ventana del navegador por debajo de 767px para
+// ver la transición completa.
 export const Responsive = {
   render: (args) => <SearchWithState {...args} />,
   args: {
@@ -165,6 +169,26 @@ export const Responsive = {
     actions,
     user: { name: 'Jane Doe', email: 'jane.doe@example.com' },
     userMenuItems,
+  },
+};
+
+// Mismo caso que `Responsive` pero con `commandItems`: por debajo de 767px la
+// lupa abre directo el CommandPalette (Ctrl+K) en vez del input expandido.
+export const MobileActionsAndCommandPalette = {
+  args: {
+    logo: <Logo />,
+    breadcrumbItems,
+    commandItems,
+    actions,
+    user: { name: 'Jane Doe', email: 'jane.doe@example.com' },
+    userMenuItems,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Achicá la ventana del navegador por debajo de 767px: aparecen el botón de lupa (abre el CommandPalette) y el botón "···" (abre el panel con mensajes/notificaciones/ayuda) a la derecha.',
+      },
+    },
   },
 };
 
@@ -430,6 +454,70 @@ export const PublicNavbarTransparentDark = {
     borderColor: 'transparent',
     navLinkColor: 'rgba(248, 250, 252, 0.75)',
     navLinkActiveColor: '#ffffff',
+  },
+};
+
+const sidebarGroups = [
+  {
+    title: 'General',
+    items: [
+      { id: 'home', label: 'Inicio', icon: Home },
+      { id: 'projects', label: 'Proyectos', icon: FolderKanban },
+      { id: 'docs', label: 'Documentos', icon: FileText, badge: 'GET', badgeType: 'get' },
+    ],
+  },
+];
+
+// Layout real combinando TopBar + Sidebar: por debajo de 767px de viewport,
+// el buscador central se reemplaza por un botón de lupa (abre el
+// CommandPalette, porque esta demo usa `commandItems`), las `actions` se
+// reemplazan por un botón "···" que las agrupa en un panel lateral, y
+// aparece el botón hamburguesa (prop `onMenuClick`) a la izquierda del logo
+// que abre el Sidebar como drawer deslizante (prop
+// `isMobileOpen`/`onCloseMobile`, ver story `MobileDrawer` del Sidebar).
+// Para ver el flujo completo, achicar la ventana del navegador por debajo de
+// 767px — ambos componentes reaccionan al ancho real del viewport, no al
+// tamaño de este contenedor de Storybook.
+const LayoutWithMobileSidebarDemo = () => {
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [activeId, setActiveId] = useState('home');
+
+  return (
+    <div style={{ display: 'flex', height: 560, border: '1px solid #e2e8f0' }}>
+      <ProSidebar
+        groups={sidebarGroups}
+        activeId={activeId}
+        onSelect={(item) => setActiveId(item.id)}
+        user={{ email: 'jane.doe@example.com' }}
+        isMobileOpen={isMobileOpen}
+        onCloseMobile={() => setIsMobileOpen(false)}
+      />
+      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+        <TopBar
+          logo={<Logo />}
+          title="Panel de administración"
+          commandItems={commandItems}
+          actions={actions}
+          user={{ name: 'Jane Doe', email: 'jane.doe@example.com' }}
+          userMenuItems={userMenuItems}
+          onMenuClick={() => setIsMobileOpen(true)}
+        />
+        <div style={{ flex: 1, padding: 24, color: '#64748b', fontSize: '0.9rem' }}>
+          Contenido de la página…
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export const WithMobileSidebar = {
+  render: () => <LayoutWithMobileSidebarDemo />,
+  parameters: {
+    docs: {
+      description: {
+        story: 'Combina TopBar + Sidebar como lo haría un layout real. Achicar la ventana del navegador por debajo de 767px para ver el botón hamburguesa aparecer en el TopBar y abrir el Sidebar como drawer superpuesto.',
+      },
+    },
   },
 };
 

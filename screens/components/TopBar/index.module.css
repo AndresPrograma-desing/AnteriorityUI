@@ -16,7 +16,7 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    flex: 1;
+    flex: 1 1 auto;
     min-width: 0;
 }
 
@@ -30,6 +30,40 @@
     cursor: pointer;
     color: inherit;
     flex-shrink: 0;
+}
+
+/* Botón hamburguesa para abrir el Sidebar en mobile (ver prop `onMenuClick`). Oculto en
+   desktop; solo aparece por debajo de 767px, mismo breakpoint en el que se oculta el
+   buscador central. */
+.mobileMenuButton {
+    display: none;
+}
+
+@media (max-width: 767px) {
+    .mobileMenuButton {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        width: 34px;
+        height: 34px;
+        padding: 0;
+        border-radius: 6px;
+        border: 1px solid var(--topbar-action-border, #e2e8f0);
+        background-color: var(--topbar-action-bg, #f1f5f9);
+        color: var(--topbar-icon, #475569);
+        cursor: pointer;
+        transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .mobileMenuButton:hover {
+        background-color: var(--topbar-action-hover-bg, var(--topbar-hover-bg, #e2e8f0));
+        color: var(--topbar-text, #0f172a);
+    }
+
+    .mobileMenuButton:disabled {
+        cursor: default;
+    }
 }
 
 .logoButton:disabled {
@@ -130,6 +164,7 @@ button.searchWrapper {
 
 .ctaButton {
     flex-shrink: 0;
+    white-space: nowrap;
 }
 
 .searchIcon {
@@ -186,13 +221,14 @@ button.searchWrapper {
     align-items: center;
     justify-content: flex-end;
     gap: 4px;
-    flex: 1;
+    flex: 0 1 auto;
     min-width: 0;
 }
 
 .actionBtnWrapper {
     position: relative;
     display: inline-flex;
+    flex-shrink: 0;
 }
 
 .actionBtn {
@@ -274,6 +310,7 @@ button.searchWrapper {
 .userSection {
     position: relative;
     margin-left: 4px;
+    flex-shrink: 0;
 }
 
 .userButton {
@@ -347,10 +384,19 @@ button.searchWrapper {
     background-color: #fef2f2;
 }
 
+/* Botones de mobile: lupa (abre CommandPalette o el input expandido) y "···"
+   (abre MobileActionsPanel con la lista de `actions`). Ocultos en desktop;
+   en su lugar se usan SearchBar y TopBarActions normales. */
+.mobileSearchButton,
+.mobileActionsButton {
+    display: none;
+}
+
 /* Responsive: achica paddings/gaps progresivamente y, por debajo de 768px,
-   oculta el buscador central (el consumidor puede ofrecer una lupa en
-   `actions` para ese breakpoint) para que logo + breadcrumb + acciones
-   sigan entrando en una sola fila sin desbordar ni romper layout. */
+   oculta el buscador central y las `actions` individuales, reemplazándolos
+   por .mobileSearchButton y .mobileActionsButton (lupa + "···" que abre
+   MobileActionsPanel) para que logo + breadcrumb + acciones sigan entrando
+   en una sola fila sin desbordar ni romper layout. */
 @media (max-width: 1023px) {
     .topbar {
         gap: 12px;
@@ -366,20 +412,113 @@ button.searchWrapper {
     .topbar {
         gap: 8px;
         padding: 10px 12px;
+        flex-wrap: wrap;
     }
 
     .centerSection {
         display: none;
     }
 
+    .leftSection {
+        min-width: 0;
+    }
+
     .breadcrumbs,
     .skeletonBreadcrumbs {
-        max-width: 50vw;
+        max-width: 38vw;
     }
 
     .title {
-        max-width: 50vw;
+        max-width: 38vw;
     }
+
+    .rightSection {
+        gap: 2px;
+    }
+
+    .ctaButton {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+
+    .actionBtnWrapper,
+    .actionsDivider {
+        display: none;
+    }
+
+    .mobileSearchButton,
+    .mobileActionsButton {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        width: 34px;
+        height: 34px;
+        padding: 0;
+        border-radius: 6px;
+        border: 1px solid var(--topbar-action-border, #e2e8f0);
+        background-color: var(--topbar-action-bg, #f1f5f9);
+        color: var(--topbar-icon, #475569);
+        cursor: pointer;
+        transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .mobileSearchButton:hover,
+    .mobileActionsButton:hover {
+        background-color: var(--topbar-action-hover-bg, var(--topbar-hover-bg, #e2e8f0));
+        color: var(--topbar-text, #0f172a);
+    }
+
+    .mobileActionsButtonWrapper {
+        position: relative;
+        display: inline-flex;
+    }
+}
+
+.mobileSearchOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 2100;
+    background-color: var(--topbar-bg, #ffffff);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    box-sizing: border-box;
+}
+
+.mobileSearchOverlayInput {
+    flex: 1;
+    min-width: 0;
+    height: 40px;
+    padding: 0 12px;
+    border-radius: 8px;
+    border: 1px solid var(--topbar-border, #e2e8f0);
+    background-color: var(--topbar-search-bg, #f8fafc);
+    color: var(--topbar-text, #0f172a);
+    font-size: 0.9rem;
+    font-family: inherit;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.mobileSearchOverlayInput:focus {
+    border-color: var(--topbar-accent, #0ea5e9);
+}
+
+.mobileSearchOverlayClose {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: 8px;
+    border: 1px solid var(--topbar-border, #e2e8f0);
+    background: transparent;
+    color: var(--topbar-text, #0f172a);
+    cursor: pointer;
 }
 
 @media (max-width: 479px) {
@@ -391,10 +530,14 @@ button.searchWrapper {
     .breadcrumbs,
     .skeletonBreadcrumbs,
     .title {
-        max-width: 38vw;
+        max-width: 30vw;
     }
 
     .actionsDivider {
-        margin: 0 4px;
+        margin: 0 2px;
+    }
+
+    .actionBtn {
+        padding: 6px !important;
     }
 }

@@ -71,3 +71,22 @@ export const CondensedWithMenu = {
     ],
   },
 };
+
+// Simula un trail largo con varios íconos en un contenedor angosto (ej. TopBar
+// en mobile, < 320px disponibles para el breadcrumb): el trail debe truncar en
+// una sola línea con ellipsis en vez de envolver a una segunda línea o
+// solaparse con elementos vecinos (logo, botón hamburguesa, etc.).
+export const NarrowContainer = {
+  render: (args) => (
+    <div style={{ width: 220, border: '1px dashed #cbd5e1', padding: 8 }}>
+      <Breadcrumbs {...args} />
+    </div>
+  ),
+  args: {
+    items: [
+      { label: 'ContextHub', icon: Home, onClick: () => console.log('go home') },
+      { label: 'Context Finance', icon: Gem, onClick: () => console.log('go finance') },
+      { label: 'Plan de Ahorro (2)' },
+    ],
+  },
+};

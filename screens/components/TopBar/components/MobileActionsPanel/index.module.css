@@ -1,0 +1,64 @@
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 10px 12px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: #0f172a;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.item:hover {
+    background-color: #f1f5f9;
+}
+
+.item:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.item:disabled:hover {
+    background-color: transparent;
+}
+
+.itemIcon {
+    flex-shrink: 0;
+    color: #475569;
+}
+
+.itemLabel {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.itemBadge {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 999px;
+    background-color: #ef4444;
+    color: #ffffff;
+    font-size: 0.7rem;
+    font-weight: 700;
+}
