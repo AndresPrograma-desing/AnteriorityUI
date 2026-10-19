@@ -1,0 +1,23 @@
+.jumper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.input {
+  width: 52px;
+}
+
+.input :global(.MuiInputBase-root) {
+  height: 30px;
+}
+
+.input :global(.MuiOutlinedInput-notchedOutline) {
+  border-color: transparent;
+}
+
+.pageCount {
+  font-size: 0.74rem;
+  font-weight: 600;
+  user-select: none;
+}

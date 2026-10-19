@@ -296,6 +296,12 @@ const referenciaSchema = {
       enum: ['ar', 'uy', 'br'],
       description: 'string + enum → SelectWidget (Selector, single-select)',
     },
+    plan: {
+      type: 'string',
+      title: 'Plan',
+      enum: ['free', 'pro', 'enterprise'],
+      description: "string + enum + ui:widget: 'radio' → RadioWidget (RadioGroup + Radio)",
+    },
     roles: {
       type: 'array',
       title: 'Roles',
@@ -321,6 +327,21 @@ const referenciaSchema = {
       title: 'Archivos adjuntos',
       items: { type: 'string', format: 'data-url' },
       description: "array de format: 'data-url' → FileWidget con multiple=true (detectado solo por rjsf)",
+    },
+    colorFavorito: {
+      type: 'string',
+      format: 'color',
+      title: 'Color favorito',
+      default: '#2563eb',
+      description: "format: 'color' → ColorWidget (ColorPicker)",
+    },
+    satisfaccion: {
+      type: 'integer',
+      title: 'Satisfacción',
+      minimum: 0,
+      maximum: 10,
+      default: 5,
+      description: "number/integer + ui:widget: 'range' → RangeWidget (Slider), min/max desde minimum/maximum",
     },
     direccion: {
       type: 'object',
@@ -354,9 +375,11 @@ const referenciaUiSchema = {
       ],
     },
   },
+  plan: { 'ui:widget': 'radio' },
   nacimiento: { 'ui:widget': 'DateWidget' },
   avatar: { 'ui:options': { accept: 'image/*' } },
   adjuntos: { 'ui:options': { multiple: true } },
+  satisfaccion: { 'ui:widget': 'range' },
 };
 
 export const SchemaReferencia = {

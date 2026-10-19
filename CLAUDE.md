@@ -34,6 +34,8 @@ Un consumidor de la librería que quiera usar `PasswordResetPanel` o `UserEditPo
 
 ## Convención: props de color
 
+**Por qué:** el objetivo es que quien consume la librería pueda adaptar la paleta de un componente al tema de su propio proyecto sin pelear con overrides de CSS por fuera (`!important`, selectores frágiles contra CSS Modules con nombres hasheados, etc.). Todo color visible de un componente debería poder cambiarse por prop; si algo solo se puede recolorear escribiendo CSS externo, es una laguna que hay que cerrar.
+
 La mayoría de los componentes con color propio (fondo, texto, ícono, borde) exponen props opcionales de color (`bgColor`, `textColor`, `iconColor`, `borderColor`, `accentColor`, o nombres específicos del rol cuando ninguno de esos encaja). Reglas al tocar o agregar componentes:
 
 - **Todo prop de color es opcional y su default debe reproducir exactamente el color hardcodeado que existía antes** — es un cambio aditivo, nunca un rediseño.
@@ -41,6 +43,7 @@ La mayoría de los componentes con color propio (fondo, texto, ícono, borde) ex
 - Si el color ya estaba inline en JSX (`style`, `sx`, `color=` de MUI), se reemplaza el literal por la prop con ese mismo valor como default de parámetro.
 - **Los componentes con sistema `variant`/`type` (Barnner, DesplegablePanel, Notification/Error, TableB) mantienen su variant tal cual** — las props de color nuevas son un override opcional por encima de la paleta que resolvería el variant.
 - Nombres reutilizados a propósito para consistencia entre componentes: `bgColor`, `textColor`, `iconColor`, `borderColor`, `accentColor`.
+- **Componentes que renderizan otro componente interno con sus propias props de color** (ej. `RenderJsonSchema` usando `MediaViewer` para previews de archivo) no pueden asumir que las CSS custom properties del padre llegan solas — si el hijo lee sus propios tokens (`--media-viewer-*` en vez de los del padre), hay que propagar explícitamente las props de color recibidas hacia ese hijo. Cubrir el contenedor principal y olvidarse de los sub-componentes internos dejaría una paleta a medio personalizar.
 
 ## Convención: valores fijos en `constants.js`
 

@@ -1,0 +1,84 @@
+.audioPlayer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.audioEl {
+  display: none;
+}
+
+.iconBadge {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fileName {
+  font-size: 0.8rem;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.controlsRow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.volumeGroup {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.volumeSliderWrap {
+  width: 72px;
+}
+
+.speedWrap {
+  margin-left: auto;
+}
+
+.errorRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.errorIcon {
+  flex-shrink: 0;
+  color: #ef4444;
+}
+
+.errorMsg {
+  flex: 1;
+  font-size: 0.78rem;
+}
+
+@media (max-width: 480px) {
+  .volumeSliderWrap {
+    width: 48px;
+  }
+}
+
+@media (max-width: 380px) {
+  .volumeGroup {
+    display: none;
+  }
+}

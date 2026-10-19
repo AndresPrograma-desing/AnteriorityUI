@@ -1,0 +1,69 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  color: var(--rjs-text, var(--color-text, #0f172a));
+}
+
+.bordered {
+  background: var(--rjs-bg, var(--color-card-bg, #ffffff));
+  border: 1px solid var(--rjs-border, var(--color-border, #e2e8f0));
+  border-radius: var(--radius-lg, 0.75rem);
+  padding: 0 1.25rem;
+}
+
+.sectionTitle {
+  margin: 0;
+  padding: 1rem 0 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--rjs-border, var(--color-border, #e2e8f0));
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--rjs-label, var(--color-text-muted, #64748b));
+}
+
+.value {
+  font-size: 1rem;
+  word-break: break-word;
+}
+
+.emptyValue {
+  color: var(--rjs-label, var(--color-text-muted, #94a3b8));
+  font-style: italic;
+}
+
+.nested {
+  gap: 0;
+}
+
+.nested .row:last-child {
+  padding-bottom: 0;
+}
+
+.fileList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.fileItem {
+  max-width: 160px;
+}

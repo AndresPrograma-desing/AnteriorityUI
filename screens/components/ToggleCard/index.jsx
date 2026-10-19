@@ -1,6 +1,7 @@
 import React from 'react';
 import styles from './index.module.css';
 import { formatHighlightedText } from '../GreenHighlight/utils';
+import useSwipeToDismiss from '../../../common/hooks/useSwipeToDismiss';
 
 const ToggleCard = ({
   title,
@@ -17,6 +18,8 @@ const ToggleCard = ({
   titleColor,
   descriptionColor,
   iconColor,
+  swipeToDismiss = false,
+  swipeThreshold,
   className = '',
   style,
 }) => {
@@ -25,14 +28,22 @@ const ToggleCard = ({
   const formattedTitle = typeof title === 'string' ? formatHighlightedText(title) : title;
   const formattedDescription = typeof description === 'string' ? formatHighlightedText(description) : description;
 
+  const { style: swipeStyle, handlers: swipeHandlers } = useSwipeToDismiss({
+    enabled: swipeToDismiss,
+    onDismiss: onClose,
+    ...(swipeThreshold != null ? { threshold: swipeThreshold } : {}),
+  });
+
   return (
     <div
       className={containerClass}
       onClick={onClick}
+      {...swipeHandlers}
       style={{
         ...(backgroundColor && { backgroundColor }),
         ...(borderColor && { borderColor }),
         ...(onClick && { cursor: 'pointer' }),
+        ...swipeStyle,
         ...style,
       }}
     >

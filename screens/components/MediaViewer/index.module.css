@@ -1,0 +1,200 @@
+.wrapper {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  border: 1px solid var(--media-viewer-border, #e2e8f0);
+  border-radius: 10px;
+  background-color: var(--media-viewer-bg, #f8fafc);
+  overflow: hidden;
+}
+
+.imageWrapper {
+  display: flex;
+  max-height: 480px;
+}
+
+.videoWrapper {
+  display: flex;
+  background-color: var(--media-viewer-video-bg, #0d0f14);
+}
+
+.imageWrapperZoomed {
+  overflow: auto;
+}
+
+.image,
+.video {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  max-height: 480px;
+  height: auto;
+  object-fit: contain;
+}
+
+.imageZoomable {
+  cursor: zoom-in;
+}
+
+.imageZoomed {
+  width: auto;
+  max-width: none;
+  max-height: none;
+  cursor: zoom-out;
+}
+
+.audioWrapper {
+  padding: 12px 16px;
+  overflow: visible;
+}
+
+.audioFileName {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--media-viewer-text, #334155);
+  margin-bottom: 8px;
+}
+
+.audio {
+  width: 100%;
+}
+
+.pdfWrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.pdfFrame {
+  width: 100%;
+  height: 480px;
+  border: none;
+}
+
+.fileFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  border-top: 1px solid var(--media-viewer-border, #e2e8f0);
+}
+
+.fileCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+}
+
+.fileIcon {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  color: #ffffff;
+}
+
+.fileInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fileName {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--media-viewer-text, #334155);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fileMeta {
+  font-size: 0.72rem;
+  color: var(--media-viewer-text, #334155);
+  opacity: 0.65;
+}
+
+.fileAction {
+  flex-shrink: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--media-viewer-accent, #2563eb);
+  text-decoration: none;
+}
+
+.fileAction:hover {
+  text-decoration: underline;
+}
+
+.downloadButton {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  color: var(--media-viewer-accent, #2563eb);
+  text-decoration: none;
+  transition: background-color 0.15s ease;
+}
+
+.downloadButton:hover {
+  background-color: rgba(0, 0, 0, 0.06);
+}
+
+.actionButton {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px 16px;
+  border: 1px solid var(--media-viewer-border, #e2e8f0);
+  border-radius: 10px;
+  background-color: var(--media-viewer-bg, #f8fafc);
+  color: var(--media-viewer-accent, #2563eb);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.actionButton:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+  border-color: var(--media-viewer-accent, #2563eb);
+}
+
+@media (max-width: 480px) {
+  .imageWrapper,
+  .videoWrapper {
+    max-height: 280px;
+  }
+
+  .image,
+  .video {
+    max-height: 280px;
+  }
+
+  .pdfFrame {
+    height: 320px;
+  }
+
+  .fileCard {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .fileIcon {
+    width: 34px;
+    height: 34px;
+  }
+}

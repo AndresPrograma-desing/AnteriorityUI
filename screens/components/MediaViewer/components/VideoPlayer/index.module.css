@@ -1,0 +1,89 @@
+.videoPlayer {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  max-height: 480px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  user-select: none;
+}
+
+.videoPlayerFullscreen {
+  max-height: none;
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--media-viewer-video-bg, #0d0f14);
+}
+
+.videoPlayerEl {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  object-fit: contain;
+  cursor: pointer;
+}
+
+.videoPlayerFullscreen .videoPlayerEl {
+  max-height: 100vh;
+  height: 100%;
+}
+
+.bufferingOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(13, 15, 20, 0.6);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 4;
+}
+
+.controlsBar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 6px 12px 10px;
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.78) 0%, rgba(0, 0, 0, 0.25) 65%, transparent 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.controlsBarVisible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.seekSearchRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.seekSearchRow > :first-child {
+  flex: 1;
+}
+
+@media (max-width: 480px) {
+  .videoPlayer,
+  .videoPlayerEl {
+    max-height: 280px;
+  }
+}
+
+@media (max-width: 400px) {
+  .seekSearchRow > :last-child {
+    display: none;
+  }
+}
