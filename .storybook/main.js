@@ -10,6 +10,7 @@ const config = {
     "@storybook/addon-a11y",
     "@storybook/addon-docs"
   ],
+  "staticDirs": ["../fixtures"],
   "framework": "@storybook/react-vite"
 };
 export default config;

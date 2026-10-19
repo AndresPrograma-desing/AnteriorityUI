@@ -6,11 +6,18 @@ import { useEffect } from 'react';
 // "meta" son equivalentes (ctrlOrMeta: true) para que el mismo atajo
 // funcione en Windows/Linux (Ctrl) y Mac (Cmd) sin que el consumidor tenga
 // que distinguir el sistema operativo.
+// "space" es un alias legible para la barra espaciadora, cuyo event.key real es " " (un
+// string vacío tras trim, que el parser normal de abajo descarta como si no hubiera key).
+const KEY_ALIASES = {
+  space: ' ',
+};
+
 export function parseShortcut(shortcut) {
   if (!shortcut) return null;
   const parts = shortcut.toLowerCase().split('+').map((part) => part.trim()).filter(Boolean);
   const modifiers = new Set(['ctrl', 'cmd', 'meta']);
-  const key = parts.find((part) => !modifiers.has(part) && part !== 'shift' && part !== 'alt');
+  const rawKey = parts.find((part) => !modifiers.has(part) && part !== 'shift' && part !== 'alt');
+  const key = rawKey ? (KEY_ALIASES[rawKey] ?? rawKey) : null;
   if (!key) return null;
 
   return {

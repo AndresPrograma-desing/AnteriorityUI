@@ -1113,6 +1113,90 @@ import DrawPanel from '../DrawPanel'; // export default (index.jsx)
 
 ---
 
+### FileListItem
+
+Fila de lista de archivos: checkbox de selección opcional, ícono cuadrado de color según el tipo de archivo (mismo mapeo que [MediaViewer](#mediaviewer), ver [common/icons/fileType.js](#común-iconsfiletypejs)), nombre, metadata (tamaño · fecha) y acciones a la derecha. Las acciones por default son compartir/descargar/eliminar (solo se renderiza el botón cuyo callback se pasa); se pueden reemplazar completamente por botones propios (ej. "Editar") vía la prop `actions`. Pensado para listar varias instancias apiladas (ver story `ListaCompleta`). Responsive: en viewports angostos (`max-width: 480px`) reduce paddings, tamaño del ícono y de los botones de acción; el nombre siempre trunca con ellipsis en vez de desbordar.
+
+**Import:**
+```jsx
+import FileListItem from 'anteriority-ui/screens/components/FileListItem'; // export default, archivo index.jsx
+```
+
+**Uso básico:**
+```jsx
+<FileListItem name="Product Backlog - Happy Pets v2.pdf" size="114.7 KB" date="16/10/2026" />
+
+<FileListItem
+  name="Historias Usuario.docx"
+  size="30.8 KB"
+  date="15/10/2026"
+  selectable
+  selected={selected}
+  onSelectChange={setSelected}
+  onShare={() => share(file)}
+  onDownload={() => download(file)}
+  onDelete={() => remove(file)}
+/>
+```
+
+**Props:**
+
+| Prop | Tipo | Default | Descripción |
+|---|---|---|---|
+| name | string | — | Nombre de archivo a mostrar (también se usa para inferir el ícono/color por extensión). |
+| url | string | — | URL del archivo; si no se pasa `name`, se usa para inferir el tipo igual (no se renderiza como link por sí sola — ver `onClick`/`actions` para eso). |
+| size | string | — | Texto de tamaño ya formateado (ej. `'114.7 KB'`). El componente no formatea bytes — para eso usar `formatFileSize` auxiliar de ser necesario antes de pasarlo. |
+| date | string | — | Texto de fecha ya formateado (ej. `'16/10/2026'`). |
+| selectable | bool | `false` | Muestra el checkbox de selección (MUI `Checkbox`) a la izquierda. |
+| selected | bool | `false` | Estado controlado del checkbox. |
+| onSelectChange | function | — | Callback `(checked: bool)` al tildar/destildar. |
+| selectLabel | string | `'Seleccionar archivo'` | `aria-label` del checkbox. |
+| onShare | function | — | Si se pasa, renderiza el botón de compartir (ícono `Share2`) en las acciones default. |
+| onDownload | function | — | Si se pasa, renderiza el botón de descarga (ícono `Download`) en las acciones default. |
+| onDelete | function | — | Si se pasa, renderiza el botón de eliminar (ícono `Trash2`, se pinta rojo en hover) en las acciones default. |
+| shareLabel | string | `'Compartir'` | `aria-label`/`title` del botón de compartir. |
+| downloadLabel | string | `'Descargar'` | `aria-label`/`title` del botón de descargar. |
+| deleteLabel | string | `'Eliminar'` | `aria-label`/`title` del botón de eliminar. |
+| actions | node | — | Si se pasa (incluso `null`), reemplaza por completo el bloque de acciones default — útil para botones propios como "Editar". El click dentro de este bloque no dispara el `onClick` de la fila (`stopPropagation`). |
+| onClick | function | — | Si se pasa, toda la fila es clickeable (cursor pointer, hover, `role="button"`, accesible por teclado). |
+| bgColor | string | `'transparent'` | Color de fondo de la fila. |
+| borderColor | string | `'#e2e8f0'` | Color de borde de la fila. |
+| textColor | string | `'#1e293b'` | Color del nombre de archivo. |
+| metaColor | string | `'#64748b'` | Color del texto de metadata (tamaño/fecha) y de los íconos de acción. |
+| className | string | `''` | Clase adicional para la fila. |
+| style | object | — | Estilos inline adicionales para la fila. |
+
+**Ejemplos:**
+```jsx
+// Lista completa con selección individual y eliminar que saca el item del estado
+{files.map((file) => (
+  <FileListItem
+    key={file.id}
+    name={file.name}
+    size={file.size}
+    date={file.date}
+    selectable
+    selected={file.selected}
+    onSelectChange={(checked) => toggleSelected(file.id, checked)}
+    onShare={() => share(file)}
+    onDownload={() => download(file)}
+    onDelete={() => removeFile(file.id)}
+  />
+))}
+
+// Acciones completamente custom (ej. un botón "Editar" en vez de compartir/descargar/eliminar)
+<FileListItem
+  name="reporte-ventas.xlsx"
+  size="45 KB"
+  date="01/10/2026"
+  actions={<Button size="small" onClick={() => editFile(file)}>Editar</Button>}
+/>
+```
+
+**Notas:** El ícono cuadrado de color no tiene prop propia — viene del tipo de archivo detectado (mismo mapeo que `MediaViewer`), igual que su glifo blanco. No persiste selección ni hace llamadas de red — es puramente presentacional/controlado.
+
+---
+
 ### Filter
 
 Barra de acciones para filtros de una tabla/listado: botón "Filtrar" que abre un panel lateral (drawer) con los campos de filtro, badge con el conteo de filtros activos, botón "Limpiar" e indicador del término de búsqueda actual.
@@ -1779,6 +1863,131 @@ const [value, setValue] = useState('# Hello world');
 ```
 
 **Notas:** Es un componente controlado (`value`/`onChange` obligatorios); el modo de vista es estado interno. Soporta atajos `Ctrl+B`, `Ctrl+I`, `Ctrl+K` y continuación automática de listas al presionar Enter. Usa `MarkdownContent` para la vista previa.
+
+---
+
+### MediaViewer
+
+Renderiza un archivo (imagen, video, audio, PDF o cualquier otro tipo) a partir de una `url`. El tipo de media se infiere automáticamente del `mimeType`/`type` o, si no se pasa, de la extensión del `name`/`url`; también se puede forzar explícitamente. Si no hay `type`/`mimeType` ni extensión reconocible (ej. una url de API del tipo `/api/files/42/raw`, o un CDN como `picsum.photos` que no incluye extensión), el componente prueba la `url` en cascada contra un `<img>`/`<video>`/`<audio>` real fuera del DOM visible (ver `autoDetectType` para desactivar esto) — a diferencia de `fetch()`, cargar estas etiquetas para mostrarse no está sujeto a CORS, así que funciona incluso contra CDNs que no mandan `Access-Control-Allow-Origin`. Si ni así se puede determinar el tipo, cae en una tarjeta genérica con ícono cuadrado de color según el tipo de archivo (PDF, Word, Excel, Zip, Markdown, código, etc.) + nombre + tamaño + botón de descarga — ese mapeo extensión → ícono/color vive en [common/icons/fileType.js](#común-iconsfiletypejs) y es compartido con [FileListItem](#filelistitem). Totalmente responsive: imagen/video/iframe de PDF se ajustan al ancho del contenedor padre, con tamaños reducidos en viewports angostos (`max-width: 480px`). Para imagen/video/audio se puede agregar opcionalmente un botón de acción genérico de ancho completo debajo del marco (ver `actionLabel`/`actionIcon`/`onAction`) — no viene activado por default, y no está atado a "descargar": el consumidor decide el texto, el ícono y qué hace al clickearlo (ej. abrir un panel de detalle externo, como el header con flecha de un visor de archivos).
+
+Cuando el tipo resuelve a video y `controls` es `true` (default), el `<video>` no usa los controles nativos del browser: renderiza un reproductor custom (`components/VideoPlayer`) con la paleta de la librería — play/pause central y en la barra inferior, seek bar con preview de tiempo al hover y buscador de tiempo por texto (`mm:ss` o segundos), control de volumen, velocidad de reproducción (0.5x–2x), fullscreen y Picture-in-Picture (si el browser lo soporta), overlay de buffering (usando el componente `Loading`) y overlay de error con reintento. La barra espaciadora pausa/reanuda mientras el mouse está sobre el player o en fullscreen (vía el componente `KeyboardShortcut`, sin capturar la tecla globalmente en el resto de la página). Pasar `controls={false}` devuelve el `<video>` nativo del browser sin ningún control (útil para videos de fondo/autoplay silencioso).
+
+**Import:**
+```jsx
+import MediaViewer from 'anteriority-ui/screens/components/MediaViewer'; // export default, archivo index.jsx
+```
+
+**Uso básico:**
+```jsx
+<MediaViewer url="https://ejemplo.com/foto.png" />
+<MediaViewer url="https://ejemplo.com/video.mp4" />
+<MediaViewer url="https://ejemplo.com/audio.mp3" name="nota-de-voz.mp3" />
+<MediaViewer url="https://ejemplo.com/contrato.docx" name="contrato.docx" size={512000} />
+```
+
+**Props:**
+
+| Prop | Tipo | Default | Descripción |
+|---|---|---|---|
+| url / src | string | — | URL del archivo a mostrar. Si no se pasa ninguna de las dos, el componente no renderiza nada. `src` es alias de `url`. |
+| type / mimeType | string | — | Fuerza el tipo de media en vez de inferirlo. Acepta un mimeType real (`'image/png'`, `'application/pdf'`, etc.) o directamente uno de los valores de `MediaViewer.KIND` (`'image'`, `'video'`, `'audio'`, `'pdf'`, `'file'`). |
+| name | string | — | Nombre de archivo a mostrar (y a usar para inferir el tipo por extensión si no hay `mimeType`). Si no se pasa, se intenta extraer del final de la `url`. |
+| size | number | — | Tamaño en bytes, mostrado formateado (`KB`/`MB`/`GB`) en la tarjeta genérica de archivo. |
+| alt | string | nombre del archivo | Texto alternativo para imagen/video. |
+| poster | string | — | Poster del `<video>` (atributo nativo, también usado por el reproductor custom). |
+| controls | bool | `true` | Si es video, `true` usa el reproductor custom (`VideoPlayer`); `false` devuelve el `<video>` nativo del browser sin controles. Para audio sigue siendo el atributo `controls` nativo. |
+| autoPlay | bool | `false` | Autoplay nativo de `<video>`/`<audio>`. |
+| loop | bool | `false` | Loop nativo de `<video>`/`<audio>`. |
+| muted | bool | `false` | Mute nativo de `<video>`/`<audio>`. |
+| zoomable | bool | `true` | Si es imagen, permite hacer click para ampliarla a su tamaño natural manteniendo el contenedor en su alto normal (con scroll interno) — el componente no crece hacia afuera. Volver a hacer click la achica de nuevo. Cambia el cursor a `zoom-in`/`zoom-out`. |
+| actionLabel | string | — | Texto de un botón genérico de ancho completo debajo del marco (imagen/video/audio). No tiene acción propia — es puramente de presentación; qué hace se define con `onAction`. Solo se renderiza si `onAction` está definido. |
+| actionIcon | component | `Download` (lucide-react) | Ícono (componente, no elemento) que se muestra junto a `actionLabel` en el botón. Pasar `null` para que el botón se vea sin ícono. |
+| onAction | function | — | Callback del botón genérico. Si no se pasa, el botón no se renderiza (no es exclusivo de "descargar" — se usa para cualquier acción, ej. abrir un visor externo, compartir, etc., según lo que pase el consumidor). |
+| autoDetectType | bool | `true` | Si no se pudo inferir el tipo por `type`/`mimeType`/extensión, prueba la `url` contra un `<img>`/`<video>`/`<audio>` real (sin tocar el DOM visible) para determinar el tipo. Poner en `false` para evitar ese intento (ej. si ya se sabe que la URL no es un media reconocible, o para no generar carga innecesaria en listas largas). No se dispara si se pasó `type`/`mimeType` explícito. |
+| downloadable | bool | `true` | Muestra el botón de descarga en la tarjeta genérica de archivo (no aplica a imagen/video/audio/PDF). |
+| downloadLabel | string | `'Descargar'` | `aria-label`/`title` del botón de descarga. |
+| openLabel | string | `'Abrir'` | Texto del link "abrir en pestaña nueva" que acompaña al visor de PDF. |
+| bgColor | string | `'#f8fafc'` | Color de fondo del contenedor. |
+| borderColor | string | `'#e2e8f0'` | Color de borde del contenedor. |
+| textColor | string | `'#334155'` | Color de texto (nombre de archivo, metadata, nombre de audio). |
+| accentColor | string | `'#2563eb'` | Color del botón de descarga y del link "Abrir" del PDF. |
+| videoBgColor | string | `'#0d0f14'` | Color de fondo del reproductor de video custom (detrás del `<video>`, visible en los bordes si el aspect ratio no llena el contenedor). |
+| videoAccentColor | string | `'#7c9cff'` | Color de acento del reproductor de video custom: seek bar, slider de volumen y opción de velocidad activa. |
+| videoControlsColor | string | `'#f1f3f6'` | Color de los íconos/texto de los controles del reproductor de video custom (play, volumen, fullscreen, PiP, velocidad, buscador de tiempo) y del overlay de buffering. |
+| videoPip | bool | `true` | Muestra el botón de Picture-in-Picture en el reproductor de video custom (solo si el browser lo soporta). |
+| videoErrorLabel | string | `'No se pudo cargar el video'` | Texto del overlay de error del reproductor de video custom. |
+| videoRetryLabel | string | `'Reintentar'` | Texto del botón de reintento en el overlay de error del reproductor de video custom. |
+| videoLoadingVariant | string | `'bars'` | `variant` pasado al componente `Loading` del overlay de buffering del reproductor de video custom (`'default'`, `'bars'`, `'bounce'`, `'box'`). |
+| videoLoadingSize | string | `'medium'` | `size` pasado al componente `Loading` del overlay de buffering del reproductor de video custom. |
+| onError | function | — | Callback del evento `onError` nativo de `<img>`/`<video>`/`<audio>` (ej. para mostrar un fallback si la URL no carga). |
+| className | string | `''` | Clase adicional para el contenedor. |
+| style | object | — | Estilos inline adicionales para el contenedor. |
+
+**Ejemplos:**
+```jsx
+// Tipo forzado explícitamente (útil si la url no tiene extensión, ej. un endpoint de descarga)
+<MediaViewer url="/api/files/42/raw" type="image" name="foto-perfil" />
+
+// Imagen sin zoom al hacer click
+<MediaViewer url="/api/files/10/raw" name="banner.png" zoomable={false} />
+
+// Imagen con botón de acción debajo del marco (acción genérica, definida por el consumidor)
+import { Download } from 'lucide-react';
+
+<MediaViewer
+  url="/api/files/55/raw"
+  name="F1-Logo-black.jpeg"
+  actionLabel="Descargar"
+  actionIcon={Download}
+  onAction={() => downloadFile(fileId)}
+/>
+
+// Video con el reproductor custom repaletizado al branding del consumidor
+<MediaViewer
+  url="/api/files/77/raw"
+  name="presentacion.mp4"
+  poster="/api/files/77/poster"
+  videoBgColor="#1a0f2e"
+  videoAccentColor="#a855f7"
+  videoControlsColor="#f3e8ff"
+/>
+
+// Video sin PiP y con controles nativos del browser en vez del reproductor custom
+<MediaViewer url="/api/files/78/raw" name="clip.mp4" videoPip={false} />
+<MediaViewer url="/api/files/79/raw" name="fondo.mp4" controls={false} autoPlay loop muted />
+
+// Tarjeta de archivo genérico con colores personalizados
+<MediaViewer
+  url="/api/files/99/raw"
+  name="contrato.docx"
+  size={512000}
+  bgColor="#f5f3ff"
+  borderColor="#ddd6fe"
+  accentColor="#7c3aed"
+/>
+```
+
+**Notas:** No sube ni persiste nada — es puramente presentacional, recibe una URL ya resuelta. El PDF se muestra embebido en un `<iframe>` (sujeto a las políticas de same-origin/CSP del sitio que lo sirve) con un link "Abrir" como fallback — la story `PdfLocal` usa un PDF de prueba real servido desde `fixtures/MediaViewer/documento-de-prueba.pdf` (ver `.storybook/main.js`, `staticDirs: ["../fixtures"]`). `MediaViewer.KIND` expone las constantes de tipo (`MediaViewer.KIND.IMAGE`, etc.) para quien quiera forzar `type` sin hardcodear el string. El ícono cuadrado de la tarjeta genérica de archivo no tiene prop de color propia (su color viene del tipo de archivo detectado); usar `bgColor`/`borderColor`/`textColor`/`accentColor` para el resto del contenedor. El request de detección por `HEAD`/`GET` (ver `detectTypeByHead`) necesita que la `url` sea alcanzable por `fetch` desde el navegador con CORS permitido — si el servidor bloquea el origen, el intento falla silenciosamente y el componente se queda con el fallback por extensión/tarjeta genérica, sin romper el render.
+
+---
+
+### common/icons/fileType.js
+
+No es un componente — es el módulo compartido que mapea una extensión de archivo (`pdf`, `docx`, `xlsx`, `zip`, `md`, `mp3`, `png`, etc.) a `{ icon, bgColor, label }`, usado por [MediaViewer](#mediaviewer) y [FileListItem](#filelistitem) para no duplicar esa lógica. Los íconos son de `react-icons/bs` (set "file earmark"). Si se agrega soporte para una extensión nueva, se agrega en `FILE_TYPE_MAP` de este archivo y ambos componentes lo heredan automáticamente.
+
+**Import:**
+```jsx
+import { getFileTypeInfo, getExtension } from 'anteriority-ui/common/icons/fileType';
+```
+
+**API:**
+
+| Export | Tipo | Descripción |
+|---|---|---|
+| getFileTypeInfo(nameOrUrl) | function | Devuelve `{ icon: ComponentType, bgColor: string, label: string }` para la extensión detectada en `nameOrUrl`. Si no matchea ninguna extensión conocida, devuelve `DEFAULT_FILE_TYPE` (ícono genérico, gris, label `'Archivo'`). |
+| getExtension(value) | function | Extrae la extensión en minúsculas de un nombre de archivo o URL (ignora querystring/hash). Devuelve `''` si no hay extensión. |
+| FILE_TYPE_MAP | object | El mapa completo `extensión → { icon, bgColor, label }`, por si un consumidor necesita iterarlo o extenderlo localmente. |
+| DEFAULT_FILE_TYPE | object | El fallback usado cuando la extensión no matchea. |
 
 ---
 
@@ -2559,7 +2768,7 @@ import ScrollBar from 'screens/components/ScrollBar';
 
 Renderiza un formulario completo a partir de un JSON Schema (+ `uiSchema` opcional), usando los widgets ya existentes de la librería (`Input`, `Checks`, `Swich`, `Selector`, `CalendarPicker`, `FormTextArea`) para cada tipo de campo, en vez de los inputs default de rjsf. Pensado para usarse como `children` de cualquier contenedor (ej. `DrawPanel`): el contenedor no sabe que adentro hay un `SchemaForm`, solo le llega el schema correspondiente a cada caso (login, alta de usuario, etc.).
 
-Es un wrapper de [`@rjsf/core`](https://rjsf-team.github.io/react-jsonschema-form/docs/) — requiere `@rjsf/core` como peer dependency (opcional: solo hace falta instalarlo si se usa este componente) y un validador (ej. `@rjsf/validator-ajv8`) pasado explícitamente por prop, para no atar la librería a un validador en particular.
+Es un wrapper de [`@rjsf/core`](https://rjsf-team.github.io/react-jsonschema-form/docs/) — requiere `@rjsf/core` como peer dependency (opcional: solo hace falta instalarlo si se usa este componente). El validador (`@rjsf/validator-ajv8`) ya viene empaquetado como dependency de `anteriority-ui` y se usa por default, así que no hace falta instalarlo ni pasarlo por prop; la prop `validator` queda disponible solo para quien quiera forzar otra versión/implementación.
 
 **Import:**
 ```jsx
@@ -2568,8 +2777,6 @@ import SchemaForm from '../SchemaForm'; // export default (index.jsx)
 
 **Uso básico:**
 ```jsx
-import validator from '@rjsf/validator-ajv8';
-
 const schema = {
   type: 'object',
   required: ['email', 'password'],
@@ -2581,7 +2788,6 @@ const schema = {
 
 <SchemaForm
   schema={schema}
-  validator={validator}
   formData={formData}
   onChange={setFormData}
   onSubmit={(data) => login(data)}
@@ -2596,7 +2802,7 @@ const schema = {
 | `schema` | object | — | JSON Schema que describe los campos del formulario |
 | `uiSchema` | object | — | `uiSchema` de rjsf: qué widget usar por campo (`'ui:widget'`), opciones de cada uno (`'ui:options'`), orden, etc. |
 | `formData` | object | — | Valores actuales del formulario (controlado) |
-| `validator` | object | — | **Requerido.** Validador de rjsf, ej. el export default de `@rjsf/validator-ajv8` |
+| `validator` | object | validador ajv8 incluido | Validador de rjsf; solo hace falta pasarlo para reemplazar el default empaquetado |
 | `widgets` | object | — | Widgets adicionales/override, mergeados sobre los widgets default de `SchemaForm` |
 | `fields` | object | — | `fields` custom de rjsf (para `ObjectField`/`ArrayField` a medida) |
 | `formId` | string | — | `id` del `<form>`; útil para disparar el submit desde un botón externo (ej. el footer de `DrawPanel`) |
@@ -2623,7 +2829,10 @@ const schema = {
 | `ChecksWidget` | `Checks` | `boolean` con el look de checkbox tachable (ej. `'ui:widget': 'ChecksWidget'`) |
 | `CheckboxesWidget` | `Checks` (uno por opción) | `array` de `string` con `enum` + `uniqueItems` (selección múltiple; ej. `'ui:widget': 'CheckboxesWidget'` con `'ui:options': { enumOptions }`) |
 | `SelectWidget` | `Selector` | `string` con `enum` (default cuando hay `enum`; **no soporta selección múltiple**, usar `CheckboxesWidget` para eso) |
+| `RadioWidget` | `RadioGroup` + `Radio` (uno por opción) | `string` con `enum` + `'ui:widget': 'radio'` (alternativa a `SelectWidget` cuando conviene mostrar todas las opciones visibles en vez de un dropdown) |
 | `DateWidget` | `CalendarPicker` | `string` con `format: 'date'` (ej. `'ui:widget': 'DateWidget'`) |
+| `ColorWidget` | `ColorPicker` | `string` con `format: 'color'` (convención estándar de rjsf) |
+| `RangeWidget` | `Slider` | `number` / `integer` con `'ui:widget': 'range'`; usa `minimum`/`maximum`/`multipleOf` del schema como `min`/`max`/`step` |
 | `FileWidget` | botón de subida + `ImagePastePreview` | `string` con `format: 'data-url'` (archivo/imagen única), o `array` de esos con `format: 'data-url'` (múltiples, detectado automáticamente por rjsf) — ver nota de archivos debajo |
 | `EmailWidget` / `URLWidget` | `Input` (`type="email"`/`"url"`) | `string` con `format: 'email'` / `format: 'uri'` (rjsf los resuelve por `format` con prioridad sobre `TextWidget`, por eso necesitan su propio mapeo) |
 | `PasswordWidget` | `Input` (`type="password"`) | `string` con `'ui:widget': 'password'` (shorthand de rjsf) |
@@ -2692,6 +2901,12 @@ const schema = {
       enum: ['ar', 'uy', 'br'],
       description: 'string + enum → SelectWidget (Selector, single-select)',
     },
+    plan: {
+      type: 'string',
+      title: 'Plan',
+      enum: ['free', 'pro', 'enterprise'],
+      description: "string + enum + ui:widget: 'radio' → RadioWidget (RadioGroup + Radio)",
+    },
     roles: {
       type: 'array',
       title: 'Roles',
@@ -2717,6 +2932,21 @@ const schema = {
       title: 'Archivos adjuntos',
       items: { type: 'string', format: 'data-url' },
       description: "array de format: 'data-url' → FileWidget con multiple=true (detectado solo por rjsf)",
+    },
+    colorFavorito: {
+      type: 'string',
+      format: 'color',
+      title: 'Color favorito',
+      default: '#2563eb',
+      description: "format: 'color' → ColorWidget (ColorPicker)",
+    },
+    satisfaccion: {
+      type: 'integer',
+      title: 'Satisfacción',
+      minimum: 0,
+      maximum: 10,
+      default: 5,
+      description: "number/integer + ui:widget: 'range' → RangeWidget (Slider), min/max desde minimum/maximum",
     },
     direccion: {
       type: 'object',
@@ -2750,12 +2980,14 @@ const uiSchema = {
       ],
     },
   },
+  plan: { 'ui:widget': 'radio' },
   nacimiento: { 'ui:widget': 'DateWidget' },
   avatar: { 'ui:options': { accept: 'image/*' } },
   adjuntos: { 'ui:options': { multiple: true } },
+  satisfaccion: { 'ui:widget': 'range' },
 };
 
-<SchemaForm schema={schema} uiSchema={uiSchema} formData={formData} validator={validator} onChange={setFormData} onSubmit={handleSave} />
+<SchemaForm schema={schema} uiSchema={uiSchema} formData={formData} onChange={setFormData} onSubmit={handleSave} />
 ```
 
 **Ejemplos:**
@@ -2791,7 +3023,6 @@ const uiSchema = {
     schema={schema}
     uiSchema={uiSchema}
     formData={formData}
-    validator={validator}
     onChange={setFormData}
     onSubmit={handleSave}
     showSubmitButton={false}
@@ -2799,7 +3030,79 @@ const uiSchema = {
 </DrawPanel>
 ```
 
-**Notas:** Si se omite `validator`, el componente tira un error explícito en vez de fallar silenciosamente (rjsf lo requiere para validar `schema`). Los widgets propios pueden extenderse o pisarse por campo vía la prop `widgets` (se mergean sobre los default) sin perder el resto. Al igual que el resto de componentes con `children` libre, no se acopla a `DrawPanel` ni a ningún contenedor — cualquier componente puede envolverlo. `templates.ButtonTemplates.SubmitButton` está pisado con un componente que no renderiza nada: `@rjsf/core` agrega su propio botón de submit nativo (sin estilo) además de cualquier `children`/botón que se le pase al `<Form>`, así que sin ese override quedarían dos submits — el de `SchemaForm` y el default de rjsf.
+**Notas:** El validador (`@rjsf/validator-ajv8`) viene empaquetado como dependency de `anteriority-ui` y se usa por default — no hace falta instalarlo ni pasarlo por prop; `validator` solo sirve para forzar otra implementación. Los widgets propios pueden extenderse o pisarse por campo vía la prop `widgets` (se mergean sobre los default) sin perder el resto. Al igual que el resto de componentes con `children` libre, no se acopla a `DrawPanel` ni a ningún contenedor — cualquier componente puede envolverlo. `templates.ButtonTemplates.SubmitButton` está pisado con un componente que no renderiza nada: `@rjsf/core` agrega su propio botón de submit nativo (sin estilo) además de cualquier `children`/botón que se le pase al `<Form>`, así que sin ese override quedarían dos submits — el de `SchemaForm` y el default de rjsf.
+
+---
+
+### RenderJsonSchema
+
+Vista de **solo lectura** de datos ya guardados a partir de un JSON Schema: a diferencia de `SchemaForm`, no renderiza un formulario editable ni depende de rjsf — recorre `schema.properties` y muestra cada valor de `formData` como texto (o imagen, para `format: 'data-url'`), resolviendo el `title`, `enum`/`enumNames` (o `anyOf` con `const`/`title`), `boolean` y `format: 'date'`/`'date-time'` del propio schema. Pensado para mostrar el detalle de una respuesta ya enviada (ej. lo que guardó un `<SchemaForm />`) sin tener que escribir a mano el mapeo de cada campo.
+
+Tolera datos guardados por un widget roto o una versión vieja (un valor que no matchea el `type` esperado, como un objeto en vez de un string): en lugar de romper o mostrar `"[object Object]"`, ese campo se muestra vacío (`"Sin datos"` por default).
+
+**Import:**
+```jsx
+import RenderJsonSchema from '../RenderJsonSchema'; // export default (index.jsx)
+```
+
+**Uso básico:**
+```jsx
+const schema = {
+  type: 'object',
+  properties: {
+    nombre: { type: 'string', title: 'Nombre' },
+    pais: { type: 'string', title: 'País', enum: ['ar', 'uy'], enumNames: ['Argentina', 'Uruguay'] },
+    nacimiento: { type: 'string', title: 'Fecha de nacimiento', format: 'date' },
+  },
+};
+
+<RenderJsonSchema schema={schema} formData={{ nombre: 'Ignacio', pais: 'ar', nacimiento: '1996-05-10' }} />
+```
+
+**Props:**
+
+| Prop | Tipo | Default | Descripción |
+|---|---|---|---|
+| `schema` | object | — | Mismo JSON Schema (`properties`, `title`, `enum`/`enumNames`, `anyOf`, `format`) que se le pasaría a `SchemaForm` |
+| `formData` | object | — | Datos ya guardados a mostrar; si falta una key o el schema no tiene `properties`, se muestra `emptyText` |
+| `emptyText` | string | `'Sin datos'` | Texto para un campo sin valor, o un valor que no matchea el tipo esperado por el schema |
+| `bordered` | boolean | `true` | Si `true`, envuelve las filas en un panel con fondo/borde propio (look de card). Un `object` anidado se renderiza internamente con `bordered={false}` para no anidar panel dentro de panel |
+| `bgColor` | string | — | Color de fondo del panel (solo visible si `bordered`) |
+| `textColor` | string | — | Color del texto de los valores |
+| `labelColor` | string | — | Color de los labels (nombre de cada campo) |
+| `borderColor` | string | — | Color del borde del panel y de la línea divisoria entre filas |
+| `className` | string | `''` | Clase adicional en el contenedor raíz |
+| `style` | object | — | Estilos inline en el contenedor raíz |
+
+**Ejemplos:**
+```jsx
+// object anidado → recursión (mismo componente, con indentación); array de enum → labels unidos por coma
+const schema = {
+  type: 'object',
+  properties: {
+    roles: {
+      type: 'array',
+      title: 'Roles',
+      items: { type: 'string', enum: ['admin', 'editor'], enumNames: ['Admin', 'Editor'] },
+    },
+    direccion: {
+      type: 'object',
+      title: 'Dirección',
+      properties: {
+        calle: { type: 'string', title: 'Calle' },
+        ciudad: { type: 'string', title: 'Ciudad' },
+      },
+    },
+  },
+};
+
+<RenderJsonSchema
+  schema={schema}
+  formData={{ roles: ['admin', 'editor'], direccion: { calle: 'Av. Siempre Viva 742', ciudad: 'Springfield' } }}
+/>
+```
+
+**Notas:** No usa ningún widget de `SchemaForm` ni acepta `uiSchema` — el mapeo de presentación (enum→label, boolean→Sí/No, fecha formateada `dd/MM/yyyy` con `date-fns`) está fijo y se resuelve solo con lo que ya describe el `schema`. Layout en una sola columna: cada campo es una fila (label en mayúsculas chico arriba, valor grande abajo) separada de la siguiente por una línea divisoria, todo dentro de un único panel — así es naturalmente responsive, sin media queries. Un `object` anidado recorre el mismo componente dentro de la fila del campo padre (sin repetir panel/borde), heredando los mismos props de color. Para `format: 'data-url'` (archivo/imagen, single o array) cada valor se renderiza con `MediaViewer` (detecta imagen/video/audio/PDF/archivo genérico solo), no con un `<img>` a mano; `bgColor`/`textColor`/`borderColor` se propagan también a ese `MediaViewer` interno (usa sus propios tokens CSS, no los hereda solo). Los colores son light por default (como el resto de la librería); para un panel oscuro (ej. para integrarlo en un contenedor con tema oscuro) usar `bgColor`/`textColor`/`labelColor`/`borderColor` en vez de CSS global, siguiendo la convención de props de color del resto de componentes — ver [Convención: props de color](#convención-props-de-color) en CLAUDE.md.
 
 ---
 

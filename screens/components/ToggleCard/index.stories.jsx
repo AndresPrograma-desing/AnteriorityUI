@@ -33,6 +33,16 @@ export const Closable = {
   },
 };
 
+export const SwipeToDismiss = {
+  args: {
+    title: 'Deslizá para cerrar',
+    description: 'En pantallas táctiles, arrastrá esta tarjeta hacia la izquierda o derecha para descartarla.',
+    icon: Info,
+    onClose: () => console.log('closed by swipe or button'),
+    swipeToDismiss: true,
+  },
+};
+
 export const WithActionAndCustomColors = {
   args: {
     title: 'Acción requerida',

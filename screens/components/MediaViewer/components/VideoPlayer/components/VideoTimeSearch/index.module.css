@@ -1,0 +1,27 @@
+.searchForm {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 8px;
+  height: 30px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+.searchInput {
+  width: 52px;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.searchInput::placeholder {
+  color: rgba(241, 243, 246, 0.45);
+}
+
+.searchInputInvalid {
+  color: #ef4444 !important;
+}

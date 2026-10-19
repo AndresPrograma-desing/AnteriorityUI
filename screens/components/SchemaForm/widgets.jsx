@@ -10,6 +10,9 @@ import CalendarPicker from '../CalendarPicker/index';
 import ImagePastePreview from '../ImagePastePreview/index';
 import Button from '../Button/index';
 import { FormTextArea } from '../FormControls/index';
+import { RadioGroup, Radio } from '../Radio/index';
+import ColorPicker from '../ColorPicker/index';
+import Slider from '../Slider/index';
 
 // Widgets de rjsf: cada uno traduce la interfaz (value, onChange, label, ...)
 // que rjsf les pasa a la interfaz de los componentes ya existentes de la librería,
@@ -224,7 +227,61 @@ export function DateWidget({ label, value, required, disabled, readonly, onChang
       value={value ?? ''}
       required={required}
       disabled={disabled || readonly}
+      onChange={(e) => onChange(e.target.value || undefined)}
+    />
+  );
+}
+
+// rjsf resuelve RadioWidget para enum + 'ui:widget': 'radio' (igual que rjsf
+// nativo). enumOptions viene en options, igual que en SelectWidget.
+export function RadioWidget({ id, value, disabled, readonly, label, options, onChange }) {
+  const enumOptions = options?.enumOptions || [];
+  return (
+    <RadioGroup
+      label={label}
+      name={id}
+      value={value ?? ''}
+      disabled={disabled || readonly}
+      onChange={(e) => onChange(e.target.value === '' ? undefined : e.target.value)}
+    >
+      {enumOptions.map((opt) => (
+        <Radio key={String(opt.value)} value={opt.value} label={opt.label} />
+      ))}
+    </RadioGroup>
+  );
+}
+
+// Widget para schema { type: 'string', format: 'color' } (convención estándar
+// de rjsf para selectores de color). A diferencia de CalendarPicker, el
+// onChange de ColorPicker entrega el hex ya desenvuelto (no un evento).
+export function ColorWidget({ label, value, disabled, readonly, onChange }) {
+  return (
+    <ColorPicker
+      label={label}
+      value={value || undefined}
+      disabled={disabled || readonly}
       onChange={(next) => onChange(next || undefined)}
+    />
+  );
+}
+
+// Pisa el RangeWidget nativo de rjsf (number/integer + 'ui:widget': 'range')
+// con el Slider de la librería. min/max/step vienen del propio schema
+// (minimum/maximum/multipleOf), igual que en el range input nativo de rjsf.
+export function RangeWidget({ id, value, disabled, readonly, schema, onChange }) {
+  const min = schema?.minimum ?? 0;
+  const max = schema?.maximum ?? 100;
+  const step = schema?.multipleOf ?? 1;
+  return (
+    <Slider
+      aria-label={id}
+      value={value ?? min}
+      min={min}
+      max={max}
+      step={step}
+      disabled={disabled || readonly}
+      showPercentage
+      onChange={(next) => onChange(next)}
     />
   );
 }
@@ -240,6 +297,9 @@ export const SCHEMA_FORM_WIDGETS = {
   SwitchWidget,
   CheckboxesWidget,
   FileWidget,
+  RadioWidget,
+  ColorWidget,
+  RangeWidget,
   // rjsf resuelve estos por 'format' (prioridad sobre 'type') a sus propios
   // widgets nativos sin estilo — se pisan para que también usen Input.
   EmailWidget: TextWidget,

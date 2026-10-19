@@ -1,0 +1,29 @@
+.controlsRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.controlsLeft,
+.controlsRight {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.volumeGroup {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.volumeSliderWrap {
+  width: 70px;
+}
+
+@media (max-width: 480px) {
+  .volumeSliderWrap {
+    width: 48px;
+  }
+}

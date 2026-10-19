@@ -1,0 +1,30 @@
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(13, 15, 20, 0.6);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 4;
+}
+
+.errorCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+  padding: 1.25rem;
+}
+
+.errorIcon {
+  color: #ef4444;
+}
+
+.errorMsg {
+  margin: 0;
+  color: #f1f3f6;
+  font-size: 0.85rem;
+}
+

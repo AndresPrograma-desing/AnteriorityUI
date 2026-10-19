@@ -1,0 +1,47 @@
+.docxViewer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.docAreaOuter {
+  position: relative;
+  width: 100%;
+}
+
+.docArea {
+  display: flex;
+  justify-content: center;
+  padding: 16px 8px;
+  box-sizing: border-box;
+}
+
+.docxContent {
+  transform-origin: top center;
+  transition: transform 0.15s ease;
+}
+
+.docxContent :global(.docx-wrapper) {
+  background: transparent;
+  padding: 0;
+}
+
+.docxContent :global(.docx-wrapper > section.docx) {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+  margin-bottom: 16px;
+}
+
+.loadingOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+@media (max-width: 480px) {
+  .docArea {
+    padding: 10px 6px;
+  }
+}

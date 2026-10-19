@@ -1,5 +1,6 @@
 import React from 'react';
 import Form from '@rjsf/core';
+import ajv8Validator from '@rjsf/validator-ajv8';
 
 import Button from '../Button/index';
 import styles from './index.module.css';
@@ -15,14 +16,14 @@ import { DEFAULT_SUBMIT_TEXT } from './constants.js';
 // contenedor no sabe ni le importa que adentro hay un SchemaForm, solo le pasa
 // el schema que corresponda a ese caso (login, alta de usuario, etc.).
 //
-// Requiere @rjsf/core + un validador (ej. @rjsf/validator-ajv8) como peer dependency
-// del consumidor; se le pasa explícitamente por prop para no atar la librería a uno
-// en particular.
+// Requiere @rjsf/core como peer dependency del consumidor. El validador (ajv8) ya
+// viene empaquetado con anteriority-ui y se usa por default; pasar "validator" solo
+// hace falta para forzar otra versión/implementación.
 const SchemaForm = ({
   schema,
   uiSchema,
   formData,
-  validator,
+  validator = ajv8Validator,
   widgets,
   fields,
   templates,
@@ -38,12 +39,6 @@ const SchemaForm = ({
   style,
   children,
 }) => {
-  if (!validator) {
-    throw new Error(
-      'SchemaForm: falta la prop "validator" (ej. pasar el validator de @rjsf/validator-ajv8).'
-    );
-  }
-
   return (
     <Form
       id={formId}

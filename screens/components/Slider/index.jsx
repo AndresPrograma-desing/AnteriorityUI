@@ -6,6 +6,8 @@ import { DEFAULT_ACCENT, DEFAULT_THICKNESS } from './constants.js';
 
 // Slider horizontal controlado (MUI). Con showPercentage, el tooltip del thumb muestra el porcentaje
 // del recorrido (value respecto de min..max) mientras se arrastra o se pasa el mouse por encima.
+// formatValueLabel permite pisar ese formato (ej. mm:ss en vez de porcentaje, para un seek bar de
+// video) — si viene, el tooltip se muestra aunque showPercentage sea false.
 export default function Slider({
   value = 0,
   min = 0,
@@ -14,6 +16,7 @@ export default function Slider({
   onChange,
   disabled = false,
   showPercentage = false,
+  formatValueLabel,
   accentColor,
   thickness = DEFAULT_THICKNESS,
   className = '',
@@ -36,8 +39,8 @@ export default function Slider({
       value={value}
       disabled={disabled}
       aria-label={ariaLabel}
-      valueLabelDisplay={showPercentage ? 'auto' : 'off'}
-      valueLabelFormat={formatPercentage}
+      valueLabelDisplay={showPercentage || formatValueLabel ? 'auto' : 'off'}
+      valueLabelFormat={formatValueLabel || formatPercentage}
       onChange={(_event, next) => onChange?.(next)}
       sx={{
         color: accentColor ?? DEFAULT_ACCENT,
