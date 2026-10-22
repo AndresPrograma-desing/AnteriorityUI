@@ -431,3 +431,48 @@ export const DentroDeDrawPanel = {
     );
   },
 };
+
+const colorSchema = {
+  type: 'object',
+  properties: {
+    colorFavorito: {
+      type: 'string',
+      format: 'color',
+      title: 'Color favorito',
+      default: '#7c3aed',
+    },
+  },
+};
+
+// Las props de color del popover de ColorPicker (bgColor/textColor/borderColor/accentColor)
+// se pasan vía ui:options, no por el schema — igual que options.inputType en TextWidget o
+// options.accept en FileWidget. Sin esto, el popover del selector queda con su fondo claro
+// default aunque el formulario entero esté oscurecido (ver colorSchemaUiSchema abajo).
+const colorSchemaUiSchema = {
+  colorFavorito: {
+    'ui:options': {
+      bgColor: '#1e1b2e',
+      textColor: '#e9e4f7',
+      borderColor: '#3d3659',
+      accentColor: '#a78bfa',
+    },
+  },
+};
+
+export const ColorWidgetPersonalizado = {
+  render: () => {
+    const [formData, setFormData] = useState({ colorFavorito: '#7c3aed' });
+    return (
+      <div style={{ background: '#13111c', padding: '2rem', borderRadius: '12px' }}>
+        <SchemaForm
+          schema={colorSchema}
+          uiSchema={colorSchemaUiSchema}
+          formData={formData}
+          validator={validator}
+          onChange={setFormData}
+          showSubmitButton={false}
+        />
+      </div>
+    );
+  },
+};

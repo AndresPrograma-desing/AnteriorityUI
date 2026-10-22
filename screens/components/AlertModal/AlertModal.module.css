@@ -1,4 +1,3 @@
-
 .modalOverlay {
   position: fixed;
   inset: 0;
@@ -16,7 +15,8 @@
   backdrop-filter: var(--blur);
   padding: 1.5rem;
   border-radius: var(--border-radius-lg);
-  width: min(820px, calc(100% - 2rem));
+  /* Cambiado de 820px a 450px para que sea mucho más compacto y estrecho */
+  width: min(450px, calc(100% - 2rem));
   box-shadow: var(--modal-shadow);
   border: var(--modal-border);
   animation: slideUp 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
@@ -39,7 +39,7 @@
   color: var(--modal-title-color);
   text-align: center;
   background-color: transparent;
-  border: 1px solid var(--alertmodal-title-border, black);
+  /* border: 1px solid var(--alertmodal-title-border, black); */
   padding: 5px;
   border-radius: 20px;
 }

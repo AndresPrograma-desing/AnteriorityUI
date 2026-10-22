@@ -1,0 +1,93 @@
+.wrapper {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  perspective: 600px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cube {
+  width: 50px;
+  height: 50px;
+  position: relative;
+  transform-style: preserve-3d;
+  animation: rotate 4s ease-in-out infinite alternate;
+}
+
+.face {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  background: color-mix(in srgb, var(--loading-color, #0d52f8) 12%, transparent);
+  border: 1.5px solid var(--loading-color, #0d52f8);
+  box-shadow:
+    inset 0 0 15px color-mix(in srgb, var(--loading-color, #0d52f8) 30%, transparent),
+    0 0 10px color-mix(in srgb, var(--loading-color, #0d52f8) 20%, transparent);
+  backdrop-filter: blur(4px);
+}
+
+.front {
+  transform: translateZ(25px);
+}
+
+.back {
+  transform: rotateY(180deg) translateZ(25px);
+}
+
+.right {
+  transform: rotateY(90deg) translateZ(25px);
+}
+
+.left {
+  transform: rotateY(-90deg) translateZ(25px);
+}
+
+.top {
+  transform: rotateX(90deg) translateZ(25px);
+  background: color-mix(in srgb, var(--loading-color, #0d52f8) 25%, transparent);
+}
+
+.bottom {
+  transform: rotateX(-90deg) translateZ(25px);
+  box-shadow: 0 25px 20px rgba(0, 0, 0, 0.6);
+}
+
+.shadow {
+  position: absolute;
+  bottom: 5px;
+  width: 45px;
+  height: 12px;
+  background: color-mix(in srgb, var(--loading-color, #0d52f8) 25%, transparent);
+  border-radius: 50%;
+  filter: blur(6px);
+  animation: shadowPulse 4s ease-in-out infinite alternate;
+}
+
+@keyframes rotate {
+  0% {
+    transform: translateY(-8px) rotateX(-25deg) rotateY(25deg) rotateZ(0deg);
+  }
+  50% {
+    transform: translateY(8px) rotateX(-35deg) rotateY(205deg) rotateZ(10deg);
+  }
+  100% {
+    transform: translateY(-8px) rotateX(-25deg) rotateY(385deg) rotateZ(0deg);
+  }
+}
+
+@keyframes shadowPulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+}

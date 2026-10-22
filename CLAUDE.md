@@ -1,3 +1,4 @@
+
 # CLAUDE.md
 
 Guía para trabajar en este repo. Para documentación orientada a consumidores de la librería, ver [README.md](README.md) (instalación, setup, estructura) y [AnteriorityUI.md](AnteriorityUI.md) (props y ejemplos de uso de cada uno de los 50 componentes, en un único documento).
@@ -44,6 +45,44 @@ La mayoría de los componentes con color propio (fondo, texto, ícono, borde) ex
 - **Los componentes con sistema `variant`/`type` (Barnner, DesplegablePanel, Notification/Error, TableB) mantienen su variant tal cual** — las props de color nuevas son un override opcional por encima de la paleta que resolvería el variant.
 - Nombres reutilizados a propósito para consistencia entre componentes: `bgColor`, `textColor`, `iconColor`, `borderColor`, `accentColor`.
 - **Componentes que renderizan otro componente interno con sus propias props de color** (ej. `RenderJsonSchema` usando `MediaViewer` para previews de archivo) no pueden asumir que las CSS custom properties del padre llegan solas — si el hijo lee sus propios tokens (`--media-viewer-*` en vez de los del padre), hay que propagar explícitamente las props de color recibidas hacia ese hijo. Cubrir el contenedor principal y olvidarse de los sub-componentes internos dejaría una paleta a medio personalizar.
+
+**Verificación obligatoria al crear un componente nuevo:** todo componente visual nuevo debe poder recolorearse completamente por props antes de darse por terminado — no es opcional ni queda para "después". Usar la skill `design-color-props` (`.claude/skills/design-color-props/`) para auditar el componente (incluyendo sub-componentes internos, ver convención de descomposición más abajo) y aplicar las props de color que falten. Esto no depende de que se recuerde invocarla a mano: hay un hook `PostToolUse` sobre `Write|Edit` (`.claude/settings.json` → `.claude/hooks/remind-color-props.mjs`) que, cada vez que se escribe o edita un `index.jsx` bajo `screens/components/**/`, inyecta un recordatorio obligatorio en el contexto para correr la skill antes de cerrar la tarea.
+
+## Convención: descomponer componentes grandes en subcomponentes
+
+**Por qué:** un `index.jsx` que crece mezclando múltiples responsabilidades visuales (ej. un viewer que renderiza 5 tipos de media distintos, cada uno con su propia barra de controles) se vuelve difícil de leer, de tocar sin romper otro caso, y de testear/documentar por partes. Partirlo en subcomponentes mantiene cada pieza enfocada y hace que el árbol de archivos refleje la estructura visual real.
+
+**Ejemplo de referencia: `screens/components/MediaViewer/`.** Es el componente mejor dividido del repo — úsalo como plantilla al descomponer cualquier otro:
+
+```
+MediaViewer/
+  index.jsx                          → orquesta: resuelve el tipo de media y delega a cada player
+  constants.js, utils.js
+  components/
+    index.js                         → barrel interno (solo para los sub-componentes de ESTE componente)
+    VideoPlayer/
+      index.jsx
+      index.module.css
+      components/
+        index.js
+        VideoControlsBar/index.jsx + .module.css
+        VideoSeekBar/index.jsx + .module.css
+        VideoSpeedControl/index.jsx + .module.css
+        VideoCenterPlayButton/index.jsx + .module.css
+        VideoErrorOverlay/index.jsx + .module.css
+    AudioPlayer/      (mismo patrón: index.jsx + components/AudioPlayerSkeleton/)
+    PdfViewer/        (mismo patrón: index.jsx + components/PdfControlsBar/, PdfPageJumper/)
+    DocxViewer/       (mismo patrón: index.jsx + components/DocxControlsBar/)
+```
+
+Reglas al descomponer un componente que creció demasiado:
+- El split va en una carpeta **`components/` interna al componente** (`screens/components/<Nombre>/components/<SubNombre>/`), no en `screens/components/` de primer nivel — estas piezas no son componentes públicos de la librería, son implementación interna de `<Nombre>`. No se agregan al barrel `index.js` raíz.
+- Cada sub-componente sigue el mismo patrón que uno público: su propia carpeta con `index.jsx` + `index.module.css` (y `components/` propio si a su vez necesita dividirse — ver `VideoPlayer/components/`, dos niveles de anidación en este repo).
+- El barrel `components/index.js` del componente padre re-exporta cada sub-componente por nombre (mismo mecanismo que el barrel raíz, pero con alcance local).
+- El criterio de corte es responsabilidad visual, no tamaño de archivo: cada tipo de media/variante/estado complejo que el componente orquesta pasa a ser su propio sub-componente; el `index.jsx` del padre queda como orquestador (resuelve qué caso aplica y delega), no como lugar donde vive el detalle de cada caso.
+- **Las props de color del componente padre se propagan explícitamente a cada sub-componente** (ver "Convención: props de color" arriba) — un sub-componente con sus propios tokens CSS no hereda la paleta del padre solo por estar anidado en el DOM.
+- No hace falta tocar `scripts/build.mjs` ni `check-case` — recorren `screens/components/` recursivamente, así que la carpeta `components/` anidada ya queda cubierta.
+- Usar la skill `decompose-large-component` para auditar un componente existente y aplicar este split.
 
 ## Convención: valores fijos en `constants.js`
 
