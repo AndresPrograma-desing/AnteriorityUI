@@ -1,25 +1,32 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { ChevronRight, ChevronUp } from 'lucide-react'; // <-- Cambiado de X a ChevronRight y ChevronUp
+import { XCircle } from 'lucide-react'; 
 import styles from './index.module.css';
 
 import Button from '../Button/index';
 import CountdownBar from '../CountdownBar/index';
+import Loading from '../Loading/index';
 
 const DrawPanel = ({ 
   isOpen, 
   onClose, 
   title, 
+  closeIcon : CloseIcon = XCircle,
   description,
   descriptionPosition = 'top',
   children,
   width = '400px',
-  showActions = false,
+  showActions = true,
   onConfirm,
   confirmText = 'Confirmar',
   cancelText = 'Cancelar',
+  confirmButtonProps,
+  cancelButtonProps,
   formId,
   loading = false,
+  contentLoading = false,
+  contentLoadingText,
+  typeLoading = 'default',
   success = undefined,
   className = '',
   showCountdown = false,
@@ -50,6 +57,7 @@ const DrawPanel = ({
 }) => {
   const [render, setRender] = useState(isOpen);
   const [pendingClose, setPendingClose] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const pendingCloseTimeoutRef = useRef(null);
 
   useEffect(() => {
@@ -120,7 +128,6 @@ const DrawPanel = ({
   const animClass = isOpen
     ? (anchor === 'top' ? styles.slideInTop : styles.slideIn)
     : (anchor === 'top' ? styles.slideOutTop : styles.slideOut);
-  const CloseIcon = anchor === 'top' ? ChevronUp : ChevronRight;
 
   return createPortal(
     <div
@@ -138,74 +145,95 @@ const DrawPanel = ({
         )}
 
         <div className={styles.header} style={{ backgroundColor: panelColor, borderBottomColor: borderColor }}>
-          <div className={styles.headerTitleContainer}>
-            <h3 className={styles.title} style={{ color: textColor }}>{title}</h3>
-            {description && descriptionPosition === 'top' && (
-              <p className={styles.description} style={{ color: mutedTextColor }}>{description}</p>
-            )}
+          <div className={styles.headerTop}>
+            <div className={styles.headerTitleContainer}>
+              <h3 className={styles.title} style={{ color: textColor }}>{title}</h3>
+              {description && descriptionPosition === 'top' && (
+                <p className={styles.description} style={{ color: mutedTextColor }}>{description}</p>
+              )}
+            </div>
+            <div className={styles.closeButtonWrapper}>
+              <Button
+                variant={Button.VARIANTS.DANGER}
+                color={Button.COLORS.TRANSPARENT}
+                onClick={handleCloseClick}
+                circle
+                aria-label="Cerrar panel"
+              >
+                <CloseIcon size={24} color={mutedTextColor} />
+              </Button>
+            </div>
           </div>
-          <div className={styles.closeButtonWrapper}>
-            <Button
-              variant={Button.VARIANTS.DANGER}
-              color={Button.COLORS.TRANSPARENT}
-              onClick={handleCloseClick}
-              circle
-              aria-label="Cerrar panel"
-            >
-              <CloseIcon size={24} color={mutedTextColor} />
-            </Button>
-          </div>
+
+          {showCountdown && (
+            <div className={styles.countdownWrapper}>
+              <CountdownBar
+                active={countdownActive}
+                duration={countdownDuration}
+                onComplete={countdownOnComplete}
+                expiresAt={countdownExpiresAt}
+                totalDuration={countdownTotalDuration}
+                value={calculatedProgress}
+                height={countdownHeight}
+                colors={countdownColors}
+                width="100%"
+                increment={countdownIncrement}
+              />
+            </div>
+          )}
         </div>
 
-        {showCountdown && (
-          <div style={{ padding: '0 1.5rem', width: '100%', boxSizing: 'border-box' }}>
-            <CountdownBar
-              active={countdownActive}
-              duration={countdownDuration}
-              onComplete={countdownOnComplete}
-              expiresAt={countdownExpiresAt}
-              totalDuration={countdownTotalDuration}
-              value={calculatedProgress}
-              height={countdownHeight}
-              colors={countdownColors}
-              width="100%"
-              increment={countdownIncrement}
-            />
-          </div>
-        )}
-
-        <div className={styles.content}>
-          {children}
-          {description && descriptionPosition === 'bottom' && (
-            <div className={styles.descriptionBottom} style={{ borderTopColor: borderColor }}>
-              <h4 className={styles.descriptionBottomTitle} style={{ color: textColor }}>Descripción de Tarea</h4>
-              <p className={styles.descriptionBottomText} style={{ color: mutedTextColor }}>{description}</p>
+        <div
+          className={`${styles.content} ${isScrolled ? styles.contentScrolled : ''}`}
+          style={isScrolled ? { '--draw-panel-scroll-shadow': borderColor } : undefined}
+          onScroll={(e) => setIsScrolled(e.currentTarget.scrollTop > 0)}
+        >
+          {contentLoading ? (
+            <div className={styles.contentLoading}>
+              <Loading
+              text={contentLoadingText}
+              variant={typeLoading?.toLowerCase?.() === 'skeleton' ? 'skeleton' : typeLoading}
+              size='large'
+              fullHeight
+              color={mutedTextColor} />
             </div>
+          ) : (
+            <>
+              {children}
+              {description && descriptionPosition === 'bottom' && (
+                <div className={styles.descriptionBottom} style={{ borderTopColor: borderColor }}>
+                  <h4 className={styles.descriptionBottomTitle} style={{ color: textColor }}>Descripción de Tarea</h4>
+                  <p className={styles.descriptionBottomText} style={{ color: mutedTextColor }}>{description}</p>
+                </div>
+              )}
+            </>
           )}
         </div>
 
         {showActions && (
           <div className={styles.footer} style={{ backgroundColor: panelColor, borderTopColor: borderColor }}>
-            <Button 
-              variant="" 
-              onClick={onClose} 
+            <Button
+              variant=""
+              onClick={onClose}
               border={Button.COLORS.RED}
-              disabled={loading} 
+              disabled={loading}
               fullWidth
+              {...cancelButtonProps}
             >
-              {cancelText}
+              {cancelButtonProps?.children ?? cancelText}
             </Button>
-            <Button 
-              type={formId ? 'submit' : 'button'} 
-              form={formId} 
-              variant="primary" 
-              color={Button.COLORS.PRIMARY} 
-              onClick={onConfirm} 
+            <Button
+              type={formId ? 'submit' : 'button'}
+              form={formId}
+              variant="primary"
+              color={Button.COLORS.PRIMARY}
+              onClick={onConfirm}
               loading={loading}
               success={success}
               fullWidth
+              {...confirmButtonProps}
             >
-              {confirmText}
+              {confirmButtonProps?.children ?? confirmText}
             </Button>
           </div>
         )}

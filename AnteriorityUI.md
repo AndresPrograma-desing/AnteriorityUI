@@ -84,6 +84,75 @@ import AlertModal from '../AlertModal/AlertModal'; // export default
 
 ---
 
+### AppShell
+
+Plantilla de layout principal de una aplicación: compone `Sidebar` (columna fija a la izquierda, alto completo) + `TopBar` (barra superior) + un área de contenido central con scroll propio, para no tener que armar esa estructura a mano en cada proyecto. No redeclara las props de `Sidebar`/`TopBar` una por una — se les pasa un objeto (`sidebarProps`/`topBarProps`) que se spreadea tal cual sobre cada uno, así que cualquier prop que esos componentes acepten hoy o agreguen en el futuro ya es compatible sin tocar `AppShell`.
+
+**Import:**
+```jsx
+import AppShell from '../AppShell/index'; // export default, archivo index.jsx
+```
+
+**Uso básico:**
+```jsx
+<AppShell
+  sidebarProps={{
+    groups: [{ title: 'General', items: [{ id: 'home', label: 'Inicio', icon: Home }] }],
+    activeId: 'home',
+    onSelect: (item) => navigate(item.id),
+    headerContent: <Logo />, // evita el espacio vacío arriba del sidebar
+  }}
+  topBarProps={{ title: 'Panel de control', logo: <Logo /> }}
+  useContainer
+>
+  <h2>Contenido de la página</h2>
+</AppShell>
+```
+
+**Props:**
+
+| Prop | Tipo | Default | Descripción |
+|---|---|---|---|
+| `sidebarProps` | object | `{}` | Spreadeado tal cual sobre el `Sidebar` interno (`groups`, `activeId`, `onSelect`, `user`, colores, etc. — ver [Sidebar](#sidebar)) |
+| `topBarProps` | object | `{}` | Spreadeado tal cual sobre el `TopBar` interno (`title`, `actions`, `user`, `searchProps`, colores, etc. — ver [TopBar](#topbar)) |
+| `children` | node | — | Contenido principal, renderizado dentro del área central con scroll propio |
+| `useContainer` | boolean | `false` | Envuelve `children` en un [Container](#container) (con `wattermark={false}`) para darle marco (card con borde/sombra) al contenido sin que el consumidor tenga que importarlo aparte |
+| `containerProps` | object | `{}` | Spreadeado tal cual sobre el `Container` interno cuando `useContainer` está activo (`borderColor`, `bgImage`, `showPagination`, etc. — ver [Container](#container)); ignorado si `useContainer` es `false` |
+| `contentBgColor` | string | `'#f8fafc'` | Color de fondo del área de contenido (no afecta a `Sidebar`/`TopBar`, que mantienen su propio fondo vía `sidebarProps`/`topBarProps`) |
+| `className` | string | `''` | Clase adicional en el contenedor raíz del layout |
+| `style` | object | — | Estilos inline adicionales para el contenedor raíz |
+
+**Ejemplos:**
+```jsx
+// Estado mobile del Sidebar manejado automáticamente: AppShell conecta por
+// defecto el botón hamburguesa de TopBar (onMenuClick) con isMobileOpen/
+// onCloseMobile de Sidebar. Pasar esas props dentro de sidebarProps/topBarProps
+// las sobreescribe si se necesita un control propio.
+<AppShell
+  sidebarProps={{
+    groups,
+    activeId,
+    onSelect: setActiveId,
+    user: { email: 'jane.doe@example.com' },
+    userMenuItems,
+  }}
+  topBarProps={{
+    title: 'Reportes',
+    actions: [{ key: 'notifications', icon: Bell, tooltip: 'Notificaciones', onClick: () => {} }],
+    user: { email: 'jane.doe@example.com' },
+  }}
+  contentBgColor="#eef2ff"
+  useContainer
+  containerProps={{ borderColor: '#6366f1' }}
+>
+  <ReportsPage />
+</AppShell>
+```
+
+**Notas:** Compone `Sidebar`, `TopBar`, `ScrollBar` y (con `useContainer`) `Container` internos del sistema — ver sus respectivas secciones para la lista completa de props disponibles vía `sidebarProps`/`topBarProps`/`containerProps`. El layout es `height: 100vh` (pensado para ocupar toda la ventana); el `Sidebar` ya trae su propio `height: 100vh` y el `TopBar` es `width: 100%` sin alto fijo, por lo que encajan sin ajustes adicionales. El área de `children` scrollea con el `ScrollBar` de la librería (track/thumb estilizados, auto-hide) en vez de la barra de scroll nativa del navegador — el scroll horizontal queda deshabilitado (`horizontal={false}`), ya que el área de contenido está pensada para crecer solo en alto. Si se pasa `onMenuClick`/`isMobileOpen`/`onCloseMobile` manualmente dentro de `topBarProps`/`sidebarProps`, reemplaza el manejo automático del estado mobile que `AppShell` provee por defecto. Ninguno de los dos trae un logo por defecto: sin `sidebarProps.headerContent` el bloque superior del sidebar queda vacío (o directamente no se renderiza, salvo que `collapsible` esté activo), y sin `topBarProps.logo` el `TopBar` arranca directo en el título — pasar el mismo logo a ambas props (`headerContent` y `logo`) es el uso esperado.
+
+---
+
 ### Avatar
 
 Componente de avatar nativo (sin dependencias de MUI) para fotos de perfil, iniciales de nombre o íconos, con generación automática de colores armoniosos basados en el texto/nombre e iniciales automáticas.
@@ -471,7 +540,12 @@ import CustomDatePicker from '../CalendarComponent/CustomDatePicker'; // export 
 
 ### CalendarPicker
 
-Variante de selector de fecha equivalente a `CalendarComponent`, pero el calendario se renderiza dentro de un `Frame` (modal reutilizable) y usa los `Button`/`Selector` del sistema de diseño en vez de controles nativos.
+Selector de fecha con dos variantes (`variant`):
+
+- `'popover'` (default): un `TextField` que al clickearse abre un calendario chico (círculos) flotando debajo, anclado al input, con selectores rápidos de mes/año.
+- `'inline'`: sin `TextField` — se renderiza directo un calendario grande tipo "hoja de agenda" (celdas rectangulares, pensado para ocupar el ancho de un container, ej. una vista de citas/turnos).
+
+Internamente delega el grid de cada variante a un subcomponente propio (`components/CalendarGrid` para popover, `components/AgendaGrid` para inline) controlado por `CalendarPicker`, que mantiene todo el estado (mes visible, selección, rango, drag).
 
 **Import:**
 ```jsx
@@ -486,22 +560,48 @@ import CalendarPicker from '../CalendarPicker/index'; // export default
   value={birthDate}
   onChange={(e) => setBirthDate(e.target.value)}
 />
+
+// Modo agenda (sin TextField, calendario grande inline)
+<CalendarPicker
+  name="agendaDate"
+  variant="inline"
+  value={selectedDate}
+  onChange={(e) => setSelectedDate(e.target.value)}
+/>
 ```
 
 **Props:**
 
 | Prop | Tipo | Default | Descripción |
 |---|---|---|---|
-| `label` | string | — | Label del `TextField` |
+| `variant` | `'popover'` \| `'inline'` | `'popover'` | `'popover'`: `TextField` + calendario flotante chico. `'inline'`: calendario grande tipo agenda, sin `TextField`, ocupa el ancho del container (`max-width: 880px`). |
+| `label` | string | — | Label del `TextField` (solo aplica en `variant="popover"`) |
 | `name` | string | — | Nombre usado en el evento sintético `onChange` |
 | `value` | string (`YYYY-MM-DD`) \| Date | — | Fecha seleccionada (modo simple). Ignorado si `range` es `true`. |
 | `onChange` | function | — | Recibe un evento `{ target: { name, value, type } }`. `type` es `'date'` en modo simple o `'date-range'` en modo rango. |
-| `required` | boolean | `false` | Marca el campo como requerido |
-| `disabled` | boolean | `false` | Deshabilita la apertura del calendario |
-| `range` | boolean | `false` | Activa selección de rango. `value`/`onChange` pasan a usar `{ start, end }` (strings `YYYY-MM-DD`) en vez de una fecha suelta. |
-| `inputSx` | object | — | `sx` custom pasado al `TextField` interno |
+| `required` | boolean | `false` | Marca el campo como requerido (solo `variant="popover"`) |
+| `disabled` | boolean | `false` | Deshabilita la apertura del calendario (solo `variant="popover"`) |
+| `showFooter` | boolean | `false` | Solo `variant="popover"`. Muestra el footer con los botones "Borrar" (limpia el valor) y "Hoy" (selecciona la fecha actual) debajo del grid de días. Es opt-in: si no se pasa, el popover solo muestra el calendario, sin esos controles. |
+| `range` | boolean | `false` | Activa selección de rango. `value`/`onChange` pasan a usar `{ start, end }` (strings `YYYY-MM-DD`) en vez de una fecha suelta. Funciona igual en ambas variantes. |
+| `inputSx` | object | — | `sx` custom pasado al `TextField` interno (solo `variant="popover"`) |
+| `renderDay` | `function(date: Date) => ReactNode` | — | Solo `variant="inline"`. Contenido custom por celda (ej. eventos/citas de ese día + acciones). Si no se pasa, la celda entera es un único `Button` de la librería (click selecciona el día); si se pasa, la celda es un contenedor y solo el número de día es un `Button` circular aparte (un `<button>` no puede contener otro `<button>`, así que el contenido de `renderDay` puede incluir sus propios `Button`s — ver ejemplo). |
+| `country` | string | — | Código de país ISO 3166-1 (ej. `"AR"`, `"US"`) para calcular feriados/efemérides oficiales vía `date-holidays`. Funciona en ambas variantes. |
+| `showHolidays` | boolean | `Boolean(country)` | Marca los días con feriado/efeméride. Por default se activa solo si se pasó `country`. Funciona en ambas variantes (ver nota sobre cómo se ve en cada una). |
+| `extraHolidays` | `{ [yyyy-MM-dd]: string \| {label, type} \| Array<...> }` | — | Feriados/efemérides custom que `date-holidays` no cubre (ej. una efeméride internacional puntual), combinados con los oficiales de `country`. Funciona en ambas variantes. |
+| `showMoonPhases` | boolean | `false` | Marca los días con un ícono de fase lunar (react-icons/wi), calculada por ciclo sinódico (±1 día de margen). Funciona en ambas variantes. |
 | `selectedColor` | string | — | Color del día seleccionado (y de los extremos/relleno del rango) (`--cp-selected`) |
 | `accentColor` | string | — | Color de acento / botón "Hoy" (`--cp-accent`) |
+| `holidayBorderColor` | string | `#ef4444` (rojo) | Color del anillo/borde que marca la celda de un día con feriado/efeméride, en ambas variantes (`--cp-agenda-holiday-border` en inline, `--cp-holiday-border` en popover). Tiene un default visible (no solo el fallback del token CSS) porque el borde debe marcarse incluso sin personalizar nada. |
+| `moonPhaseColor` | string | — | Color del ícono/punto de fase lunar, en ambas variantes (`--cp-agenda-moon` en inline, `--cp-moon-dot` en popover). |
+| `tooltipBgColor` | string | — | Fondo del tooltip (`ModalTooltip`) que muestra el detalle de un feriado/fase lunar al hacer hover, en ambas variantes. |
+| `tooltipTextColor` | string | — | Color de texto de ese tooltip, en ambas variantes. |
+| `bgColor` | string | — | Solo `variant="inline"`. Fondo del calendario (`--cp-agenda-bg`). |
+| `textColor` | string | — | Solo `variant="inline"`. Color del texto principal (mes, números de día) (`--cp-agenda-text`). |
+| `mutedColor` | string | — | Solo `variant="inline"`. Color de texto secundario (año, nombres de día, días de otro mes) (`--cp-agenda-muted`/`--cp-agenda-year`). |
+| `mutedBgColor` | string | — | Solo `variant="inline"`. Fondo de las celdas de días fuera del mes actual (`--cp-agenda-muted-bg`). |
+| `borderColor` | string | — | Solo `variant="inline"`. Color de las líneas divisorias del grid (`--cp-agenda-border`). |
+| `hoverColor` | string | — | Solo `variant="inline"`. Fondo al pasar el mouse sobre una celda (`--cp-agenda-hover`). |
+| `holidayColor` | string | — | Solo `variant="inline"`. Color del nombre del feriado/efeméride en la celda (`--cp-agenda-holiday`) — el popover no tiene este, el nombre nunca se muestra como texto ahí (ver nota). |
 
 **Ejemplos:**
 ```jsx
@@ -517,11 +617,59 @@ import CalendarPicker from '../CalendarPicker/index'; // export default
   value={{ start: '2024-06-10', end: '2024-06-18' }}
   onChange={(e) => setStayRange(e.target.value)} // e.target.value = { start, end }
 />
+
+// Agenda con feriados de Argentina + fases lunares
+<CalendarPicker
+  name="agendaDate"
+  variant="inline"
+  country="AR"
+  showMoonPhases
+  value={selectedDate}
+  onChange={(e) => setSelectedDate(e.target.value)}
+/>
+
+// Agenda con eventos propios por día (usa el Button de la librería para cada acción)
+<CalendarPicker
+  name="agendaWithEvents"
+  variant="inline"
+  value={selectedDate}
+  onChange={(e) => setSelectedDate(e.target.value)}
+  renderDay={(day) => {
+    const events = getEventsForDay(day); // lógica del consumidor
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        {events.map((ev) => (
+          <Button key={ev.id} variant="primary" size="small" onClick={(e) => { e.stopPropagation(); openEvent(ev); }}>
+            {ev.label}
+          </Button>
+        ))}
+      </div>
+    );
+  }}
+/>
 ```
 
-**Notas:** El calendario se abre dentro de `Frame` (`isModal`), a diferencia de `CalendarComponent` que usa su propio backdrop; ambos componentes son intercambiables en su API pero difieren en la implementación visual del modal.
+**Ejemplo (popover con feriados y fases lunares):**
+```jsx
+<CalendarPicker
+  label="Fecha de la cita"
+  name="popoverHolidays"
+  country="AR"
+  showMoonPhases
+  value={selectedDate}
+  onChange={(e) => setSelectedDate(e.target.value)}
+/>
+```
 
-En modo `range`, la selección soporta dos gestos, intercambiables: (1) click en el día de inicio → click en el día de fin (el panel queda abierto entre medio, permitiendo navegar de mes con las flechas sin perder el progreso), o (2) mousedown sobre el día de inicio + arrastrar + soltar sobre el día de fin (confirma al soltar, sin necesidad de un segundo click). Si el día de fin es anterior al de inicio, se reordenan automáticamente. Mientras se arrastra/pasa el mouse se previsualiza el rango con un resaltado tenue antes de confirmar.
+**Notas:**
+- En modo `range`, la selección soporta dos gestos, intercambiables: (1) click en el día de inicio → click en el día de fin (el panel queda abierto entre medio, permitiendo navegar de mes con las flechas sin perder el progreso), o (2) mousedown sobre el día de inicio + arrastrar + soltar sobre el día de fin (confirma al soltar, sin necesidad de un segundo click). Si el día de fin es anterior al de inicio, se reordenan automáticamente. Mientras se arrastra/pasa el mouse se previsualiza el rango con un resaltado tenue antes de confirmar.
+- `country`/`showHolidays`/`extraHolidays`/`showMoonPhases` funcionan en **ambas** variantes, pero se muestran distinto por el espacio disponible en cada una:
+  - `variant="inline"` (celda rectangular grande): el nombre del feriado se ve como texto (truncado si no entra) y la fase lunar como un ícono de `react-icons/wi`, ambos dentro de la celda.
+  - `variant="popover"` (círculo chico de 36px, tamaño fijo — nunca se agranda ni deforma): el feriado se marca con un anillo/borde de color alrededor del círculo (`holidayBorderColor`) y la fase lunar con un punto diminuto (`moonPhaseColor`); ninguno de los dos se muestra como texto/ícono visible ahí, porque no entra sin romper el tamaño fijo de la celda.
+  - En ambas variantes, pasar el mouse sobre el día revela el detalle completo (nombre del feriado, fase lunar + fecha) en un tooltip (`ModalTooltip`, vía portal a `document.body` — un tooltip `position: absolute` local no alcanza porque cada celda del grid es su propio stacking context y las celdas de filas siguientes, pintadas después en el DOM, lo taparían).
+- `holidayColor` (color del *texto* del nombre del feriado) solo existe en `variant="inline"`, porque el popover nunca muestra ese texto. `holidayBorderColor`/`moonPhaseColor`/`tooltipBgColor`/`tooltipTextColor` sí aplican a ambas variantes.
+- `bgColor`/`textColor`/`mutedColor`/`mutedBgColor`/`borderColor`/`hoverColor` (paleta general del calendario grande) solo existen en `variant="inline"` — el popover usa su propia paleta fija (ver `selectedColor`/`accentColor`).
+- El cálculo de feriados usa `date-holidays` (datos reales por país, no hardcodeados en la librería); el de fase lunar es un cálculo astronómico aproximado por ciclo sinódico (sin dependencia de red), con ±1 día de margen de error — no reemplaza una efeméride astronómica oficial.
 
 ---
 
@@ -1044,19 +1192,25 @@ import DrawPanel from '../DrawPanel'; // export default (index.jsx)
 | `isOpen` | boolean | — | Controla apertura/cierre (anima entrada/salida antes de desmontar) |
 | `onClose` | function | — | Handler de cierre (click en overlay, botón X o cancelar) |
 | `title` | string | — | Título del panel |
+| `closeIcon` | component | `XCircle` (lucide-react) | Ícono del botón de cerrar; recibe `size` y `color` como props (mismo contrato que cualquier ícono de lucide-react) |
 | `description` | string | — | Texto descriptivo, ubicado según `descriptionPosition` |
 | `descriptionPosition` | `'top' \| 'bottom'` | `'top'` | Dónde se muestra la descripción |
 | `children` | node | — | Contenido principal del panel |
 | `width` | string | `'400px'` | Ancho máximo del panel |
-| `showActions` | boolean | `false` | Muestra footer con botones cancelar/confirmar |
+| `showActions` | boolean | `true` | Muestra footer con botones cancelar/confirmar |
 | `onConfirm` | function | — | Handler del botón confirmar |
-| `confirmText` | string | `'Confirmar'` | Texto del botón confirmar |
-| `cancelText` | string | `'Cancelar'` | Texto del botón cancelar |
+| `confirmText` | string | `'Confirmar'` | Texto del botón confirmar (ignorado si `confirmButtonProps.children` viene definido) |
+| `cancelText` | string | `'Cancelar'` | Texto del botón cancelar (ignorado si `cancelButtonProps.children` viene definido) |
+| `confirmButtonProps` | object | — | Props adicionales spreadeadas sobre el `Button` de confirmar (override total: variant, color, icon, children, etc.) |
+| `cancelButtonProps` | object | — | Props adicionales spreadeadas sobre el `Button` de cancelar (override total: variant, color, icon, children, etc.) |
 | `formId` | string | — | Si se define, el botón confirmar es `type="submit"` con `form={formId}` |
 | `loading` | boolean | `false` | Estado de carga de los botones del footer |
+| `contentLoading` | boolean | `false` | Reemplaza `children` (y la descripción bottom) por un `Loading` centrado dentro del área de contenido |
+| `contentLoadingText` | string | — | Texto mostrado bajo el spinner cuando `contentLoading` está activo (pasado a `Loading` como `text`; ignorado si `typeLoading` es `'skeleton'`) |
+| `typeLoading` | string | `'default'` | Variante de `Loading` usada cuando `contentLoading` está activo. `'skeleton'`/`'Skeleton'` (sin distinguir mayúsculas) fuerza el placeholder de líneas; cualquier otro valor se pasa tal cual como `variant` a `Loading` (`'bars'`, `'bounce'`, `'box'`, o cualquier otro string, que cae al spinner `'default'` de `Loading` si no matchea ninguna variante) |
 | `success` | boolean \| undefined | `undefined` | Pasado al `Button` de confirmar |
 | `className` | string | `''` | Clase adicional en el panel |
-| `showCountdown` | boolean | `false` | Muestra una `CountdownBar` bajo el header |
+| `showCountdown` | boolean | `false` | Muestra una `CountdownBar` dentro del header (debajo del título), pegada a la línea divisoria |
 | `countdownActive` | boolean | `true` | Activa el temporizador de la `CountdownBar` |
 | `countdownDuration` | number | — | Duración pasada a `CountdownBar` |
 | `countdownOnComplete` | function | — | Callback al completar el countdown |
@@ -1107,9 +1261,38 @@ import DrawPanel from '../DrawPanel'; // export default (index.jsx)
 >
   <p>2 de 4 elementos seleccionados.</p>
 </DrawPanel>
+
+<DrawPanel
+  isOpen
+  onClose={handleClose}
+  title="Detalle del registro"
+  closeIcon={MedalIcon} // ícono propio (lucide-react) en vez del XCircle default
+>
+  <p>Contenido del panel lateral.</p>
+</DrawPanel>
+
+<DrawPanel
+  isOpen
+  onClose={handleClose}
+  title="Detalle del registro"
+  contentLoading={isFetching}
+  contentLoadingText="Cargando información..."
+>
+  <p>Este contenido no se muestra mientras contentLoading es true.</p>
+</DrawPanel>
+
+<DrawPanel
+  isOpen
+  onClose={handleClose}
+  title="Detalle del registro"
+  contentLoading={isFetching}
+  typeLoading="skeleton"
+>
+  <p>Este contenido no se muestra mientras contentLoading es true.</p>
+</DrawPanel>
 ```
 
-**Notas:** Se renderiza con `createPortal` en `document.body`. Si hay `formData` con valores (o `hasUnsavedChanges` es `true`), el primer click fuera del panel o en el botón cerrar solo muestra un aviso (`closeConfirmMessage`); un segundo click sí cierra. Compone `Button` y `CountdownBar` internos del sistema.
+**Notas:** Se renderiza con `createPortal` en `document.body`. Si hay `formData` con valores (o `hasUnsavedChanges` es `true`), el primer click fuera del panel o en el botón cerrar solo muestra un aviso (`closeConfirmMessage`); un segundo click sí cierra. Compone `Button`, `CountdownBar` y `Loading` internos del sistema. El header (título + `CountdownBar` si `showCountdown`) queda fijo (`flex-shrink: 0`) mientras solo el contenido (`children`) hace scroll; al scrollear el contenido aparece una sombra interna sutil bajo el header (color derivado de `borderColor`) como indicador de que hay más contenido arriba. En `anchor="top"` el panel queda acotado a la altura del viewport (`max-height: 100%`) para que el scroll ocurra siempre dentro del contenido, nunca en la página. `contentLoading` es independiente del `loading` de los botones del footer: se puede mostrar el panel con los botones habilitados mientras el contenido todavía carga, o viceversa.
 
 ---
 
@@ -1696,7 +1879,7 @@ import Input from '../Input/index'; // export default, forwardRef, archivo index
 **Notas:** Es un wrapper de `TextField` con `forwardRef`, por lo que la `ref` se reenvía al input nativo.
 
 ---
-
+[]()
 ### KeyboardShortcut
 
 Envoltorio genérico que asigna un atajo de teclado global a **cualquier** `children` (`Button`, `Input`, un `<div>` propio, etc.) sin agregar markup propio al DOM — renderiza exactamente el `children` recibido, así que no altera layouts `flex`/`grid` del padre. Internamente usa el hook compartido `useKeyboardShortcut` (`common/hooks/useKeyboardShortcut.js`), el mismo que usan los atajos Ctrl/Cmd+K de `TopBar` y Ctrl/Cmd+B de `Sidebar`.
@@ -1736,7 +1919,7 @@ import KeyboardShortcut from 'anteriority-ui/screens/components/KeyboardShortcut
 
 ### Loading
 
-Indicador de carga con varias variantes visuales (spinner, barras, rebote, caja) y texto opcional, incluyendo rotación automática entre varias frases.
+Indicador de carga con varias variantes visuales (spinner, barras, rebote, caja, skeleton, y un set de loaders más elaborados: barra rebotando, barra continua, escáner neón, pulso líquido, órbita 3D, waveform, hélice ADN, cohete despegando) y texto opcional, incluyendo rotación automática entre varias frases.
 
 **Import:**
 ```jsx
@@ -1755,9 +1938,11 @@ import Loading from '../Loading/index'; // export default, archivo index.jsx
 | text | string | `''` | Texto fijo mostrado junto al loader (se ignora si se pasa `phrases`). |
 | phrases | string[] | `[]` | Frases que rotan automáticamente cada 3.5s con transición de fundido. |
 | size | `'small'` \| `'medium'` \| `'large'` \| `'giant'` | `'medium'` | Tamaño del loader. |
-| variant | `'default'` \| `'bars'` \| `'bounce'` \| `'box'` | `'default'` | Estilo visual del loader (`'default'` es el spinner circular). |
+| variant | `'default'` \| `'bars'` \| `'bounce'` \| `'box'` \| `'skeleton'` \| `'bounce-bar'` \| `'continuous-bar'` \| `'neon-scanner'` \| `'liquid-pulse'` \| `'orbit-3d'` \| `'waveform'` \| `'dna-helix'` \| `'rocket'` \| `'cube-3d'` \| `'prism-3d'` \| `'text-3d'` \| `'text-3d-static'` | `'default'` | Estilo visual del loader (`'default'` es el spinner circular; `'skeleton'` muestra 5 líneas de placeholder con shimmer, ver nota). Un valor no reconocido cae al spinner `'default'`. |
 | className | string | `''` | Clase(s) CSS adicionales. |
 | color | string | — | Color personalizado del loader (`--loading-color`). |
+| active | boolean | `true` | Controla la animación de salida (ver nota). Pasar `active={false}` cuando la carga termina en vez de desmontar `Loading` directamente — sigue renderizado un instante animando la salida y recién después retorna `null` por su cuenta. |
+| onExited | function | — | Callback disparado cuando termina la animación de salida (`active={false}`) y `Loading` ya se ocultó internamente — útil para desmontar el componente padre recién ahí. |
 
 **Ejemplos:**
 ```jsx
@@ -1766,8 +1951,35 @@ import Loading from '../Loading/index'; // export default, archivo index.jsx
 ```jsx
 <Loading text="Un momento..." size="large" variant="bars" />
 ```
+```jsx
+<Loading variant="skeleton" color="#94a3b8" />
+```
+```jsx
+<Loading text="Desplegando..." size="giant" variant="rocket" />
+```
+```jsx
+<Loading text="Cargando" variant="neon-scanner" />
+```
+```jsx
+<Loading text="Renderizando..." size="giant" variant="cube-3d" />
+```
+```jsx
+<Loading text="A" size="giant" variant="text-3d" />
+```
+```jsx
+<Loading text="AnteriorityUI" size="giant" variant="text-3d-static" />
+```
+```jsx
+// Al terminar la carga real, pasar active={false} en vez de dejar de renderizar
+// Loading de golpe: así alcanza a animar la salida antes de ocultarse.
+<Loading text="AnteriorityUI" size="giant" variant="text-3d" active={!loadingFinished} />
+```
 
-**Notas:** Es usado internamente por `Frame` (prop `isLoading`) con `size="giant"`.
+**Notas:** Es usado internamente por `Frame` (prop `isLoading`) con `size="giant"` y por `DrawPanel` (prop `contentLoading`, ver [DrawPanel](#drawpanel)). La variante `'skeleton'` ignora `text`/`phrases`/`size` (no tiene spinner ni texto) y usa `className` sobre su propio contenedor (`height: 100%`) en vez del de `loadingContainer` — para que ocupe el espacio disponible necesita que su contenedor padre tenga una altura definida (como el `.contentLoading` de `DrawPanel`, que estira el `Loading` con `height: 100%`).
+
+Las 12 variantes elaboradas (`'bounce-bar'`, `'continuous-bar'`, `'neon-scanner'`, `'liquid-pulse'`, `'orbit-3d'`, `'waveform'`, `'dna-helix'`, `'rocket'`, `'cube-3d'`, `'prism-3d'`, `'text-3d'`, `'text-3d-static'`) viven como sub-componentes propios en `screens/components/Loading/components/<Nombre>/` (mismo patrón de descomposición que [MediaViewer](#mediaviewer)): cada una es `index.jsx` + `index.module.css`, no son componentes públicos de la librería (no están en el barrel raíz). Todas aceptan `color` (mapeado a `--loading-color`, igual que el resto de variantes) para su tono principal, con el mismo azul (`#0d52f8`) como default en todas — consistente entre sí, no cada una con un color distinto; donde el diseño original tenía varios tonos fijos (ej. el segundo anillo de `'orbit-3d'`, las caras de `'cube-3d'`/`'prism-3d'`, antes cada una de un color del espectro), los tonos secundarios se derivan del `color` recibido con `color-mix()`/opacidad en vez de quedar completamente hardcodeados — excepción consciente: el fuego/humo de `'rocket'` mantiene su paleta de fuego (naranja/rojo) mezclada parcialmente con `color`, porque es un efecto físico, no el color del cohete en sí (que sí es 100% `color`, un solo tono para el casco completo). `'rocket'` agrupa el SVG del cohete y su fuego en un único elemento animado (`.ship`) para que viajen pegados durante el despegue, en vez de que el fuego quede fijo mientras el cuerpo se mueve. `'cube-3d'` (cubo isométrico con 6 caras `preserve-3d`) y `'prism-3d'` (octaedro flotante con 8 caras tipo `border-triangle`) son los dos loaders 3D más pesados en CSS del set — usan `perspective`/`transform-style: preserve-3d`, igual de livianos en JS que el resto (solo CSS, sin JS de animación). `'text-3d'` extruye el `text` recibido (sin límite de longitud) apilando 10 capas en `translateZ` que rotan 360° en Y a `3s` por vuelta; a propósito **no** usa `backface-visibility: hidden`, así que al cruzar 90°/180°/270° el texto se ve momentáneamente espejado — es el efecto elegido para esta variante, no un bug a corregir. `'text-3d-static'` usa la misma extrusión en capas pero sin rotación (ángulo fijo `rotateY(-22deg) rotateX(10deg)`, siempre legible); en su lugar, la capa frontal tiene un reflejo/shine que la recorre (`background-clip: text` con gradiente animado en `background-position`, mismo mecanismo que el shimmer de `'skeleton'` pero aplicado al glifo del texto en vez de a un bloque). Todas menos `'neon-scanner'`/`'text-3d'`/`'text-3d-static'` reutilizan el wrapper estándar de `Loading` (`text`/`phrases` animados debajo del loader, igual que `'bars'`/`'bounce'`/`'box'`); `'neon-scanner'` integra el texto dentro de su propio diseño (mayúsculas, estilo neón) en vez de usar el texto genérico de abajo, así que no muestra doble texto.
+
+**Animación de salida (`active`):** `'text-3d'` y `'text-3d-static'` tienen una animación de salida con estilo cuando `active` pasa a `false` — en vez de desaparecer de golpe (porque el padre dejó de renderizar `Loading`), el loader hace fade + scale-down + un giro de 90° en Y (`loadingExit`, 0.5s) antes de ocultarse. El patrón es el mismo que `DrawPanel.isOpen`: `Loading` sigue montado internamente durante la animación (estado `render` propio) y recién retorna `null` cuando termina (`onAnimationEnd` → `onExited`, si se pasó). El resto de variantes (`'default'`, `'bars'`, `'rocket'`, `'cube-3d'`, etc.) todavía no tienen esta animación de salida — `active={false}` en ellas no hace nada visible, simplemente no se les aplica la clase `.exiting`.
 
 ---
 
@@ -2264,9 +2476,9 @@ import Selector from '../Material-UI/Components/Selector/index'; // export defau
 | onChange | function | — | Se llama con un evento simulado `{ target: { value } }`, no con `(event, newValue)` de MUI. |
 | options | array | `[]` | Lista de opciones `{ value, label, icon? }` (`icon` es una URL de imagen mostrada en el listado). |
 | id | string | `'custom-autocomplete'` | id del `Autocomplete`. |
-| style | object | `{}` | Estilos adicionales (`sx`) del contenedor. |
+| style | object | `{}` | Estilo inline del `Autocomplete` (prop `style` nativa, no `sx`) — útil para pisar el ancho default sin pelear con `fullWidth` (ej. `style={{ width: 200 }}`). |
 | className | string | `''` | Clase CSS adicional. |
-| fullWidth | boolean | `true` | Si ocupa el 100% del ancho (si `false`, ancho fijo de 300px). |
+| fullWidth | boolean | `true` | Si ocupa el 100% del ancho (si `false`, ancho fijo de 300px). Para un ancho distinto que no sea 300px fijo, usar `style={{ width }}` junto con `fullWidth={false}`. |
 | placeholder | string | — | Placeholder del campo. |
 | required | boolean | — | Muestra un indicador `**` junto a la etiqueta. |
 | requiredColor | string | `'red'` | Color del indicador de requerido. |
@@ -2280,8 +2492,11 @@ import Selector from '../Material-UI/Components/Selector/index'; // export defau
 ```jsx
 <Selector label="Especie" options={options} value="gato" onChange={onChange} />
 ```
+```jsx
+<Selector label="Especie" options={options} value={value} onChange={onChange} fullWidth={false} style={{ width: 180 }} />
+```
 
-**Notas:** El matching de `value` contra `options` ignora mayúsculas, espacios, guiones y guiones bajos si no hay coincidencia exacta por `value`.
+**Notas:** El matching de `value` contra `options` ignora mayúsculas, espacios, guiones y guiones bajos si no hay coincidencia exacta por `value`. `fullWidth` default es `true` — si solo se pasa `className` para controlar el ancho sin `fullWidth={false}`, el `sx.width: '100%'` default sigue ganando; para un ancho custom, combinar `fullWidth={false}` con `style={{ width }}`.
 
 ---
 
@@ -2841,6 +3056,13 @@ const schema = {
 
 **Nota sobre archivos (`FileWidget`):** el valor que entrega `onChange` es un data-URL en base64 (string), o un array de data-URLs si el campo es `array`/`'ui:options': { multiple: true }` — no un `File` nativo del browser. Restringir el tipo de archivo con `'ui:options': { accept: 'image/*' }` (mismo formato que el atributo HTML `accept`). El preview reusa `ImagePastePreview` (el mismo chip que usan `PasteImageField`/`MultilinePlaceholder`).
 
+**Nota sobre theming de `ColorWidget`/`RadioWidget`/`RangeWidget`:** estos tres widgets no tienen ninguna prop de color directa en `SchemaForm` — `widgets.jsx` no inyecta un theme global a los widgets internos. Para tematizarlos hay que pasar las props de color del componente subyacente vía `'ui:options'` en el campo correspondiente del `uiSchema`, igual que `accept`/`multiple` en `FileWidget`:
+- `ColorWidget` → `'ui:options': { bgColor, textColor, borderColor, accentColor }` (mismas props que acepta `ColorPicker`, incluido el popover).
+- `RadioWidget` → `'ui:options': { color }` (prop `color` de `RadioGroup`/`Radio` de MUI: `'primary'` / `'secondary'` / etc., no un hex libre).
+- `RangeWidget` → `'ui:options': { accentColor }` (prop `accentColor` de `Slider`, sí acepta hex).
+
+Sin `ui:options`, los tres quedan con la paleta default de su componente (no heredan ningún color del resto del formulario).
+
 **Schema de referencia completo:** este `schema` + `uiSchema` ejercitan todos los tipos/formatos que `SchemaForm` sabe interpretar — útil como plantilla para armar uno propio o para ver de un vistazo qué forma de JSON Schema produce cada widget.
 
 ```js
@@ -2980,11 +3202,12 @@ const uiSchema = {
       ],
     },
   },
-  plan: { 'ui:widget': 'radio' },
+  plan: { 'ui:widget': 'radio', 'ui:options': { color: 'secondary' } },
   nacimiento: { 'ui:widget': 'DateWidget' },
   avatar: { 'ui:options': { accept: 'image/*' } },
   adjuntos: { 'ui:options': { multiple: true } },
-  satisfaccion: { 'ui:widget': 'range' },
+  colorFavorito: { 'ui:options': { bgColor: '#1e293b', textColor: '#f1f5f9', borderColor: '#334155' } },
+  satisfaccion: { 'ui:widget': 'range', 'ui:options': { accentColor: '#f97316' } },
 };
 
 <SchemaForm schema={schema} uiSchema={uiSchema} formData={formData} onChange={setFormData} onSubmit={handleSave} />

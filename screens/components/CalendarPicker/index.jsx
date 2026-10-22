@@ -1,14 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { format, addMonths, subMonths, isSameDay, isSameMonth, isBefore, setMonth, setYear } from 'date-fns';
-import { es } from 'date-fns/locale';
-import { ChevronLeft, ChevronRight, CalendarDays, X, ChevronDown } from 'lucide-react';
+import { format, addMonths, subMonths, isSameDay, isBefore, setMonth, setYear } from 'date-fns';
+import { CalendarDays } from 'lucide-react';
 import styles from './index.module.css';
 import TextField from '../Material-UI/Components/TextField/index';
-import Frame from '../Frame/index';
-import Button from '../Button/index';
-import Selector from '../Material-UI/Components/Selector/index';
-import { MONTHS, WEEKDAYS, BUTTONS, RANGE_HINTS } from './Constants';
-import { parseValueToDate, getDaysForMonth, isDayInRange, isDaySame } from './utils';
+import { RANGE_HINTS, BUTTONS } from './Constants';
+import { parseValueToDate, getDaysForMonth } from './utils';
+import { CalendarGrid, AgendaGrid } from './components/index.js';
 
 const CalendarPicker = ({
   label,
@@ -21,15 +18,38 @@ const CalendarPicker = ({
   inputSx,
   selectedColor,
   accentColor,
+  bgColor,
+  textColor,
+  mutedColor,
+  mutedBgColor,
+  borderColor,
+  hoverColor,
+  holidayColor,
+  holidayBorderColor,
+  tooltipBgColor,
+  tooltipTextColor,
+  moonPhaseColor,
+  variant = 'popover',
+  showFooter = false,
+  renderDay,
+  country,
+  showHolidays,
+  extraHolidays,
+  showMoonPhases,
   className = '',
   style
 }) => {
+  const isInline = variant === 'inline';
+
   const [currentDate, setCurrentDate] = useState(new Date());
   const [isOpen, setIsOpen] = useState(false);
   const [showSelectors, setShowSelectors] = useState(false);
   const [hoveredDay, setHoveredDay] = useState(null);
   const [dragStartDay, setDragStartDay] = useState(null);
   const dragStateRef = useRef({ didDrag: false, hoveredDay: null });
+  const wrapperRef = useRef(null);
+
+  const isPopoverOpen = isInline || isOpen;
 
   const rangeValue = range && value && typeof value === 'object' ? value : { start: '', end: '' };
   const rangeStart = range ? parseValueToDate(rangeValue.start) : null;
@@ -37,29 +57,36 @@ const CalendarPicker = ({
   const selectedDate = !range ? parseValueToDate(value) : null;
 
   useEffect(() => {
-    if (!isOpen) {
+    if (!isPopoverOpen) {
       setHoveredDay(null);
       setDragStartDay(null);
       dragStateRef.current = { didDrag: false, hoveredDay: null };
     }
-  }, [isOpen]);
+  }, [isPopoverOpen]);
 
   useEffect(() => {
+    if (isInline || !isOpen) return undefined;
+
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
         setIsOpen(false);
         setShowSelectors(false);
       }
     };
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-      window.addEventListener('keydown', handleKeyDown);
-    }
-    return () => {
-      document.body.style.overflow = '';
-      window.removeEventListener('keydown', handleKeyDown);
+    const handleClickOutside = (e) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
+        setIsOpen(false);
+        setShowSelectors(false);
+      }
     };
-  }, [isOpen]);
+
+    window.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isInline, isOpen]);
 
   const handleNextMonth = () => setCurrentDate(addMonths(currentDate, 1));
   const handlePrevMonth = () => setCurrentDate(subMonths(currentDate, 1));
@@ -85,7 +112,7 @@ const CalendarPicker = ({
   const handleDateClick = (day) => {
     if (!range) {
       emitChange(toIsoDate(day));
-      setIsOpen(false);
+      if (!isInline) setIsOpen(false);
       return;
     }
 
@@ -102,7 +129,7 @@ const CalendarPicker = ({
     }
 
     emitChange({ start: toIsoDate(rangeStart), end: toIsoDate(day) });
-    setIsOpen(false);
+    if (!isInline) setIsOpen(false);
   };
 
   // Arrastre con mouse: mousedown ancla el inicio, mouseenter va previsualizando
@@ -137,14 +164,14 @@ const CalendarPicker = ({
           ? [dragStartDay, endDay]
           : [endDay, dragStartDay];
         emitChange({ start: toIsoDate(from), end: toIsoDate(to) });
-        setIsOpen(false);
+        if (!isInline) setIsOpen(false);
       }
       setDragStartDay(null);
     };
     window.addEventListener('mouseup', handleMouseUp);
     return () => window.removeEventListener('mouseup', handleMouseUp);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [range, dragStartDay]);
+  }, [range, dragStartDay, isInline]);
 
   const handleSetToday = () => {
     const today = new Date();
@@ -154,7 +181,7 @@ const CalendarPicker = ({
 
   const handleClear = () => {
     emitChange(range ? { start: '', end: '' } : '');
-    setIsOpen(false);
+    if (!isInline) setIsOpen(false);
   };
 
   const handleMonthChange = (e) => {
@@ -173,9 +200,6 @@ const CalendarPicker = ({
 
   const safeDate = currentDate instanceof Date && !isNaN(currentDate.getTime()) ? currentDate : new Date();
 
-  const currentYear = safeDate.getFullYear();
-  const years = Array.from({ length: 110 }, (_, i) => currentYear + 5 - i);
-
   const { monthStart, days } = getDaysForMonth(safeDate);
 
   const displayText = range
@@ -184,50 +208,99 @@ const CalendarPicker = ({
 
   const rangeHint = range && rangeStart && !rangeEnd ? RANGE_HINTS.END : RANGE_HINTS.START;
 
-  const headerContent = (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', borderBottom: '1px solid #f8fafc', paddingBottom: '0.5rem', marginBottom: '1rem' }}>
-      <div className={styles.headerTitleContainer} onClick={() => setShowSelectors(!showSelectors)}>
-        <span className={styles.monthName}>
-          {format(safeDate, 'MMMM yyyy', { locale: es })}
-        </span>
-        <ChevronDown size={14} className={`${styles.dropdownChevron} ${showSelectors ? styles.chevronChevronOpen : ''}`} />
-      </div>
+  const colorVars = {
+    ...(selectedColor ? { '--cp-selected': selectedColor } : {}),
+    ...(accentColor ? { '--cp-accent': accentColor } : {}),
+  };
 
-      <div className={styles.navigation}>
-        {!showSelectors && (
-          <>
-            <Button
-              variant="ghost"
-              size="small"
-              circle
-              onClick={handlePrevMonth}
-              icon={ChevronLeft}
-              color="inherit"
-            />
-            <Button
-              variant="ghost"
-              size="small"
-              circle
-              onClick={handleNextMonth}
-              icon={ChevronRight}
-              color="inherit"
-            />
-          </>
-        )}
-        <Button
-          variant="ghost"
-          size="small"
-          circle
-          onClick={() => { setIsOpen(false); setShowSelectors(false); }}
-          icon={X}
-          color="var(--cancel-button)"
+  if (isInline) {
+    return (
+      <div className={`${styles.inlineWrapper} ${className}`.trim()} style={{ ...colorVars, ...style }}>
+        <AgendaGrid
+          currentDate={safeDate}
+          monthStart={monthStart}
+          days={days}
+          onPrevMonth={handlePrevMonth}
+          onNextMonth={handleNextMonth}
+          onSetToday={handleSetToday}
+          todayLabel={BUTTONS.TODAY}
+          range={range}
+          selectedDate={selectedDate}
+          rangeStart={rangeStart}
+          rangeEnd={rangeEnd}
+          dragStartDay={dragStartDay}
+          hoveredDay={hoveredDay}
+          onDayMouseLeave={() => setHoveredDay(null)}
+          onDayClick={handleDateClick}
+          onDayMouseDown={handleDayMouseDown}
+          onDayMouseEnter={handleDayMouseEnter}
+          renderDay={renderDay}
+          country={country}
+          showHolidays={showHolidays}
+          extraHolidays={extraHolidays}
+          holidayColor={holidayColor}
+          holidayBorderColor={holidayBorderColor}
+          tooltipBgColor={tooltipBgColor}
+          tooltipTextColor={tooltipTextColor}
+          showMoonPhases={showMoonPhases}
+          moonPhaseColor={moonPhaseColor}
+          bgColor={bgColor}
+          textColor={textColor}
+          mutedColor={mutedColor}
+          mutedBgColor={mutedBgColor}
+          borderColor={borderColor}
+          hoverColor={hoverColor}
         />
       </div>
-    </div>
+    );
+  }
+
+  const grid = (
+    <CalendarGrid
+      currentDate={safeDate}
+      monthStart={monthStart}
+      days={days}
+      showSelectors={showSelectors}
+      onToggleSelectors={() => setShowSelectors(!showSelectors)}
+      onPrevMonth={handlePrevMonth}
+      onNextMonth={handleNextMonth}
+      onMonthChange={handleMonthChange}
+      onYearChange={handleYearChange}
+      onConfirmSelectors={() => setShowSelectors(false)}
+      range={range}
+      rangeHint={rangeHint}
+      selectedDate={selectedDate}
+      rangeStart={rangeStart}
+      rangeEnd={rangeEnd}
+      dragStartDay={dragStartDay}
+      hoveredDay={hoveredDay}
+      onDayMouseLeave={() => setHoveredDay(null)}
+      onDayClick={handleDateClick}
+      onDayMouseDown={handleDayMouseDown}
+      onDayMouseEnter={handleDayMouseEnter}
+      onClear={handleClear}
+      onSetToday={handleSetToday}
+      showFooter={showFooter}
+      accentColor={accentColor}
+      selectedColor={selectedColor}
+      country={country}
+      showHolidays={showHolidays}
+      extraHolidays={extraHolidays}
+      holidayBorderColor={holidayBorderColor}
+      tooltipBgColor={tooltipBgColor}
+      tooltipTextColor={tooltipTextColor}
+      showMoonPhases={showMoonPhases}
+      moonPhaseColor={moonPhaseColor}
+    />
   );
 
   return (
-    <div className={`${styles.inputGroup} ${className}`.trim()} onClick={(e) => e.stopPropagation()} style={style}>
+    <div
+      ref={wrapperRef}
+      className={`${styles.inputGroup} ${className}`.trim()}
+      onClick={(e) => e.stopPropagation()}
+      style={style}
+    >
       <TextField
         label={label}
         value={displayText}
@@ -251,128 +324,9 @@ const CalendarPicker = ({
       />
 
       {isOpen && (
-        <Frame
-          isModal={true}
-          onClose={() => { setIsOpen(false); setShowSelectors(false); }}
-          className={styles.calendarFrame}
-        >
-          <div
-            style={{
-              display: 'contents',
-              ...(selectedColor ? { '--cp-selected': selectedColor } : {}),
-              ...(accentColor ? { '--cp-accent': accentColor } : {}),
-            }}
-          >
-          {headerContent}
-
-          {showSelectors ? (
-            <div className={styles.selectorsPanel}>
-              <div className={styles.selectorGroup}>
-                <Selector
-                  label="Mes"
-                  value={currentDate.getMonth()}
-                  onChange={handleMonthChange}
-                  options={MONTHS.map((m, index) => ({ value: index, label: m }))}
-                />
-              </div>
-              <div className={styles.selectorGroup}>
-                <Selector
-                  label="Año"
-                  value={currentDate.getFullYear()}
-                  onChange={handleYearChange}
-                  options={years.map(y => ({ value: y, label: String(y) }))}
-                />
-              </div>
-              <Button
-                variant="primary"
-                fullWidth
-                onClick={() => setShowSelectors(false)}
-                color={selectedColor || '#0f172a'}
-                style={{ marginTop: '0.5rem' }}
-              >
-                {BUTTONS.CONFIRM}
-              </Button>
-            </div>
-          ) : (
-            <>
-              {range && <div className={styles.rangeHint}>{rangeHint}</div>}
-
-              <div className={styles.weekDaysGrid}>
-                {WEEKDAYS.map(day => (
-                  <div key={day} className={styles.weekDayName}>{day}</div>
-                ))}
-              </div>
-
-              <div className={styles.daysGrid} onMouseLeave={() => setHoveredDay(null)}>
-                {days.map((day, index) => {
-                  const isCurrentMonth = isSameMonth(day, monthStart);
-                  const isToday = isSameDay(day, new Date());
-
-                  let dayClassName = styles.dayCell;
-                  let isSelected = false;
-
-                  if (range) {
-                    // Arrastrando: el ancla del drag pisa al inicio ya confirmado (arranca
-                    // un rango nuevo). Si no se está arrastrando, es el flujo de dos clicks
-                    // normal (inicio confirmado, fin todavía sin confirmar).
-                    const effectiveStart = dragStartDay || rangeStart;
-                    const effectiveEnd = dragStartDay ? null : rangeEnd;
-                    const previewEnd = effectiveStart && !effectiveEnd ? hoveredDay : null;
-
-                    const isRangeStart = isDaySame(day, effectiveStart);
-                    const isRangeEnd = isDaySame(day, effectiveEnd);
-                    const isBetween = isDayInRange(day, effectiveStart, effectiveEnd) || isDayInRange(day, effectiveStart, previewEnd);
-                    const isPreviewEdge = previewEnd && isDaySame(day, previewEnd);
-
-                    isSelected = isRangeStart || isRangeEnd;
-                    if (isBetween) dayClassName += ` ${styles.inRange}`;
-                    if (isRangeStart) dayClassName += ` ${styles.rangeStart}`;
-                    if (isRangeEnd) dayClassName += ` ${styles.rangeEnd}`;
-                    if (isPreviewEdge) dayClassName += ` ${styles.rangeEnd} ${styles.rangePreviewEdge}`;
-                  } else {
-                    isSelected = selectedDate && isSameDay(day, selectedDate);
-                  }
-
-                  if (!isCurrentMonth) dayClassName += ` ${styles.otherMonth}`;
-                  if (!range && isSelected) dayClassName += ` ${styles.selectedDay}`;
-                  if (isToday && !isSelected) dayClassName += ` ${styles.todayDay}`;
-
-                  return (
-                    <div
-                      key={index}
-                      className={dayClassName}
-                      onClick={() => isCurrentMonth && handleDateClick(day)}
-                      onMouseDown={() => isCurrentMonth && handleDayMouseDown(day)}
-                      onMouseEnter={() => isCurrentMonth && handleDayMouseEnter(day)}
-                    >
-                      {format(day, 'd')}
-                    </div>
-                  );
-                })}
-              </div>
-            </>
-          )}
-
-          <div className={styles.footer}>
-            <Button
-              variant="ghost"
-              size="small"
-              onClick={handleClear}
-              color="inherit"
-            >
-              {BUTTONS.CLEAR}
-            </Button>
-            <Button
-              variant="ghost"
-              size="small"
-              onClick={handleSetToday}
-              color={accentColor || 'green'}
-            >
-              {BUTTONS.TODAY}
-            </Button>
-          </div>
-          </div>
-        </Frame>
+        <div className={styles.calendarPopover} style={colorVars}>
+          {grid}
+        </div>
       )}
     </div>
   );

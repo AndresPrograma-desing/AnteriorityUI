@@ -1,0 +1,53 @@
+.wrapper {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  perspective: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.scene {
+  position: relative;
+  transform-style: preserve-3d;
+  transform: rotateY(-22deg) rotateX(10deg);
+}
+
+.layer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  font-size: 2.25rem;
+  font-weight: 800;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  line-height: 1;
+  white-space: nowrap;
+  color: color-mix(in srgb, var(--loading-color, #0d52f8) 55%, black);
+  user-select: none;
+}
+
+.front {
+  background: linear-gradient(
+    110deg,
+    var(--loading-color, #0d52f8) 35%,
+    color-mix(in srgb, var(--loading-color, #0d52f8) 25%, white) 50%,
+    var(--loading-color, #0d52f8) 65%
+  );
+  background-size: 250% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 14px color-mix(in srgb, var(--loading-color, #0d52f8) 45%, transparent);
+  animation: shine 1.8s ease-in-out infinite;
+}
+
+@keyframes shine {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}

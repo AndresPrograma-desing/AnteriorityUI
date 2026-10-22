@@ -38,7 +38,8 @@ export default function Selector({
     return (
         <Autocomplete
             id={id}
-            sx={{ width: fullWidth ? '100%' : 300, m: 0, ...style }}
+            sx={{ width: fullWidth ? '100%' : 300, m: 0 }}
+            style={style}
             className={className}
             options={options}
             autoHighlight

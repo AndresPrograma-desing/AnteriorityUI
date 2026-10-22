@@ -1,4 +1,6 @@
 import DrawPanel from './index.jsx';
+import Callout from '../Callout/index.jsx';
+import { MedalIcon } from 'lucide-react';
 
 export default {
   title: 'Components/DrawPanel',
@@ -12,6 +14,7 @@ export const Default = {
     title: 'Detalle del registro',
     description: 'Revisa la información antes de continuar',
     width: '420px',
+    closeIcon: MedalIcon,
     children: (
       <p style={{ margin: 0 }}>Contenido del panel lateral.</p>
     ),
@@ -47,7 +50,45 @@ export const WithCountdownSelectionProgress = {
     totalItems: ['a', 'b', 'c', 'd'],
     selectedItems: ['a', 'b'],
     children: (
-      <p style={{ margin: 0 }}>2 de 4 elementos seleccionados.</p>
+      <div>
+      {Array.from({ length: 20 }).map((_, index) => (
+        <Callout
+          key={index}
+          title={`Elemento ${index + 1}`}
+          description={`Descripción del elemento ${index + 1}`}
+        />
+      ))}
+      </div>
+    ),
+  },
+};
+
+export const ContentLoading = {
+  args: {
+    isOpen: true,
+    onClose: () => console.log('closed'),
+    title: 'Detalle del registro',
+    width: '420px',
+    contentLoading: true,
+    contentLoadingText: 'Cargando información...',
+    loading: false,
+    children: (
+      <p style={{ margin: 0 }}>Este contenido no se muestra mientras contentLoading es true.</p>
+    ),
+  },
+};
+
+export const ContentLoadingSkeleton = {
+  args: {
+    isOpen: true,
+    onClose: () => console.log('closed'),
+    title: 'Detalle del registro',
+    width: '420px',
+    contentLoading: true,
+    typeLoading: 'skeleton',
+    loading: false,
+    children: (
+      <p style={{ margin: 0 }}>Este contenido no se muestra mientras contentLoading es true.</p>
     ),
   },
 };

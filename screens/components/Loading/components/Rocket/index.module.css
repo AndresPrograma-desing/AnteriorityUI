@@ -1,0 +1,127 @@
+.container {
+  position: relative;
+  width: 100px;
+  height: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.ship {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  animation: launch 2.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.svg {
+  width: 48px;
+  height: 48px;
+  position: relative;
+  z-index: 1;
+}
+
+.hull {
+  fill: var(--loading-color, #0d52f8);
+}
+
+.window {
+  fill: #0b0f19;
+  stroke: var(--loading-color, #0d52f8);
+}
+
+.fire {
+  position: absolute;
+  bottom: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 12px;
+  height: 20px;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--loading-color, #0d52f8) 60%, #f97316),
+    color-mix(in srgb, var(--loading-color, #0d52f8) 30%, #ef4444),
+    transparent
+  );
+  border-radius: 50%;
+  filter: blur(2px);
+  animation: flicker 0.15s ease-in-out infinite alternate;
+}
+
+.smoke {
+  position: absolute;
+  bottom: 6px;
+  width: 40px;
+  height: 8px;
+  background: color-mix(in srgb, var(--loading-color, #0d52f8) 15%, transparent);
+  border-radius: 50%;
+  animation: smokeExpand 2.6s ease-out infinite;
+}
+
+@keyframes launch {
+  0% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  10% {
+    transform: translateY(-2px) rotate(-2deg);
+  }
+  15% {
+    transform: translateY(0px) rotate(2deg);
+  }
+  20% {
+    transform: translateY(-4px) rotate(-1deg);
+  }
+  45% {
+    transform: translateY(-42px);
+  }
+  65% {
+    transform: translateY(-38px);
+  }
+  85% {
+    transform: translateY(-90px);
+    opacity: 1;
+  }
+  86% {
+    opacity: 0;
+  }
+  87% {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0px);
+    opacity: 1;
+  }
+}
+
+@keyframes flicker {
+  0% {
+    transform: translateX(-50%) scaleY(0.8) scaleX(0.9);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateX(-50%) scaleY(1.3) scaleX(1.1);
+    opacity: 1;
+  }
+}
+
+@keyframes smokeExpand {
+  0%,
+  20% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}

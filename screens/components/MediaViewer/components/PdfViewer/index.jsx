@@ -47,6 +47,14 @@ const PdfViewer = ({
 
   // Carga el documento cuando cambia la url. pdfjs-dist se importa dinámicamente (no al tope
   // del archivo) para no pagar su costo en componentes de la librería que nunca muestran un PDF.
+  //
+  // El worker se vendoriza como asset propio (./pdf.worker.min.mjs, copiado por scripts/build.mjs
+  // junto al resto de screens/) en vez de resolverse como 'pdfjs-dist/build/pdf.worker.min.mjs':
+  // esta librería instala pdfjs-dist como dependency normal, pero bajo instalación estricta
+  // (pnpm sin node-linker=hoisted) el consumidor NO tiene las dependencias transitivas de
+  // anteriority-ui en su propio node_modules, así que ese import dinámico resolvía solo en este
+  // repo y daba 404 en el proyecto consumidor. El import dinámico de 'pdfjs-dist' en sí (la API,
+  // no el worker) sigue dependiendo de que el consumidor la tenga instalada.
   useEffect(() => {
     let cancelled = false;
     setIsLoading(true);
@@ -58,7 +66,7 @@ const PdfViewer = ({
       try {
         const pdfjs = await import('pdfjs-dist');
         pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-          'pdfjs-dist/build/pdf.worker.min.mjs',
+          './pdf.worker.min.mjs',
           import.meta.url,
         ).toString();
 

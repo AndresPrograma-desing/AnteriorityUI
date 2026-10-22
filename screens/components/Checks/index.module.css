@@ -24,9 +24,66 @@
   font-size: 0.95rem;
   color: var(--checks-label, #1e293b);
   margin-left: 8px;
+  transition: color 0.2s ease;
 }
 
 .checked .label {
   color: var(--checks-checked-label, #64748b);
   text-decoration: line-through;
+}
+
+/* Modo compacto (Solo icono) */
+.iconOnly {
+  width: auto !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background-color: transparent !important;
+  border-radius: 0 !important;
+  display: inline-flex !important;
+}
+
+.iconOnly:hover {
+  background-color: transparent !important;
+}
+
+/* --- ANIMACIÓN PREMIUM PARA EL CHULITO (CHECKMARK) --- */
+
+/* Animación general del recuadro (Efecto Muelle / Elastic Bounce) */
+.animatedCheck {
+  animation: boxBounce 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Animación específica para el trazado del chulito interno de MUI */
+.animatedCheck svg path {
+  transform-origin: center;
+  animation: checkmarkDraw 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Elasticidad del cuadro */
+@keyframes boxBounce {
+  0% {
+    transform: scale(0.7);
+  }
+  50% {
+    transform: scale(1.18);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Revelado fluido del chulito dibujándose y expandiéndose */
+@keyframes checkmarkDraw {
+  0% {
+    opacity: 0;
+    transform: scale(0) rotate(-10deg);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.2) rotate(3deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
 }

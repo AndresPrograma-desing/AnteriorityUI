@@ -1,0 +1,179 @@
+.agendaGrid {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background-color: var(--cp-agenda-bg, #ffffff);
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--cp-agenda-border, #e2e8f0);
+  margin-bottom: 0;
+}
+
+.titleGroup {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+
+.monthName {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--cp-agenda-text, #0f172a);
+  text-transform: capitalize;
+}
+
+.yearName {
+  font-size: 1.5rem;
+  font-weight: 400;
+  color: var(--cp-agenda-year, #475569);
+}
+
+.navigation {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.weekDaysRow {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  border-bottom: 1px solid var(--cp-agenda-border, #e2e8f0);
+}
+
+.weekDayName {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--cp-agenda-muted, #94a3b8);
+  padding: 0.9rem 0.5rem;
+  text-align: left;
+}
+
+.daysGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  /* Fila de altura fija e igual para las 6 semanas — sin esto, una celda con
+     contenido más alto (ej. un feriado con nombre largo) estira TODA la fila
+     del grid y desalinea las demás celdas de esa semana. */
+  grid-auto-rows: 120px;
+}
+
+.dayCell {
+  position: relative;
+  padding: 0.5rem;
+  border-right: 1px solid var(--cp-agenda-border, #e2e8f0);
+  border-bottom: 1px solid var(--cp-agenda-border, #e2e8f0);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  /* El overflow se recorta acá, no en la celda — así el tooltip del feriado
+     truncado (position:absolute, ver .holidayTooltip) puede salir visualmente
+     por fuera de la celda en vez de quedar cortado por este mismo overflow. */
+  min-height: 0;
+}
+
+.daysGrid .dayCell:nth-child(7n) {
+  border-right: none;
+}
+
+.dayCell:hover:not(.otherMonth) {
+  background-color: var(--cp-agenda-hover, #f8fafc);
+}
+
+/* Define su propia forma circular porque se usa en dos contextos: como texto
+   plano (span) dentro de la celda-Button simple, o como className de un
+   Button circle propio (celda con renderDay) — en ese segundo caso coexiste
+   con el circleStyle de Button sin chocar (ese pisa minWidth/padding vía sx,
+   acá solo fijamos el tamaño/tipografía/color visibles). */
+.dayNumber {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--cp-agenda-text, #0f172a);
+  border-radius: 50%;
+}
+
+.dayNumberToday {
+  color: var(--cp-selected, #0ea5e9);
+  background-color: color-mix(in srgb, var(--cp-selected, #0ea5e9) 14%, transparent) !important;
+}
+
+.dayContent {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.dayExtras {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.moonIcon {
+  flex-shrink: 0;
+  color: var(--cp-agenda-moon, #64748b);
+}
+
+/* El texto truncado en sí — el tooltip con el nombre completo lo resuelve
+   ModalTooltip (portal a document.body), no CSS local: una celda del grid es
+   su propio stacking context y un tooltip position:absolute contenido en ella
+   queda tapado por las celdas de filas siguientes, que se pintan después. */
+.holidayLabel {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--cp-agenda-holiday, #ef4444);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.otherMonth {
+  cursor: not-allowed;
+  background-color: var(--cp-agenda-muted-bg, #fafbfc);
+}
+
+.otherMonth .dayNumber {
+  color: var(--cp-agenda-muted, #cbd5e1);
+}
+
+.selectedDay {
+  box-shadow: inset 0 0 0 2px var(--cp-selected, #0ea5e9);
+  background-color: color-mix(in srgb, var(--cp-selected, #0ea5e9) 6%, transparent);
+}
+
+/* Borde fino de color en la celda del día que tiene feriado/efeméride —
+   independiente de .selectedDay, que usa box-shadow con el color de
+   selección; este usa un border real (más fino, no compite visualmente con
+   el box-shadow de selección si un día cae en ambos casos a la vez). */
+.isHoliday {
+  border: 1px solid var(--cp-agenda-holiday-border, #ef4444);
+}
+
+.inRange {
+  background-color: color-mix(in srgb, var(--cp-selected, #0ea5e9) 8%, transparent);
+}
+
+.rangePreviewEdge {
+  opacity: 0.7;
+}

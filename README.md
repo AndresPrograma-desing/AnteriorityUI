@@ -65,6 +65,12 @@ pnpm add react react-dom @mui/material @emotion/react @emotion/styled
    pnpm add @rjsf/core @rjsf/validator-ajv8
    ```
 
+5. (Opcional) Si vas a mostrar PDFs con `MediaViewer`, agregá `pdfjs-dist` (el worker ya viene empaquetado con la librería, pero la librería en sí no — es `peerDependency` opcional para no duplicarla si tu proyecto ya la usa):
+
+   ```bash
+   pnpm add pdfjs-dist
+   ```
+
 ## Importar componentes
 
 Todos los componentes están indexados en el entry point principal — no hace falta conocer el subpath de cada uno:

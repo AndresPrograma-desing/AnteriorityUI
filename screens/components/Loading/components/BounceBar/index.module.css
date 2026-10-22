@@ -1,0 +1,34 @@
+.track {
+  position: relative;
+  width: 100%;
+  max-width: 220px;
+  height: 10px;
+  background-color: color-mix(in srgb, var(--loading-color, #0d52f8) 14%, transparent);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 30%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    var(--loading-color, #0d52f8),
+    color-mix(in srgb, var(--loading-color, #0d52f8) 65%, white)
+  );
+  border-radius: 8px;
+  box-shadow: 0 0 12px color-mix(in srgb, var(--loading-color, #0d52f8) 60%, transparent);
+  animation: bounce 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+}
+
+@keyframes bounce {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(233.3%);
+  }
+}

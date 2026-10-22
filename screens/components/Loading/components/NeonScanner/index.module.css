@@ -1,0 +1,41 @@
+.scanner {
+  position: relative;
+  width: 220px;
+  height: 44px;
+  background: #030712;
+  border-radius: 22px;
+  border: 1px solid #1f2937;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.scanner::before {
+  content: '';
+  position: absolute;
+  width: 50px;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, var(--loading-color, #0d52f8), transparent);
+  filter: blur(4px);
+  animation: scan 1.4s ease-in-out infinite alternate;
+}
+
+.text {
+  position: relative;
+  z-index: 1;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--loading-color, #0d52f8);
+}
+
+@keyframes scan {
+  0% {
+    transform: translateX(-100px);
+  }
+  100% {
+    transform: translateX(100px);
+  }
+}

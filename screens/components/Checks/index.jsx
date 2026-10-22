@@ -5,33 +5,66 @@ import styles from './index.module.css';
 
 import ModalTooltip from '../ModalTooltip/ModalTooltip';
 
-export default function PermissionCheckboxItem({ label, checked, onChange, disabled, checkedBgColor, labelColor, checkedLabelColor, className = '', style: styleProp }) {
+export default function PermissionCheckboxItem({
+  label,
+  checked,
+  onChange,
+  disabled,
+  checkedBgColor,
+  labelColor,
+  checkedLabelColor,
+  iconOnly = false,
+  className = '',
+  style: styleProp,
+}) {
   const style = {
     ...(checkedBgColor ? { '--checks-checked-bg': checkedBgColor } : {}),
     ...(labelColor ? { '--checks-label': labelColor } : {}),
     ...(checkedLabelColor ? { '--checks-checked-label': checkedLabelColor } : {}),
   };
 
+  const containerClasses = [
+    styles.itemContainer,
+    checked ? styles.checked : '',
+    iconOnly ? styles.iconOnly : '',
+    className,
+  ]
+    .filter(Boolean)
+    .join(' ');
+
+  const checkboxClasses = checked ? styles.animatedCheck : '';
+
+  const checkboxElement = (
+    <Checkbox
+      checked={checked}
+      disabled={disabled}
+      disableRipple
+      tabIndex={-1}
+      className={checkboxClasses}
+      sx={iconOnly ? { p: 0 } : undefined}
+    />
+  );
+
   return (
     <ButtonBase
       component="div"
-      className={`${styles.itemContainer} ${checked ? styles.checked : ''} ${className}`.trim()}
+      className={containerClasses}
       onClick={!disabled ? onChange : undefined}
       disabled={disabled}
-      focusRipple
+      focusRipple={!iconOnly}
       style={{ ...style, ...styleProp }}
     >
-        <ModalTooltip  text={label}>
-      <Checkbox
-        checked={checked}
-        disabled={disabled}
-        disableRipple
-        tabIndex={-1}
-      />
-      </ModalTooltip>
-     
-        <span className={styles.label}>{label}</span>
+      {label ? (
+        <ModalTooltip text={label}>
+          {checkboxElement}
+        </ModalTooltip>
+      ) : (
+        checkboxElement
+      )}
 
+      {!iconOnly && label && (
+        <span className={styles.label}>{label}</span>
+      )}
     </ButtonBase>
   );
 }

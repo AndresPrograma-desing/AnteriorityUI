@@ -1,0 +1,42 @@
+.wrapper {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  perspective: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.scene {
+  position: relative;
+  transform-style: preserve-3d;
+  animation: spin 3s linear infinite;
+}
+
+.layer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  font-size: 2.25rem;
+  font-weight: 800;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  line-height: 1;
+  white-space: nowrap;
+  color: color-mix(in srgb, var(--loading-color, #0d52f8) 55%, black);
+  user-select: none;
+}
+
+.front {
+  color: var(--loading-color, #0d52f8);
+  text-shadow: 0 0 14px color-mix(in srgb, var(--loading-color, #0d52f8) 55%, transparent);
+}
+
+@keyframes spin {
+  0% {
+    transform: rotateY(0deg) rotateX(8deg);
+  }
+  100% {
+    transform: rotateY(360deg) rotateX(8deg);
+  }
+}

@@ -48,15 +48,9 @@ const draftsFromHsv = (hsv) => ({
 
 const CHANNEL_MAX = { r: 255, g: 255, b: 255, h: 360, s: 100, l: 100 };
 
-// Colores del Input/popover numérico siguen los tokens del ColorPicker (bgColor/textColor/...).
-const inputColors = {
-    bgColor: 'var(--cp-bg, #ffffff)',
-    textColor: 'var(--cp-text, #1e293b)',
-    popoverBgColor: 'var(--cp-bg, #ffffff)',
-    popoverIconColor: 'var(--cp-text, #1e293b)',
-    popoverPlacement: 'bottom',
-};
-
+// Colores del Input numérico siguen los tokens del ColorPicker (bgColor/textColor/...) vía
+// fieldSx de abajo — Input/TextField no exponen props bgColor/textColor propias, así que el
+// único mecanismo real es `sx` leyendo las CSS vars --cp-* que ColorPicker define en su root.
 const fieldSx = (hasError) => ({
     m: 0,
     '& .MuiInputBase-root': { backgroundColor: 'var(--cp-bg, #ffffff)', color: 'var(--cp-text, #1e293b)' },
@@ -260,7 +254,6 @@ const ColorPickerPanel = ({ value, onChange, labels }) => {
             {keys.map((channel) => (
                 <div className={styles.channelField} key={channel}>
                     <Input
-                        {...inputColors}
                         label={text.channels[channel]}
                         max={CHANNEL_MAX[channel]}
                         min={0}
@@ -333,7 +326,6 @@ const ColorPickerPanel = ({ value, onChange, labels }) => {
                 <span className={styles.preview} style={{ '--swatch-color': hex }} />
                 {format === COLOR_FORMATS.HEX && (
                     <Input
-                        {...inputColors}
                         onBlur={restoreOnBlur('hex')}
                         onChange={(event) => handleHexChange(event.target.value)}
                         slotProps={{ htmlInput: { maxLength: 7, spellCheck: false, 'aria-invalid': Boolean(errors.hex) } }}

@@ -1,31 +1,44 @@
-/* Sidebar base styling */
+/* Variables base del Sidebar */
+:root {
+  --sidebar-bg: #ffffff;
+  --sidebar-text: #0f172a;
+  --sidebar-text-muted: #64748b;
+  --sidebar-text-active: #0d52f8;
+  --sidebar-hover-bg: #f1f5f9;
+  --sidebar-active-bg: #eff6ff;
+  --sidebar-border: #e2e8f0;
+  --sidebar-border-right: 1px solid #e2e8f0;
+  --sidebar-avatar-bg: #0d52f8;
+  --sidebar-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+  --sidebar-radius: 10px;
+}
+
+/* Base Sidebar */
 .sidebar {
   height: 100vh;
   max-height: 100vh;
   background: var(--sidebar-bg);
-  backdrop-filter: var(--sidebar-blur);
-  -webkit-backdrop-filter: var(--sidebar-blur);
-  border-radius: 0;
-  border: none;
   border-right: var(--sidebar-border-right);
   color: var(--sidebar-text);
-  padding: 24px 16px;
-  width: 280px;
-  min-width: 280px;
+  padding: 20px 14px;
+  width: 270px;
+  min-width: 270px;
   align-self: stretch;
   display: flex;
   flex-direction: column;
   gap: 16px;
   box-sizing: border-box;
   position: relative;
-  transition: width 0.3s ease, min-width 0.3s ease, padding 0.3s ease;
+  transition: width 0.28s cubic-bezier(0.4, 0, 0.2, 1), min-width 0.28s cubic-bezier(0.4, 0, 0.2, 1), padding 0.28s ease;
+  user-select: none;
+  overflow: hidden; /* Evita que aparezcan barras de scroll indeseadas en la estructura principal */
 }
 
-/* Collapsed state styling */
+/* Colapsado */
 .sidebar.collapsed {
-  width: 68px;
-  min-width: 68px;
-  padding: 20px 8px;
+  width: 72px;
+  min-width: 72px;
+  padding: 20px 10px;
 }
 
 .sidebarWrapper {
@@ -33,18 +46,11 @@
   height: 100%;
 }
 
-.mobileCloseBtn {
+.mobileCloseBtn, .mobileBackdrop {
   display: none;
 }
 
-.mobileBackdrop {
-  display: none;
-}
-
-/* Mobile: por debajo de 767px el sidebar se oculta fuera de pantalla y se abre como
-   drawer superpuesto (botón hamburguesa a cargo del consumidor, ej. TopBar), en vez
-   de empujar o achicar el contenido. Controlado por la prop `isMobileOpen` — este
-   componente no mide el viewport por JS, solo reacciona vía CSS a ese breakpoint. */
+/* Responsive (Mobile Drawer) */
 @media (max-width: 767px) {
   .sidebarWrapper {
     position: fixed;
@@ -53,7 +59,7 @@
     bottom: 0;
     z-index: 1300;
     transform: translateX(-100%);
-    transition: transform 0.25s ease;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .sidebarWrapper.mobileOpen {
@@ -62,17 +68,16 @@
 
   .sidebarWrapper .sidebar {
     height: 100%;
-    max-height: 100%;
     width: 280px;
     min-width: 280px;
     max-width: 85vw;
-    box-shadow: 2px 0 16px rgba(0, 0, 0, 0.18);
+    box-shadow: var(--sidebar-shadow);
   }
 
   .sidebarWrapper .sidebar.collapsed {
     width: 280px;
     min-width: 280px;
-    padding: 24px 16px;
+    padding: 20px 14px;
   }
 
   .mobileCloseBtn {
@@ -80,67 +85,40 @@
     position: absolute;
     top: 16px;
     right: 16px;
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--sidebar-border);
     background-color: #ffffff;
-    color: #475569;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    color: var(--sidebar-text-muted);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
     cursor: pointer;
     z-index: 5;
-    transition: background-color 0.2s, color 0.2s;
+    transition: all 0.2s ease;
   }
 
   .mobileCloseBtn:hover {
-    background-color: var(--sidebar-avatar-bg, #0d52f8);
-    color: #ffffff;
-    border-color: var(--sidebar-avatar-bg, #0d52f8);
+    background-color: var(--sidebar-hover-bg);
+    color: var(--sidebar-text);
   }
 
   .mobileBackdrop {
     display: block;
     position: fixed;
     inset: 0;
-    background: rgba(15, 23, 42, 0.45);
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(2px);
     z-index: 1299;
   }
 
-  .sidebarWrapper .sidebarHeader {
-    padding-right: 36px;
-  }
-
-  /* El toggle de colapsar es un concepto de escritorio (ancho fijo 280px <-> 68px);
-     en el drawer mobile el sidebar siempre ocupa su ancho completo, así que este
-     botón se oculta y solo queda el de cerrar (.mobileCloseBtn). */
   .sidebarWrapper .toggleBtn {
     display: none;
   }
 }
 
-.sidebar.collapsed .sidebarHeader {
-  justify-content: center;
-  padding: 0;
-}
-
-.sidebar.collapsed .sidebarItemBtn {
-  padding: 10px 0 !important;
-  justify-content: center !important;
-}
-
-.sidebar.collapsed .btnLayout {
-  justify-content: center !important;
-}
-
-.sidebar.collapsed .leftPart {
-  justify-content: center !important;
-  flex: none !important;
-  gap: 0 !important;
-}
-
-/* Header section */
+/* Header & Toggle Button (Alineado a la Derecha) */
 .sidebarHeader {
   display: flex;
   align-items: center;
@@ -148,6 +126,7 @@
   padding: 0 4px;
   min-height: 40px;
   gap: 8px;
+  width: 100%;
 }
 
 .headerContent {
@@ -157,257 +136,92 @@
 }
 
 .toggleBtn {
+  margin-left: auto !important; /* Empuja el botón a la derecha si no hay headerContent */
   flex-shrink: 0;
   width: 28px !important;
   height: 28px !important;
-  min-width: 0 !important;
-  padding: 0 !important;
+  border-radius: 8px !important;
+  border: 1px solid var(--sidebar-border) !important;
   background-color: #ffffff !important;
-  border: 1px solid #cbd5e1 !important;
-  color: #475569 !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08) !important;
-  z-index: 5;
-  border-radius: 50% !important;
+  color: var(--sidebar-text-muted) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  transition: background-color 0.2s, color 0.2s;
+  transition: all 0.2s ease !important;
 }
 
 .toggleBtn:hover {
-  background-color: var(--sidebar-avatar-bg, #0d52f8) !important;
-  color: #ffffff !important;
-  border-color: var(--sidebar-avatar-bg, #0d52f8) !important;
+  background-color: var(--sidebar-hover-bg) !important;
+  color: var(--sidebar-text) !important;
 }
 
-/* Search wrapper */
-.searchWrapper {
-  margin-top: 4px;
-}
-
-/* Navigation container */
+/* Navegación y Scroll */
 .navContainer {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 18px;
   flex: 1;
   overflow-y: auto;
-  padding-right: 4px;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  overflow-x: hidden; /* Elimina la barra de scroll horizontal */
+  padding-right: 2px;
+  scrollbar-width: none; /* Oculta la barra en Firefox */
+  -ms-overflow-style: none; /* Oculta la barra en IE/Edge */
 }
 
+/* Oculta la barra de scroll en Chrome, Safari y Opera */
 .navContainer::-webkit-scrollbar {
   display: none;
+  width: 0;
+  height: 0;
 }
 
-.navContainer::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
-
-/* Menu groups */
 .menuGroup {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .groupTitle {
-  font-size: 0.72rem;
+  font-size: 0.70rem;
   font-weight: 700;
   color: #94a3b8;
-  letter-spacing: 0.06em;
-  display: block;
-  padding-left: 8px;
+  letter-spacing: 0.08em;
+  padding: 0 10px;
   text-transform: uppercase;
 }
 
 .buttonList {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
-/* Sidebar list items */
+/* Botones de navegación */
 .sidebarItemBtn {
+  position: relative !important;
   width: 100% !important;
-  justify-content: flex-start !important;
-  align-items: center !important;
-  text-align: left !important;
-  padding: 10px 12px !important;
-  border-radius: 8px !important;
+  padding: 9px 12px !important;
+  border-radius: var(--sidebar-radius) !important;
   border: none !important;
-  box-shadow: none !important;
-  color: var(--sidebar-text-muted) !important;
   background-color: transparent !important;
+  color: var(--sidebar-text-muted) !important;
   text-transform: none !important;
-  display: flex !important;
-  transition: background-color 0.2s, color 0.2s !important;
+  transition: all 0.18s ease-in-out !important;
 }
-
-.btnLayout {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  width: 100% !important;
-  gap: 12px;
-}
-
-.leftPart {
-  display: flex !important;
-  align-items: center !important;
-  gap: 12px;
-  flex: 1;
-  min-width: 0;
-}
-
-.icon {
-  font-size: 20px !important;
-  color: var(--sidebar-text-muted);
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.label {
-  font-size: 0.88rem;
-  font-weight: 500;
-  color: inherit;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* Badge styles */
-.badge {
-  font-size: 0.65rem;
-  font-weight: 800;
-  padding: 2px 6px;
-  border-radius: 4px;
-  flex-shrink: 0;
-  text-transform: uppercase;
-}
-
-.badgePost { background: var(--sidebar-badge-post-bg, #dcfce7); color: var(--sidebar-badge-post-color, #15803d); }
-.badgeGet { background: var(--sidebar-badge-get-bg, #e0f2fe); color: var(--sidebar-badge-get-color, #0369a1); }
-.badgePut { background: var(--sidebar-badge-put-bg, #fef3c7); color: var(--sidebar-badge-put-color, #b45309); }
-.badgeDelete { background: var(--sidebar-badge-delete-bg, #fee2e2); color: var(--sidebar-badge-delete-color, #b91c1c); }
-.badgeInfo { background: var(--sidebar-badge-info-bg, #f1f5f9); color: var(--sidebar-badge-info-color, #475569); }
 
 .sidebarItemBtn:hover {
   background-color: var(--sidebar-hover-bg) !important;
-  color: var(--sidebar-text-active) !important;
-}
-
-.dragHandle {
-  display: inline-flex;
-  align-items: center;
-  color: var(--sidebar-text-muted);
-  opacity: 0.5;
-  flex-shrink: 0;
-  cursor: grab;
-}
-
-.sidebarItemBtn:hover .dragHandle {
-  opacity: 0.9;
-}
-
-.pinnedIcon {
-  color: var(--sidebar-pinned-icon, #f59e0b);
-  flex-shrink: 0;
-}
-
-.dragging {
-  opacity: 0.5 !important;
-}
-
-.dragOver {
-  box-shadow: inset 0 2px 0 0 #0d52f8 !important;
+  color: var(--sidebar-text) !important;
 }
 
 .sidebarItemBtn:hover .icon {
-  color: var(--sidebar-text-active) !important;
+  color: var(--sidebar-text);
 }
 
-/* Expandable items with subItems (ej. "Vacunas" -> Ver/Crear/Pendientes/Lotes) */
-.itemWithSubItems {
-  display: flex;
-  flex-direction: column;
-}
-
-.expandChevron {
-  flex-shrink: 0;
-  color: var(--sidebar-text-muted);
-  opacity: 0.7;
-  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
-}
-
-.expandChevronOpen {
-  transform: rotate(180deg);
-  opacity: 1;
-}
-
-.expandParentOpen {
-  color: var(--sidebar-text-active) !important;
-  font-weight: 600 !important;
-}
-
-.expandParentOpen .icon {
-  color: var(--sidebar-text-active) !important;
-}
-
-.subItemListWrapper {
-  display: grid;
-  grid-template-rows: 0fr;
-  margin-top: 0;
-  transition: grid-template-rows 0.28s cubic-bezier(0.4, 0, 0.2, 1), margin-top 0.28s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.subItemListWrapperOpen {
-  grid-template-rows: 1fr;
-  margin-top: 2px;
-}
-
-.subItemList {
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  margin-left: 29px;
-  padding: 2px 0 2px 14px;
-  border-left: 1.5px solid var(--sidebar-border);
-  opacity: 0;
-  transform: translateY(-4px);
-  transition: opacity 0.16s ease, transform 0.16s ease;
-}
-
-.subItemListWrapperOpen .subItemList {
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 0.22s ease 0.08s, transform 0.22s ease 0.08s;
-}
-
-.subItemBtn {
-  padding: 7px 10px !important;
-  min-height: 0 !important;
-}
-
-.subItemBtn .label {
-  font-size: 0.82rem;
-  font-weight: 500;
-}
-
-.subItemBtn.activeBtn {
-  background-color: var(--sidebar-subitem-active-bg, #e0edff) !important;
-  color: var(--sidebar-subitem-active-text, #1d4ed8) !important;
-  font-weight: 600 !important;
-}
-
-/* Active navigation item styling */
 .activeBtn {
-  background-color: var(--sidebar-hover-bg) !important;
+  background-color: var(--sidebar-active-bg) !important;
   color: var(--sidebar-text-active) !important;
   font-weight: 600 !important;
 }
@@ -416,23 +230,116 @@
   color: var(--sidebar-text-active) !important;
 }
 
-/* Footer section: groups the optional footerContent slot and the user footer together
-   so both stay bottom-aligned and share a single top divider. */
+.btnLayout {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  gap: 10px;
+}
+
+.leftPart {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.icon {
+  font-size: 18px !important;
+  color: var(--sidebar-text-muted);
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.label {
+  font-size: 0.86rem;
+  color: inherit;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Badges */
+.badge {
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.badgePost { background: #dcfce7; color: #15803d; }
+.badgeGet { background: #e0f2fe; color: #0369a1; }
+.badgePut { background: #fef3c7; color: #b45309; }
+.badgeDelete { background: #fee2e2; color: #b91c1c; }
+.badgeInfo { background: #f1f5f9; color: #475569; }
+
+/* SubItems */
+.itemWithSubItems {
+  display: flex;
+  flex-direction: column;
+}
+
+.expandChevron {
+  flex-shrink: 0;
+  color: var(--sidebar-text-muted);
+  transition: transform 0.22s ease, color 0.18s ease;
+}
+
+.expandChevronOpen {
+  transform: rotate(180deg);
+  color: var(--sidebar-text);
+}
+
+.subItemListWrapper {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.24s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.subItemListWrapperOpen {
+  grid-template-rows: 1fr;
+}
+
+.subItemList {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-left: 18px;
+  padding: 4px 0 4px 10px;
+  border-left: 1.5px solid var(--sidebar-border);
+}
+
+.subItemBtn {
+  padding: 7px 10px !important;
+  border-radius: 8px !important;
+}
+
+.subItemBtn .label {
+  font-size: 0.81rem;
+}
+
+/* Footer Section */
 .footerGroup {
   margin-top: auto;
   border-top: 1px solid var(--sidebar-border);
   padding-top: 12px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 
-/* User footer: avatar + email, opens the user menu (Ajustes, Cómo usar, Cerrar sesión, etc.) */
 .userFooter {
-  position: relative;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
 }
 
 .userFooterButton {
@@ -441,173 +348,157 @@
   gap: 10px;
   flex: 1;
   min-width: 0;
-  padding: 6px;
-  border: none;
+  padding: 8px;
+  border: 1px solid transparent;
   background: transparent;
-  border-radius: 8px;
+  border-radius: var(--sidebar-radius);
   cursor: pointer;
   text-align: left;
-  transition: background-color 0.2s;
+  transition: all 0.18s ease;
+  overflow: hidden;
 }
 
 .userFooterButton:hover {
   background-color: var(--sidebar-hover-bg);
-}
-
-/* Optional action button (ej. ajustes) al lado del perfil, para una acción
-   custom definida por quien consume el componente (ver prop userFooterAction). */
-.userFooterActionBtn {
-  flex-shrink: 0;
-  width: 32px !important;
-  height: 32px !important;
-  min-width: 0 !important;
-  padding: 0 !important;
-  color: var(--sidebar-text-muted) !important;
-  cursor: pointer;
-}
-
-.userFooterActionBtn:hover {
-  background-color: var(--sidebar-hover-bg) !important;
-  color: var(--sidebar-text) !important;
+  border-color: var(--sidebar-border);
 }
 
 .avatar {
   flex-shrink: 0;
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--sidebar-avatar-bg, #0d52f8);
+  background: var(--sidebar-avatar-bg);
   color: #ffffff;
-  font-weight: 700;
+  font-weight: 600;
   font-size: 0.85rem;
-  text-transform: uppercase;
+  box-shadow: 0 2px 4px rgba(13, 82, 248, 0.2);
 }
 
 .userEmail {
   font-size: 0.82rem;
+  font-weight: 500;
   color: var(--sidebar-text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* Rendered through a portal into document.body (see Index.jsx) so it always
-   paints above the rest of the app, regardless of the sidebar's stacking
-   context; position is computed from the trigger button's bounding rect. */
+/* Menú Flotante de Usuario (Portal) */
 .userMenu {
   position: fixed;
   background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+  border: 1px solid var(--sidebar-border);
+  border-radius: var(--sidebar-radius);
+  box-shadow: var(--sidebar-shadow);
   padding: 6px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
   z-index: 2000;
+  min-width: 210px;
 }
 
 .userMenuEmail {
   padding: 8px 10px;
   font-size: 0.78rem;
-  color: #64748b;
-  border-bottom: 1px solid #e2e8f0;
-  margin-bottom: 4px;
+  font-weight: 600;
+  color: var(--sidebar-text-muted);
+  border-bottom: 1px solid var(--sidebar-border);
+  margin-bottom: 2px;
   word-break: break-all;
 }
 
 .userMenuItem {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   width: 100%;
   padding: 8px 10px;
   border: none;
   background: transparent;
   border-radius: 6px;
-  font-size: 0.85rem;
-  font-family: inherit;
-  color: #334155;
+  font-size: 0.84rem;
+  font-weight: 500;
+  color: var(--sidebar-text);
   cursor: pointer;
   text-align: left;
+  transition: background-color 0.15s ease;
 }
 
 .userMenuItem:hover {
-  background-color: #f1f5f9;
+  background-color: var(--sidebar-hover-bg);
 }
 
 .userMenuItemDanger {
-  color: #dc2626;
+  color: #ef4444;
 }
 
 .userMenuItemDanger:hover {
   background-color: #fef2f2;
 }
 
-/* Legal/secondary links (ej. "Política de Privacidad", "Términos del Servicio"),
-   agrupados debajo de los botones de acción dentro del mismo menú de usuario. */
+/* Enlaces del pie de usuario (Legales) */
 .userMenuLinks {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 4px;
+  gap: 6px;
   margin-top: 4px;
-  padding: 8px 10px 6px;
-  border-top: 1px solid #e2e8f0;
+  padding: 8px 10px 4px;
+  border-top: 1px solid var(--sidebar-border);
 }
 
 .userMenuLinkItem {
-  font-size: 0.72rem;
-  color: #94a3b8;
+  font-size: 0.75rem;
+  color: var(--sidebar-text-muted);
   text-decoration: none;
+  transition: color 0.15s ease;
+  display: block;
 }
 
 .userMenuLinkItem:hover {
+  color: var(--sidebar-text-active);
   text-decoration: underline;
-  color: #334155;
 }
 
-/* Right-click context menu for sidebar items (Editar / Eliminar).
-   Also rendered through a portal into document.body — see Index.jsx. */
+/* Context Menu */
 .contextMenu {
   position: fixed;
   background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+  border: 1px solid var(--sidebar-border);
+  border-radius: var(--sidebar-radius);
+  box-shadow: var(--sidebar-shadow);
   padding: 6px;
   display: flex;
   flex-direction: column;
   gap: 2px;
   z-index: 2000;
-  min-width: 150px;
+  min-width: 160px;
 }
 
 .contextMenuItem {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   width: 100%;
   padding: 8px 10px;
   border: none;
   background: transparent;
   border-radius: 6px;
-  font-size: 0.85rem;
-  font-family: inherit;
-  color: #334155;
+  font-size: 0.84rem;
+  color: var(--sidebar-text);
   cursor: pointer;
-  text-align: left;
 }
 
 .contextMenuItem:hover {
-  background-color: #f1f5f9;
+  background-color: var(--sidebar-hover-bg);
 }
 
 .contextMenuItemDanger {
-  color: #dc2626;
+  color: #ef4444;
 }
 
 .contextMenuItemDanger:hover {

@@ -1,0 +1,202 @@
+.calendarGrid {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.headerTitleContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 8px;
+  transition: background-color 0.15s ease;
+}
+
+.headerTitleContainer:hover {
+  background-color: #f8fafc;
+}
+
+.monthName {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1e293b;
+  text-transform: capitalize;
+}
+
+.dropdownChevron {
+  color: #94a3b8;
+  transition: transform 0.2s ease;
+}
+
+.chevronChevronOpen {
+  transform: rotate(180deg);
+  color: var(--cp-accent, #6366f1);
+}
+
+.selectorsPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0.5rem 0;
+  animation: fadeIn 0.2s ease;
+}
+
+.selectorGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.rangeHint {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #94a3b8;
+  text-align: center;
+  margin-bottom: 0.6rem;
+}
+
+.weekDaysGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  margin-bottom: 0.4rem;
+  text-align: center;
+}
+
+.weekDayName {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #cbd5e1;
+  text-transform: uppercase;
+  width: 36px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: auto;
+}
+
+.daysGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  text-align: center;
+}
+
+.dayCell {
+  position: relative;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #334155;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: auto;
+  border-radius: 50%;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.15s ease;
+}
+
+/* Anillo de color para el día con feriado/efeméride — box-shadow en vez de
+   border para no sumar grosor al tamaño fijo de 36x36px de la celda (el
+   objetivo es no tocar el tamaño de los días, solo el popover chico lo exige
+   explícitamente; el modo agenda grande sí usa un border real). */
+.hasHoliday {
+  box-shadow: 0 0 0 2px var(--cp-holiday-border, #ef4444);
+}
+
+/* Punto diminuto en la esquina inferior derecha que indica fase lunar —
+   position:absolute, no participa del layout de la celda. El detalle
+   completo (qué fase es) se revela en el ModalTooltip al hover, no acá. */
+.moonDot {
+  position: absolute;
+  bottom: 1px;
+  right: 1px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--cp-moon-dot, #64748b);
+}
+
+.dayCell:hover:not(.otherMonth) {
+  background-color: #f1f5f9;
+  color: #0f172a;
+}
+
+.todayDay {
+  font-weight: 700;
+  color: var(--cp-accent, #6366f1);
+}
+
+.selectedDay {
+  background-color: var(--cp-selected, #6366f1);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* :hover tiene que empatar o superar la especificidad de
+   `.dayCell:hover:not(.otherMonth)` de arriba (0,3,0) — por eso el prefijo
+   `.dayCell.` acá y en los overrides de rango de abajo; si no, el gris de
+   hover le gana visualmente al color de selección/rango. */
+.dayCell.selectedDay:hover {
+  background-color: var(--cp-selected, #6366f1);
+  filter: brightness(0.92);
+}
+
+/* Modo rango: días intermedios con fondo tenue, extremos con círculo sólido */
+.inRange {
+  background-color: color-mix(in srgb, var(--cp-selected, #6366f1) 12%, transparent);
+  border-radius: 8px;
+}
+
+.dayCell.inRange:hover {
+  background-color: color-mix(in srgb, var(--cp-selected, #6366f1) 20%, transparent);
+}
+
+.rangeStart,
+.rangeEnd {
+  background-color: var(--cp-selected, #6366f1);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.dayCell.rangeStart:hover,
+.dayCell.rangeEnd:hover {
+  background-color: var(--cp-selected, #6366f1);
+  filter: brightness(0.92);
+}
+
+.rangePreviewEdge {
+  opacity: 0.6;
+}
+
+.otherMonth {
+  color: #e2e8f0;
+  cursor: not-allowed;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #f1f5f9;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

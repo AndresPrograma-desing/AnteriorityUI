@@ -234,6 +234,10 @@ export function DateWidget({ label, value, required, disabled, readonly, onChang
 
 // rjsf resuelve RadioWidget para enum + 'ui:widget': 'radio' (igual que rjsf
 // nativo). enumOptions viene en options, igual que en SelectWidget.
+// La prop de color (options.color, el mismo nombre que acepta <RadioGroup>/<Radio> de MUI:
+// 'primary'|'secondary'|etc., no un hex libre) se pasa vía ui:options en el uiSchema del
+// consumidor, igual que bgColor/textColor/etc. en ColorWidget. RadioGroup ya propaga su prop
+// color a cada <Radio> hijo automáticamente, así que alcanza con pasarla una sola vez acá.
 export function RadioWidget({ id, value, disabled, readonly, label, options, onChange }) {
   const enumOptions = options?.enumOptions || [];
   return (
@@ -242,6 +246,7 @@ export function RadioWidget({ id, value, disabled, readonly, label, options, onC
       name={id}
       value={value ?? ''}
       disabled={disabled || readonly}
+      color={options?.color}
       onChange={(e) => onChange(e.target.value === '' ? undefined : e.target.value)}
     >
       {enumOptions.map((opt) => (
@@ -254,13 +259,21 @@ export function RadioWidget({ id, value, disabled, readonly, label, options, onC
 // Widget para schema { type: 'string', format: 'color' } (convención estándar
 // de rjsf para selectores de color). A diferencia de CalendarPicker, el
 // onChange de ColorPicker entrega el hex ya desenvuelto (no un evento).
-export function ColorWidget({ label, value, disabled, readonly, onChange }) {
+// Las props de color del popover (bgColor/textColor/borderColor/accentColor) se pasan vía
+// ui:options en el uiSchema del consumidor, igual que options.inputType en TextWidget o
+// options.accept en FileWidget — necesarias porque el <ColorPicker> no tiene aquí ningún
+// prop directo donde el consumidor del formulario pueda tematizarlo.
+export function ColorWidget({ label, value, disabled, readonly, onChange, options }) {
   return (
     <ColorPicker
       label={label}
       value={value || undefined}
       disabled={disabled || readonly}
       onChange={(next) => onChange(next || undefined)}
+      bgColor={options?.bgColor}
+      textColor={options?.textColor}
+      borderColor={options?.borderColor}
+      accentColor={options?.accentColor}
     />
   );
 }
@@ -268,7 +281,9 @@ export function ColorWidget({ label, value, disabled, readonly, onChange }) {
 // Pisa el RangeWidget nativo de rjsf (number/integer + 'ui:widget': 'range')
 // con el Slider de la librería. min/max/step vienen del propio schema
 // (minimum/maximum/multipleOf), igual que en el range input nativo de rjsf.
-export function RangeWidget({ id, value, disabled, readonly, schema, onChange }) {
+// options.accentColor (el mismo nombre que acepta <Slider>) se pasa vía ui:options en el
+// uiSchema del consumidor, igual que en ColorWidget/RadioWidget.
+export function RangeWidget({ id, value, disabled, readonly, schema, options, onChange }) {
   const min = schema?.minimum ?? 0;
   const max = schema?.maximum ?? 100;
   const step = schema?.multipleOf ?? 1;
@@ -281,6 +296,7 @@ export function RangeWidget({ id, value, disabled, readonly, schema, onChange })
       step={step}
       disabled={disabled || readonly}
       showPercentage
+      accentColor={options?.accentColor}
       onChange={(next) => onChange(next)}
     />
   );

@@ -15,3 +15,11 @@ export const TEXTS = {
   collaboratorsItem: "Colaboradores",
   closeMobileMenu: "Cerrar menú"
 };
+
+export const DEFAULT_METHOD_BADGE_COLORS = {
+  post: { bg: '#dcfce7', color: '#15803d' },
+  get: { bg: '#e0f2fe', color: '#0369a1' },
+  put: { bg: '#fef3c7', color: '#b45309' },
+  delete: { bg: '#fee2e2', color: '#b91c1c' },
+  info: { bg: '#f1f5f9', color: '#475569' },
+};
