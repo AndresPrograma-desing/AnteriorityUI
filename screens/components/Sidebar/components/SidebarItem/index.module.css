@@ -1,0 +1,132 @@
+/* Botones de navegación */
+.sidebarItemBtn {
+  position: relative !important;
+  width: 100% !important;
+  padding: 9px 12px !important;
+  border-radius: var(--sidebar-radius) !important;
+  border: none !important;
+  background-color: transparent !important;
+  color: var(--sidebar-text-muted) !important;
+  text-transform: none !important;
+  transition: all 0.18s ease-in-out !important;
+}
+
+.sidebarItemBtn:hover {
+  background-color: var(--sidebar-hover-bg) !important;
+  color: var(--sidebar-text) !important;
+}
+
+.sidebarItemBtn:hover .icon {
+  color: var(--sidebar-text);
+}
+
+.activeBtn {
+  background-color: var(--sidebar-active-bg) !important;
+  color: var(--sidebar-text-active) !important;
+  font-weight: 600 !important;
+}
+
+.activeBtn .icon {
+  color: var(--sidebar-text-active) !important;
+}
+
+.btnLayout {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  gap: 10px;
+}
+
+.leftPart {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.icon {
+  font-size: 18px !important;
+  color: var(--sidebar-text-muted);
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.label {
+  font-size: 0.86rem;
+  color: inherit;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Badges */
+.badge {
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.badgePost { background: #dcfce7; color: #15803d; }
+.badgeGet { background: #e0f2fe; color: #0369a1; }
+.badgePut { background: #fef3c7; color: #b45309; }
+.badgeDelete { background: #fee2e2; color: #b91c1c; }
+.badgeInfo { background: #f1f5f9; color: #475569; }
+
+/* SubItems */
+.itemWithSubItems {
+  display: flex;
+  flex-direction: column;
+}
+
+.expandChevron {
+  flex-shrink: 0;
+  color: var(--sidebar-text-muted);
+  transition: transform 0.22s ease, color 0.18s ease;
+}
+
+.expandChevronOpen {
+  transform: rotate(180deg);
+  color: var(--sidebar-text);
+}
+
+.subItemListWrapper {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.24s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.subItemListWrapperOpen {
+  grid-template-rows: 1fr;
+}
+
+.subItemList {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-left: 18px;
+  padding: 4px 0 4px 10px;
+  border-left: 1.5px solid var(--sidebar-border);
+}
+
+.subItemBtn {
+  padding: 7px 10px !important;
+  border-radius: 8px !important;
+}
+
+.subItemBtn .label {
+  font-size: 0.81rem;
+}
+
+/* Nota: .dragHandle, .dragging, .dragOver y .pinnedIcon se referencian en el JSX (ver
+   SidebarItem/index.jsx) pero no tienen regla definida aquí ni la tenían en el
+   index.module.css original del Sidebar antes de este split — se preserva tal cual
+   (sin estilo aplicado) para no introducir un cambio visual nuevo. */

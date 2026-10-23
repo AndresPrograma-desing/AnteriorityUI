@@ -35,3 +35,24 @@ export const WithCopyableTitleAndCode = {
       '# Guía rápida\n\nPasa el mouse sobre el título para ver el botón de copiar, y sobre el bloque de código para copiarlo completo.\n\n```js\nfunction fibonacci(n) {\n  if (n <= 1) return n;\n  return fibonacci(n - 1) + fibonacci(n - 2);\n}\n\nconsole.log(fibonacci(10));\n```',
   },
 };
+
+export const WithImage = {
+  args: {
+    children:
+      '# Captura de pantalla\n\n![Logo de ejemplo](https://via.placeholder.com/320x120.png?text=Imagen+de+ejemplo)\n\nLas imágenes usan la sintaxis estándar de markdown: `![alt](url)`.',
+  },
+};
+
+export const WithColoredText = {
+  args: {
+    children:
+      'Este párrafo tiene {color:#ef4444}texto en rojo{/color}, {color:#16a34a}texto en verde{/color} y {color:#2563eb}texto en azul{/color} usando la sintaxis `{color:X}texto{/color}`.\n\nTambién funciona dentro de **negrita con {color:#d97706}color adentro{/color}**.',
+  },
+};
+
+export const WithBarePastedImageUrl = {
+  args: {
+    children:
+      '# Imagen pegada directa\n\nSi pegás una URL sola en su propia línea (sin escribir `![alt](url)`), se muestra como imagen automáticamente — útil para URLs de Google Images u otros servicios que no terminan en `.png`/`.jpg`.\n\nhttps://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFvLKiCCYeL-dqH4i8rEAHVcLw9aMIxp3qFmMk-CMDjg&s=10',
+  },
+};

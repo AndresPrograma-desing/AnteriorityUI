@@ -11,6 +11,10 @@
   --sidebar-avatar-bg: #0d52f8;
   --sidebar-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
   --sidebar-radius: 10px;
+
+  /* Botón Filtro Activo por defecto */
+  --sidebar-filter-btn-active-bg: #eff6ff;
+  --sidebar-filter-btn-active-color: #0d52f8;
 }
 
 /* Base Sidebar */
@@ -31,7 +35,7 @@
   position: relative;
   transition: width 0.28s cubic-bezier(0.4, 0, 0.2, 1), min-width 0.28s cubic-bezier(0.4, 0, 0.2, 1), padding 0.28s ease;
   user-select: none;
-  overflow: hidden; /* Evita que aparezcan barras de scroll indeseadas en la estructura principal */
+  overflow: hidden;
 }
 
 /* Colapsado */
@@ -118,7 +122,7 @@
   }
 }
 
-/* Header & Toggle Button (Alineado a la Derecha) */
+/* Header & Acciones */
 .sidebarHeader {
   display: flex;
   align-items: center;
@@ -135,8 +139,15 @@
   overflow: hidden;
 }
 
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
 .toggleBtn {
-  margin-left: auto !important; /* Empuja el botón a la derecha si no hay headerContent */
   flex-shrink: 0;
   width: 28px !important;
   height: 28px !important;
@@ -164,19 +175,21 @@
   gap: 18px;
   flex: 1;
   overflow-y: auto;
-  overflow-x: hidden; /* Elimina la barra de scroll horizontal */
+  overflow-x: hidden;
   padding-right: 2px;
-  scrollbar-width: none; /* Oculta la barra en Firefox */
-  -ms-overflow-style: none; /* Oculta la barra en IE/Edge */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
-/* Oculta la barra de scroll en Chrome, Safari y Opera */
 .navContainer::-webkit-scrollbar {
   display: none;
   width: 0;
   height: 0;
 }
 
+/* .menuGroup y .buttonList son compartidas entre el render real de grupos (este archivo)
+   y SidebarSkeleton, que las importa desde acá para que el estado de carga use el mismo
+   layout que el contenido real. */
 .menuGroup {
   display: flex;
   flex-direction: column;
@@ -198,134 +211,6 @@
   gap: 4px;
 }
 
-/* Botones de navegación */
-.sidebarItemBtn {
-  position: relative !important;
-  width: 100% !important;
-  padding: 9px 12px !important;
-  border-radius: var(--sidebar-radius) !important;
-  border: none !important;
-  background-color: transparent !important;
-  color: var(--sidebar-text-muted) !important;
-  text-transform: none !important;
-  transition: all 0.18s ease-in-out !important;
-}
-
-.sidebarItemBtn:hover {
-  background-color: var(--sidebar-hover-bg) !important;
-  color: var(--sidebar-text) !important;
-}
-
-.sidebarItemBtn:hover .icon {
-  color: var(--sidebar-text);
-}
-
-.activeBtn {
-  background-color: var(--sidebar-active-bg) !important;
-  color: var(--sidebar-text-active) !important;
-  font-weight: 600 !important;
-}
-
-.activeBtn .icon {
-  color: var(--sidebar-text-active) !important;
-}
-
-.btnLayout {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  width: 100% !important;
-  gap: 10px;
-}
-
-.leftPart {
-  display: flex !important;
-  align-items: center !important;
-  gap: 10px;
-  flex: 1;
-  min-width: 0;
-}
-
-.icon {
-  font-size: 18px !important;
-  color: var(--sidebar-text-muted);
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.label {
-  font-size: 0.86rem;
-  color: inherit;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* Badges */
-.badge {
-  font-size: 0.62rem;
-  font-weight: 700;
-  padding: 2px 7px;
-  border-radius: 6px;
-  flex-shrink: 0;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-}
-
-.badgePost { background: #dcfce7; color: #15803d; }
-.badgeGet { background: #e0f2fe; color: #0369a1; }
-.badgePut { background: #fef3c7; color: #b45309; }
-.badgeDelete { background: #fee2e2; color: #b91c1c; }
-.badgeInfo { background: #f1f5f9; color: #475569; }
-
-/* SubItems */
-.itemWithSubItems {
-  display: flex;
-  flex-direction: column;
-}
-
-.expandChevron {
-  flex-shrink: 0;
-  color: var(--sidebar-text-muted);
-  transition: transform 0.22s ease, color 0.18s ease;
-}
-
-.expandChevronOpen {
-  transform: rotate(180deg);
-  color: var(--sidebar-text);
-}
-
-.subItemListWrapper {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows 0.24s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.subItemListWrapperOpen {
-  grid-template-rows: 1fr;
-}
-
-.subItemList {
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  margin-left: 18px;
-  padding: 4px 0 4px 10px;
-  border-left: 1.5px solid var(--sidebar-border);
-}
-
-.subItemBtn {
-  padding: 7px 10px !important;
-  border-radius: 8px !important;
-}
-
-.subItemBtn .label {
-  font-size: 0.81rem;
-}
-
 /* Footer Section */
 .footerGroup {
   margin-top: auto;
@@ -336,171 +221,5 @@
   gap: 8px;
 }
 
-.userFooter {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.userFooterButton {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex: 1;
-  min-width: 0;
-  padding: 8px;
-  border: 1px solid transparent;
-  background: transparent;
-  border-radius: var(--sidebar-radius);
-  cursor: pointer;
-  text-align: left;
-  transition: all 0.18s ease;
-  overflow: hidden;
-}
-
-.userFooterButton:hover {
-  background-color: var(--sidebar-hover-bg);
-  border-color: var(--sidebar-border);
-}
-
-.avatar {
-  flex-shrink: 0;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--sidebar-avatar-bg);
-  color: #ffffff;
-  font-weight: 600;
-  font-size: 0.85rem;
-  box-shadow: 0 2px 4px rgba(13, 82, 248, 0.2);
-}
-
-.userEmail {
-  font-size: 0.82rem;
-  font-weight: 500;
-  color: var(--sidebar-text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* Menú Flotante de Usuario (Portal) */
-.userMenu {
-  position: fixed;
-  background: #ffffff;
-  border: 1px solid var(--sidebar-border);
-  border-radius: var(--sidebar-radius);
-  box-shadow: var(--sidebar-shadow);
-  padding: 6px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  z-index: 2000;
-  min-width: 210px;
-}
-
-.userMenuEmail {
-  padding: 8px 10px;
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--sidebar-text-muted);
-  border-bottom: 1px solid var(--sidebar-border);
-  margin-bottom: 2px;
-  word-break: break-all;
-}
-
-.userMenuItem {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  padding: 8px 10px;
-  border: none;
-  background: transparent;
-  border-radius: 6px;
-  font-size: 0.84rem;
-  font-weight: 500;
-  color: var(--sidebar-text);
-  cursor: pointer;
-  text-align: left;
-  transition: background-color 0.15s ease;
-}
-
-.userMenuItem:hover {
-  background-color: var(--sidebar-hover-bg);
-}
-
-.userMenuItemDanger {
-  color: #ef4444;
-}
-
-.userMenuItemDanger:hover {
-  background-color: #fef2f2;
-}
-
-/* Enlaces del pie de usuario (Legales) */
-.userMenuLinks {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-top: 4px;
-  padding: 8px 10px 4px;
-  border-top: 1px solid var(--sidebar-border);
-}
-
-.userMenuLinkItem {
-  font-size: 0.75rem;
-  color: var(--sidebar-text-muted);
-  text-decoration: none;
-  transition: color 0.15s ease;
-  display: block;
-}
-
-.userMenuLinkItem:hover {
-  color: var(--sidebar-text-active);
-  text-decoration: underline;
-}
-
-/* Context Menu */
-.contextMenu {
-  position: fixed;
-  background: #ffffff;
-  border: 1px solid var(--sidebar-border);
-  border-radius: var(--sidebar-radius);
-  box-shadow: var(--sidebar-shadow);
-  padding: 6px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  z-index: 2000;
-  min-width: 160px;
-}
-
-.contextMenuItem {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  padding: 8px 10px;
-  border: none;
-  background: transparent;
-  border-radius: 6px;
-  font-size: 0.84rem;
-  color: var(--sidebar-text);
-  cursor: pointer;
-}
-
-.contextMenuItem:hover {
-  background-color: var(--sidebar-hover-bg);
-}
-
-.contextMenuItemDanger {
-  color: #ef4444;
-}
-
-.contextMenuItemDanger:hover {
-  background-color: #fef2f2;
-}
+/* Nota: .footerContent se referencia en el JSX pero no tenía regla definida en el
+   index.module.css original del Sidebar — se preserva tal cual (sin estilo propio). */

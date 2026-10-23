@@ -21,8 +21,18 @@
   align-items: center;
   gap: 4px;
   min-width: 0;
+  flex-shrink: 1;
   animation: crumbEnter 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
   animation-delay: calc(var(--crumb-index, 0) * 45ms);
+}
+
+/* El crumb actual (siempre el último) es el que más probablemente trae el
+   label más largo (título de sesión, nombre de archivo, etc.) — se le da
+   prioridad para encogerse y ocupar el espacio que sobra, en vez de competir
+   en partes iguales con los crumbs anteriores (que suelen ser cortos). */
+.item:last-child {
+  flex-shrink: 999;
+  min-width: 24px;
 }
 
 @keyframes crumbEnter {
@@ -52,6 +62,7 @@
   position: relative;
   display: inline-flex;
   align-items: center;
+  min-width: 0;
   border: none;
   background: transparent;
   padding: 3px 2px;
@@ -68,7 +79,14 @@
 
 .linkLabel {
   position: relative;
-  display: inline-block;
+  display: block;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+  min-width: 0;
+  flex-shrink: 1;
 }
 
 .linkLabel::after {
@@ -106,6 +124,7 @@
 }
 
 .crumbText {
+  display: inline-block;
   font-size: 0.95rem;
   font-weight: 600;
   color: var(--crumb-link-color, #9ba1ae);
@@ -113,6 +132,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 360px;
+  min-width: 0;
 }
 
 /* Current page: same plain text as the other crumbs, just bolder/brighter —
@@ -134,7 +154,7 @@
 }
 
 .separator {
-  color: #4b5563;
+  color: var(--crumb-separator-color, #4b5563);
   flex-shrink: 0;
   font-size: 0.85rem;
   line-height: 1;

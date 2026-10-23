@@ -1,0 +1,39 @@
+.navLinks {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+}
+
+.navLinkWrapper {
+    position: relative;
+    display: flex;
+}
+
+.navLink {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border: none;
+    background: transparent;
+    padding: 0;
+    color: var(--topbar-navlink-color, var(--topbar-text, #0f172a));
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.navLink:hover,
+.navLinkOpen {
+    color: var(--topbar-navlink-active, var(--topbar-accent, #0ea5e9));
+}
+
+.navLinkChevron {
+    transition: transform 0.15s ease;
+}
+
+.navLinkChevronOpen {
+    transform: rotate(180deg);
+}

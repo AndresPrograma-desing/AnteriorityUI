@@ -1,21 +1,15 @@
-import React, { useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Menu, Search, MoreHorizontal, X } from 'lucide-react';
 import Breadcrumbs from '../Breadcrumbs/index';
-import Skeleton from '../Skeleton/index';
 import CommandPalette from '../CommandPalette/index';
 import Button from '../Button/index';
 import KeyboardShortcut from '../KeyboardShortcut/index';
-import SearchBar from './components/SearchBar/index';
-import TopBarActions from './components/TopBarActions/index';
-import UserMenu from './components/UserMenu/index';
-import NavLinks from './components/NavLinks/index';
-import MobileActionsPanel from './components/MobileActionsPanel/index';
+import { TopBarSkeleton, SearchBar, TopBarActions, UserMenu, NavLinks, MobileActionsPanel } from './components/index.js';
 import styles from './index.module.css';
 import { buildThemeVars, hasActionHoverEnabled, hasCenterSearch } from './utils.js';
 import {
     DEFAULT_BREADCRUMB_LINK_COLOR,
     DEFAULT_BREADCRUMB_CURRENT_COLOR,
-    DEFAULT_SKELETON_ACTIONS_COUNT,
     DEFAULT_COMMAND_PALETTE_PLACEHOLDER,
     DEFAULT_MOBILE_MENU_LABEL,
     DEFAULT_MOBILE_ACTIONS_LABEL,
@@ -139,77 +133,24 @@ function TopBar(props) {
     });
 
     if (isTopBarLoading) {
-        const actionsCount = skeletonActionsCount !== undefined
-            ? skeletonActionsCount
-            : ('actions' in props && Array.isArray(props.actions) ? props.actions.length : DEFAULT_SKELETON_ACTIONS_COUNT);
-        const showCenterSearchSkeleton = hasCenterSearch({ centerContent, searchProps, commandItems });
-        const hasCenterContent = Boolean(centerContent);
         const hasUser = user !== null && user !== false && ('user' in props ? Boolean(props.user) : true);
-        const hasLogo = logo !== null && logo !== false;
 
         return (
-            <header className={`${styles.topbar} ${className}`} style={themeVars} aria-busy="true">
-                <div className={styles.leftSection}>
-                    {onMenuClick && (
-                        <button type="button" className={styles.mobileMenuButton} disabled aria-hidden="true">
-                            <Menu size={20} />
-                        </button>
-                    )}
-
-                    {hasLogo && (
-                        <Skeleton width="32px" height="32px" radius="8px" />
-                    )}
-
-                    {breadcrumbItems && breadcrumbItems.length > 0 ? (
-                        <div className={styles.skeletonBreadcrumbs}>
-                            {breadcrumbItems.map((_, idx) => (
-                                <React.Fragment key={idx}>
-                                    {idx > 0 && <span className={styles.skeletonBreadcrumbSeparator}>/</span>}
-                                    <Skeleton
-                                        width={`${Math.max(48, Math.min(100, 52 + idx * 24))}px`}
-                                        height="14px"
-                                        radius="4px"
-                                    />
-                                </React.Fragment>
-                            ))}
-                        </div>
-                    ) : title ? (
-                        <Skeleton width="130px" height="18px" radius="4px" />
-                    ) : (
-                        <div className={styles.skeletonBreadcrumbs}>
-                            <Skeleton width="60px" height="14px" radius="4px" />
-                            <span className={styles.skeletonBreadcrumbSeparator}>/</span>
-                            <Skeleton width="90px" height="14px" radius="4px" />
-                        </div>
-                    )}
-                </div>
-
-                <div className={styles.centerSection}>
-                    {showCenterSearchSkeleton ? (
-                        <div className={styles.searchWrapper}>
-                            <Skeleton width="100%" height="36px" radius="8px" />
-                        </div>
-                    ) : hasCenterContent ? (
-                        <Skeleton width="240px" height="36px" radius="8px" />
-                    ) : null}
-                </div>
-
-                <div className={styles.rightSection}>
-                    {actionsCount > 0 && Array.from({ length: actionsCount }).map((_, idx) => (
-                        <span key={`skeleton-action-${idx}`} className={styles.actionBtnWrapper}>
-                            <Skeleton width="34px" height="34px" radius="6px" />
-                        </span>
-                    ))}
-
-                    {showDivider && actionsCount > 0 && hasUser && (
-                        <span className={styles.actionsDivider} aria-hidden="true" />
-                    )}
-
-                    {hasUser && (
-                        <Skeleton circle width="32px" height="32px" />
-                    )}
-                </div>
-            </header>
+            <TopBarSkeleton
+                className={className}
+                themeVars={themeVars}
+                onMenuClick={onMenuClick}
+                logo={logo}
+                breadcrumbItems={breadcrumbItems}
+                title={title}
+                centerContent={centerContent}
+                searchProps={searchProps}
+                commandItems={commandItems}
+                hasUser={hasUser}
+                actions={'actions' in props ? props.actions : undefined}
+                skeletonActionsCount={skeletonActionsCount}
+                showDivider={showDivider}
+            />
         );
     }
 

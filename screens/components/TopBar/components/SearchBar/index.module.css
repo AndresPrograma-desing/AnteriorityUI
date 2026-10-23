@@ -1,0 +1,48 @@
+.searchIcon {
+    position: absolute;
+    left: 12px;
+    color: var(--topbar-icon, #94a3b8);
+    pointer-events: none;
+}
+
+.searchInput {
+    width: 100%;
+    height: 36px;
+    padding: 0 40px 0 36px;
+    border-radius: 8px;
+    border: 1px solid var(--topbar-border, #e2e8f0);
+    background-color: var(--topbar-search-bg, #f8fafc);
+    color: var(--topbar-text, #0f172a);
+    font-size: 0.85rem;
+    font-family: inherit;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.searchInput::placeholder {
+    color: var(--topbar-icon, #94a3b8);
+}
+
+.searchInput:focus {
+    border-color: var(--topbar-accent, #0ea5e9);
+    background-color: var(--topbar-bg, #ffffff);
+}
+
+.searchShortcut {
+    position: absolute;
+    right: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    border-radius: 4px;
+    border: 1px solid var(--topbar-border, #e2e8f0);
+    background-color: var(--topbar-bg, #ffffff);
+    color: var(--topbar-icon, #94a3b8);
+    font-size: 0.68rem;
+    font-family: inherit;
+    pointer-events: none;
+}

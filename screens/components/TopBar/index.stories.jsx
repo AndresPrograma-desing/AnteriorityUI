@@ -17,6 +17,8 @@ const Logo = () => <SiPubg size={28} color="#f2a900" />;
 const breadcrumbItems = [
   { label: 'Mi Empresa', onClick: () => console.log('empresa clicked') },
   { label: 'Proyecto' },
+  { label: 'wedrfghjhgfdsdfghjkjhgfghjk' },
+  { label: 'qwertyuiopasdfghjklzxcvbnmqwertyu' },
 ];
 
 const actions = [

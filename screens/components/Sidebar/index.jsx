@@ -1,14 +1,12 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
-import { ChevronDown, ChevronLeft, ChevronRight, X, Pencil, Trash2, Pin, PinOff, GripVertical, Users } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import Button from '../Button/index';
-import Skeleton from '../Skeleton/index';
 import KeyboardShortcut from '../KeyboardShortcut/index';
+import { SidebarItem, SidebarSkeleton, FilterPopover, UserFooter, ItemContextMenu } from './components/index.js';
 import styles from './index.module.css';
-import { TEXTS } from './constants';
-import { findParentIdForActiveItem, getBadgeClass, getInitial, toggleSidebarCollapsed } from './utils';
+import { TEXTS, DEFAULT_METHOD_BADGE_COLORS } from './constants';
+import { findParentIdForActiveItem, toggleSidebarCollapsed } from './utils';
 import ModalTooltip from '../ModalTooltip/ModalTooltip';
-import { DEFAULT_METHOD_BADGE_COLORS } from './constants';
 
 export const ProSidebar = ({
   groups,
@@ -37,8 +35,21 @@ export const ProSidebar = ({
   isMobileOpen = false,
   onCloseMobile,
   style,
+  enableFilter = false,
+  currentFilter,
+  onFilterChange,
+  filterIcon,
+  filterBtnActiveBg,
+  filterBtnActiveColor,
+  filterPopoverBg,
+  filterPopoverTextColor,
+  filterPopoverTitleColor,
+  filterPopoverBorderColor,
+  filterPopoverHoverBg,
+  filterPopoverActiveBg,
+  filterPopoverActiveTextColor,
+  filterPopoverCheckColor,
 }) => {
-  // Se lee localStorage pero por defecto iniciará visible / desplegado (false)
   const [isCollapsed, setIsCollapsed] = useState(() => {
     const saved = localStorage.getItem('sidebar_collapsed');
     return saved !== null ? saved === 'true' : false;
@@ -50,14 +61,9 @@ export const ProSidebar = ({
     return parentId ? new Set([parentId]) : new Set();
   });
 
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const [userMenuPosition, setUserMenuPosition] = useState(null);
   const [contextMenu, setContextMenu] = useState(null);
   const [draggedItemId, setDraggedItemId] = useState(null);
   const [dragOverItemId, setDragOverItemId] = useState(null);
-
-  const userFooterButtonRef = useRef(null);
-  const userMenuRef = useRef(null);
   const contextMenuRef = useRef(null);
 
   const canShowItemContextMenu = Boolean(onItemEdit || onItemDelete || onItemPin);
@@ -75,8 +81,22 @@ export const ProSidebar = ({
     ...(pinnedIconColor ? { '--sidebar-pinned-icon': pinnedIconColor } : {}),
     ...(subItemActiveBgColor ? { '--sidebar-subitem-active-bg': subItemActiveBgColor } : {}),
     ...(subItemActiveTextColor ? { '--sidebar-subitem-active-text': subItemActiveTextColor } : {}),
+    ...(filterBtnActiveBg ? { '--sidebar-filter-btn-active-bg': filterBtnActiveBg } : {}),
+    ...(filterBtnActiveColor ? { '--sidebar-filter-btn-active-color': filterBtnActiveColor } : {}),
     ...badgeThemeVars,
     ...style,
+  };
+
+  // Variables CSS específicas para inyectar directo al Popover en el Portal
+  const popoverThemeVars = {
+    ...(filterPopoverBg ? { '--popover-bg': filterPopoverBg } : {}),
+    ...(filterPopoverTextColor ? { '--popover-text': filterPopoverTextColor } : {}),
+    ...(filterPopoverTitleColor ? { '--popover-title': filterPopoverTitleColor } : {}),
+    ...(filterPopoverBorderColor ? { '--popover-border': filterPopoverBorderColor } : {}),
+    ...(filterPopoverHoverBg ? { '--popover-hover-bg': filterPopoverHoverBg } : {}),
+    ...(filterPopoverActiveBg ? { '--popover-active-bg': filterPopoverActiveBg } : {}),
+    ...(filterPopoverActiveTextColor ? { '--popover-active-text': filterPopoverActiveTextColor } : {}),
+    ...(filterPopoverCheckColor ? { '--popover-check-color': filterPopoverCheckColor } : {}),
   };
 
   const handleDragStart = (event, item) => {
@@ -93,7 +113,7 @@ export const ProSidebar = ({
     setDragOverItemId((prev) => (prev === item.id ? null : prev));
   };
 
-  const handleDrop = (event, groupItems, targetItem) => {
+  const makeHandleDrop = (groupItems) => (event, targetItem) => {
     event.preventDefault();
     setDragOverItemId(null);
     if (!draggedItemId || draggedItemId === targetItem.id) return;
@@ -122,28 +142,6 @@ export const ProSidebar = ({
       return next;
     });
   };
-
-  useLayoutEffect(() => {
-    if (!isUserMenuOpen || !userFooterButtonRef.current) return;
-    const rect = userFooterButtonRef.current.getBoundingClientRect();
-    setUserMenuPosition({
-      bottom: window.innerHeight - rect.top + 8,
-      left: rect.left,
-      width: effectiveCollapsed ? 220 : rect.width,
-    });
-  }, [isUserMenuOpen, effectiveCollapsed]);
-
-  useEffect(() => {
-    if (!isUserMenuOpen) return undefined;
-    const handlePointerDown = (event) => {
-      const target = event.target;
-      if (userMenuRef.current?.contains(target)) return;
-      if (userFooterButtonRef.current?.contains(target)) return;
-      setIsUserMenuOpen(false);
-    };
-    document.addEventListener('mousedown', handlePointerDown);
-    return () => document.removeEventListener('mousedown', handlePointerDown);
-  }, [isUserMenuOpen]);
 
   useEffect(() => {
     if (!contextMenu) return undefined;
@@ -183,17 +181,6 @@ export const ProSidebar = ({
     onCloseMobile && onCloseMobile();
   };
 
-  const renderLeftContent = (item) => {
-    const Icon = item.icon;
-    if (Icon) {
-      if (typeof Icon === 'function' || typeof Icon === 'object') {
-        return <span className={styles.icon}><Icon size={18} /></span>;
-      }
-      return <span className={styles.icon}>{Icon}</span>;
-    }
-    return null;
-  };
-
   return (
     <KeyboardShortcut
       shortcut="ctrl+b"
@@ -218,49 +205,48 @@ export const ProSidebar = ({
             <X size={16} />
           </button>
 
-          {(headerContent || collapsible) && (
+          {(headerContent || collapsible || enableFilter) && (
             <div className={styles.sidebarHeader}>
               {!effectiveCollapsed && headerContent && (
                 <div className={styles.headerContent}>{headerContent}</div>
               )}
 
-              {collapsible && (
-                <Button
-                  circle
-                  size="small"
-                  variant={Button.VARIANTS.GHOST}
-                  className={styles.toggleBtn}
-                  onClick={() => setIsCollapsed(toggleSidebarCollapsed)}
-                  color="transparent"
-                >
-                  <ModalTooltip
-                    key={effectiveCollapsed}
-                    text={effectiveCollapsed ? TEXTS.openMenu : TEXTS.closeMenu}
-                    position="bottom"
+              <div className={styles.headerActions}>
+                {enableFilter && (
+                  <FilterPopover
+                    currentFilter={currentFilter}
+                    onFilterChange={onFilterChange}
+                    filterIcon={filterIcon}
+                    effectiveCollapsed={effectiveCollapsed}
+                    popoverThemeVars={popoverThemeVars}
+                  />
+                )}
+
+                {collapsible && (
+                  <Button
+                    circle
+                    size="small"
+                    variant={Button.VARIANTS.GHOST}
+                    className={styles.toggleBtn}
+                    onClick={() => setIsCollapsed(toggleSidebarCollapsed)}
+                    color="transparent"
                   >
-                    {effectiveCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
-                  </ModalTooltip>
-                </Button>
-              )}
+                    <ModalTooltip
+                      key={effectiveCollapsed}
+                      text={effectiveCollapsed ? TEXTS.openMenu : TEXTS.closeMenu}
+                      position="bottom"
+                    >
+                      {effectiveCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+                    </ModalTooltip>
+                  </Button>
+                )}
+              </div>
             </div>
           )}
 
           <div className={styles.navContainer}>
             {loading ? (
-              <div className={styles.menuGroup}>
-                <div className={styles.buttonList}>
-                  {Array.from({ length: skeletonItems }).map((_, idx) => (
-                    <div key={`skeleton-${idx}`} className={styles.sidebarItemBtn} style={{ cursor: 'default' }}>
-                      <div className={styles.btnLayout}>
-                        <div className={styles.leftPart}>
-                          <Skeleton circle width={20} height={20} />
-                          {!effectiveCollapsed && <Skeleton width={`${55 + (idx % 3) * 15}%`} height="12px" />}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <SidebarSkeleton skeletonItems={skeletonItems} effectiveCollapsed={effectiveCollapsed} />
             ) : groups && groups.map((group, gIdx) => (
               <div key={gIdx} className={styles.menuGroup}>
                 {group.title && !effectiveCollapsed && (
@@ -270,85 +256,29 @@ export const ProSidebar = ({
                 <div className={styles.buttonList}>
                   {group.items && group.items.map((item) => {
                     const hasSubItems = Array.isArray(item.subItems) && item.subItems.length > 0;
-                    const isActive = !hasSubItems && activeId === item.id;
                     const isDragging = draggedItemId === item.id;
                     const isDragOver = canReorder && dragOverItemId === item.id && !isDragging;
                     const isExpanded = hasSubItems && expandedIds.has(item.id) && !effectiveCollapsed;
 
                     return (
-                      <div key={item.id} className={styles.itemWithSubItems}>
-                        <Button
-                          fullWidth
-                          color="transparent"
-                          active={isActive}
-                          draggable={canReorder}
-                          onDragStart={canReorder ? (event) => handleDragStart(event, item) : undefined}
-                          onDragOver={canReorder ? (event) => handleDragOver(event, item) : undefined}
-                          onDragLeave={canReorder ? () => handleDragLeave(item) : undefined}
-                          onDrop={canReorder ? (event) => handleDrop(event, group.items, item) : undefined}
-                          onDragEnd={canReorder ? handleDragEnd : undefined}
-                          onClick={() => (hasSubItems ? toggleExpanded(item.id) : handleSelect(item))}
-                          onContextMenu={(event) => handleItemContextMenu(event, item)}
-                          className={`${styles.sidebarItemBtn} ${isActive ? styles.activeBtn : ''} ${isDragging ? styles.dragging : ''} ${isDragOver ? styles.dragOver : ''}`}
-                          ToolTip={effectiveCollapsed ? item.label : undefined}
-                        >
-                          <div className={styles.btnLayout}>
-                            <div className={styles.leftPart}>
-                              {canReorder && !effectiveCollapsed && (
-                                <span className={styles.dragHandle}><GripVertical size={14} /></span>
-                              )}
-                              {renderLeftContent(item)}
-                              {!effectiveCollapsed && <span className={styles.label}>{item.label}</span>}
-                              {!effectiveCollapsed && item.pinned && (
-                                <Pin size={12} className={styles.pinnedIcon} />
-                              )}
-                            </div>
-
-                            {!effectiveCollapsed && item.badge && (
-                              <span className={`${styles.badge} ${getBadgeClass(styles, item.badgeType)}`}>
-                                {item.badge}
-                              </span>
-                            )}
-
-                            {!effectiveCollapsed && hasSubItems && (
-                              <ChevronDown size={14} className={`${styles.expandChevron} ${isExpanded ? styles.expandChevronOpen : ''}`} />
-                            )}
-                          </div>
-                        </Button>
-
-                        {hasSubItems && !effectiveCollapsed && (
-                          <div className={`${styles.subItemListWrapper} ${isExpanded ? styles.subItemListWrapperOpen : ''}`}>
-                            <div className={styles.subItemList}>
-                              {item.subItems.map((subItem) => {
-                                const isSubActive = activeId === subItem.id;
-                                return (
-                                  <Button
-                                    key={subItem.id}
-                                    fullWidth
-                                    color="transparent"
-                                    active={isSubActive}
-                                    onClick={() => handleSelect(subItem)}
-                                    className={`${styles.sidebarItemBtn} ${styles.subItemBtn} ${isSubActive ? styles.activeBtn : ''}`}
-                                  >
-                                    <div className={styles.btnLayout}>
-                                      <div className={styles.leftPart}>
-                                        {renderLeftContent(subItem)}
-                                        <span className={styles.label}>{subItem.label}</span>
-                                      </div>
-
-                                      {subItem.badge && (
-                                        <span className={`${styles.badge} ${getBadgeClass(styles, subItem.badgeType)}`}>
-                                          {subItem.badge}
-                                        </span>
-                                      )}
-                                    </div>
-                                  </Button>
-                                );
-                              })}
-                            </div>
-                          </div>
-                        )}
-                      </div>
+                      <SidebarItem
+                        key={item.id}
+                        item={item}
+                        activeId={activeId}
+                        effectiveCollapsed={effectiveCollapsed}
+                        canReorder={canReorder}
+                        isExpanded={isExpanded}
+                        isDragging={isDragging}
+                        isDragOver={isDragOver}
+                        onToggleExpanded={toggleExpanded}
+                        onSelect={handleSelect}
+                        onContextMenu={handleItemContextMenu}
+                        onDragStart={handleDragStart}
+                        onDragOver={handleDragOver}
+                        onDragLeave={handleDragLeave}
+                        onDrop={makeHandleDrop(group.items)}
+                        onDragEnd={handleDragEnd}
+                      />
                     );
                   })}
                 </div>
@@ -362,153 +292,25 @@ export const ProSidebar = ({
                 <div className={styles.footerContent}>{footerContent}</div>
               )}
 
-              {user?.email && (
-                <div className={styles.userFooter}>
-                  <button
-                    type="button"
-                    ref={userFooterButtonRef}
-                    className={styles.userFooterButton}
-                    onClick={() => setIsUserMenuOpen((prev) => !prev)}
-                  >
-                    <span className={styles.avatar}>{getInitial(user.email)}</span>
-                    {!effectiveCollapsed && <span className={styles.userEmail}>{user.email}</span>}
-                  </button>
-
-                  {userFooterAction && !effectiveCollapsed && (
-                    <Button
-                      circle
-                      size="small"
-                      variant={Button.VARIANTS.GHOST}
-                      className={styles.userFooterActionBtn}
-                      color="transparent"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        userFooterAction.onClick && userFooterAction.onClick();
-                      }}
-                    >
-                      <ModalTooltip
-                        text={userFooterAction.tooltip}
-                        position={userFooterAction.tooltipPosition ?? 'top'}
-                        style={{ width: '100%', height: '100%', justifyContent: 'center' }}
-                      >
-                        <userFooterAction.icon size={16} />
-                      </ModalTooltip>
-                    </Button>
-                  )}
-                </div>
-              )}
+              <UserFooter
+                user={user}
+                userMenuItems={userMenuItems}
+                userMenuLinks={userMenuLinks}
+                userFooterAction={userFooterAction}
+                effectiveCollapsed={effectiveCollapsed}
+              />
             </div>
           )}
 
-          {isUserMenuOpen && userMenuPosition && user?.email && createPortal(
-            <div
-              ref={userMenuRef}
-              className={styles.userMenu}
-              style={{ bottom: userMenuPosition.bottom, left: userMenuPosition.left, width: userMenuPosition.width }}
-            >
-              <div className={styles.userMenuEmail}>{user.email}</div>
-              {userMenuItems.map((menuItem) => {
-                const Icon = menuItem.icon;
-                return (
-                  <button
-                    key={menuItem.id ?? menuItem.label}
-                    type="button"
-                    className={`${styles.userMenuItem} ${menuItem.variant === 'danger' ? styles.userMenuItemDanger : ''}`}
-                    onClick={() => {
-                      setIsUserMenuOpen(false);
-                      menuItem.onClick && menuItem.onClick();
-                    }}
-                  >
-                    {Icon && <Icon size={16} />}
-                    <span>{menuItem.label}</span>
-                  </button>
-                );
-              })}
-
-              {userMenuLinks.length > 0 && (
-                <div className={styles.userMenuLinks}>
-                  {userMenuLinks.map((link) => (
-                    <a
-                      key={link.id ?? link.label}
-                      href={link.link}
-                      target={link.target ?? '_blank'}
-                      rel="noopener noreferrer"
-                      className={styles.userMenuLinkItem}
-                      onClick={() => {
-                        setIsUserMenuOpen(false);
-                        link.onClick && link.onClick();
-                      }}
-                    >
-                      {link.label}
-                    </a>
-                  ))}
-                </div>
-              )}
-            </div>,
-            document.body
-          )}
-
-          {contextMenu && createPortal(
-            <div
-              ref={contextMenuRef}
-              className={styles.contextMenu}
-              style={{ top: contextMenu.y, left: contextMenu.x }}
-            >
-              {onItemEdit && contextMenu.item.isOwner !== false && (
-                <button
-                  type="button"
-                  className={styles.contextMenuItem}
-                  onClick={() => {
-                    onItemEdit(contextMenu.item);
-                    setContextMenu(null);
-                  }}
-                >
-                  <Pencil size={14} />
-                  <span>{TEXTS.editItem}</span>
-                </button>
-              )}
-              {onItemCollaborators && contextMenu.item.isOwner !== false && contextMenu.item.isShared && (
-                <button
-                  type="button"
-                  className={styles.contextMenuItem}
-                  onClick={() => {
-                    onItemCollaborators(contextMenu.item);
-                    setContextMenu(null);
-                  }}
-                >
-                  <Users size={14} />
-                  <span>{TEXTS.collaboratorsItem}</span>
-                </button>
-              )}
-              {onItemPin && (
-                <button
-                  type="button"
-                  className={styles.contextMenuItem}
-                  onClick={() => {
-                    onItemPin(contextMenu.item);
-                    setContextMenu(null);
-                  }}
-                >
-                  {contextMenu.item.pinned ? <PinOff size={14} /> : <Pin size={14} />}
-                  <span>{contextMenu.item.pinned ? TEXTS.unpinItem : TEXTS.pinItem}</span>
-                </button>
-              )}
-              {onItemDelete && (
-                <button
-                  type="button"
-                  className={`${styles.contextMenuItem} ${styles.contextMenuItemDanger}`}
-                  onClick={() => {
-                    onItemDelete(contextMenu.item);
-                    setContextMenu(null);
-                  }}
-                >
-                  <Trash2 size={14} />
-                  <span>{contextMenu.item.isOwner === false ? TEXTS.leaveItem : TEXTS.deleteItem}</span>
-                </button>
-              )}
-            </div>,
-            document.body
-          )}
+          <ItemContextMenu
+            contextMenu={contextMenu}
+            contextMenuRef={contextMenuRef}
+            onClose={() => setContextMenu(null)}
+            onItemEdit={onItemEdit}
+            onItemDelete={onItemDelete}
+            onItemPin={onItemPin}
+            onItemCollaborators={onItemCollaborators}
+          />
         </aside>
       </div>
     </KeyboardShortcut>

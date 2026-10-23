@@ -1,0 +1,65 @@
+.contentArea {
+  display: flex;
+  width: 100%;
+  overflow: hidden;
+}
+
+.textarea {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  padding: 0.85rem 1rem;
+  background: transparent;
+  border: none;
+  color: #e6e8ec;
+  font-family: inherit;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  resize: none;
+  outline: none;
+  overflow-y: auto;
+}
+
+.textarea::placeholder {
+  color: #6b7280;
+}
+
+.splitArea {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 100%;
+  height: 100%;
+}
+
+.splitEditor {
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  height: 100%;
+}
+
+.previewPane {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+/* El scroll del preview lo maneja el ScrollBar propio de la librería (screens/components/ScrollBar)
+   en vez del overflow-y:auto nativo del navegador — el padding que antes vivía en .previewPane
+   se mueve al área de contenido interna del ScrollBar. */
+.previewScrollBar {
+  height: 100%;
+}
+
+.previewScrollBarContent {
+  padding: 0.85rem 1.1rem;
+  box-sizing: border-box;
+}
+
+.emptyPreview {
+  color: #6b7280;
+  font-style: italic;
+  font-size: 0.85rem;
+  padding-top: 0.5rem;
+}

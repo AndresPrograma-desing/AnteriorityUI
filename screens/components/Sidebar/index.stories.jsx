@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Activity, ClipboardList, Home, FileText, Settings, Users, LogOut, User } from 'lucide-react';
+import { Activity, ClipboardList, Home, FileText, Settings, Users, LogOut, User, FilterXIcon } from 'lucide-react';
 import ProSidebar from './index';
 
 export default {
@@ -61,6 +61,49 @@ export const Default = {
     userMenuItems,
     userMenuLinks,
     userFooterAction,
+  },
+};
+
+const SidebarWithFilterState = (args) => {
+  const [activeId, setActiveId] = useState(groups[0].items[0].id);
+  const [currentFilter, setCurrentFilter] = useState('recent');
+
+  return (
+    <div style={{ height: 600 }}>
+      <ProSidebar
+        {...args}
+        activeId={activeId}
+        onSelect={(item) => setActiveId(item.id)}
+        currentFilter={currentFilter}
+        onFilterChange={(filterKey) => {
+          console.log('Filtro cambiado a:', filterKey);
+          setCurrentFilter(filterKey);
+        }}
+        filterIcon={FilterXIcon}
+        filterPopoverBg="#000000ff"
+        filterPopoverTextColor="#c2c2c4ff"
+        filterPopoverActiveTextColor="#ffffffff"
+        filterBtnActiveColor="#735bfcff"
+        filterPopoverTitleColor="#ffffffff"
+      />
+    </div>
+  );
+};
+
+export const WithFilter = {
+  render: (args) => <SidebarWithFilterState {...args} />,
+  args: {
+    groups,
+    enableFilter: true,
+    user: { email: 'jane.doe@example.com' },
+    userMenuItems,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Muestra el componente con la prop `enableFilter={true}` activada, permitiendo desplegar el popover para alternar entre los filtros de Fecha, Nombre (A-Z) y Más reciente.',
+      },
+    },
   },
 };
 
@@ -147,6 +190,12 @@ const MobileDrawerDemo = (args) => {
         onSelect={(item) => setActiveId(item.id)}
         isMobileOpen={isMobileOpen}
         onCloseMobile={() => setIsMobileOpen(false)}
+        filterIcon={FilterXIcon}
+        filterPopoverBg="#000000ff"
+        filterPopoverTextColor="#c2c2c4ff"
+        filterPopoverActiveTextColor="#ffffffff"
+        filterBtnActiveColor="#735bfcff"
+        filterPopoverTitleColor="#ffffffff"
       />
     </div>
   );
@@ -159,6 +208,12 @@ export const MobileDrawer = {
     user: { email: 'jane.doe@example.com' },
     userMenuItems,
     userMenuLinks,
+    filterIcon:{FilterXIcon},
+    filterPopoverBg:"#000000ff",
+    filterPopoverTextColor:"#c2c2c4ff",
+    filterPopoverActiveTextColor:"#ffffffff",
+    filterBtnActiveColor:"#735bfcff",
+    filterPopoverTitleColor:"#ffffffff",
   },
   parameters: {
     docs: {

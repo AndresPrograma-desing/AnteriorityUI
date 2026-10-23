@@ -181,6 +181,7 @@ const HoursPicker = ({
                 label={label}
                 value={displayText}
                 readOnly
+                autoComplete="off"
                 placeholder={
                     range
                         ? (format24h ? TEXT_HOURS_PICKER.PLACEHOLDER_RANGE_24H : TEXT_HOURS_PICKER.PLACEHOLDER_RANGE)

@@ -384,6 +384,9 @@ import { Breadcrumbs } from '../Breadcrumbs/index'; // named export (también de
 | `itemsAfterCollapse` | number | `1` | Cantidad de crumbs visibles después del colapso, incluyendo el actual (solo aplica si `maxItems` está seteado) |
 | `menuBgColor` | string | `'#1b1f27'` | Fondo del menú desplegable de crumbs colapsados |
 | `menuTextColor` | string | `'#e6e8ec'` | Color de texto del menú desplegable de crumbs colapsados |
+| `separatorColor` | string | — | Color del separador entre crumbs (`--crumb-separator-color`) |
+| `tooltipBgColor` | string | — | Fondo del tooltip que se muestra al pasar el mouse sobre un crumb truncado (pasa a `ModalTooltip.bgColor`) |
+| `tooltipTextColor` | string | — | Color de texto del tooltip de crumb truncado (pasa a `ModalTooltip.textColor`) |
 
 **Ejemplos:**
 ```jsx
@@ -428,6 +431,8 @@ Con colapso de crumbs intermedios detrás de un menú:
 
 **Notas:** Si un ítem no trae `icon`, el primer crumb cae por defecto en el ícono de casa (comportamiento sin cambios); los demás no muestran ícono salvo que se pase uno. Las animaciones de entrada usan `--crumb-index` y respetan `prefers-reduced-motion`. El botón "…" de crumbs colapsados reutiliza [MenuPopover](#menupopover) (`isCollapsed` + `triggerProps={{ circle: true }}` para el ícono redondo, `children` como render-prop para la lista de items ocultos con sus propios `MenuItem`) en vez de armar un `@mui/material/Menu` propio — así ambos componentes comparten el mismo mecanismo de dropdown y escalan juntos si ese diseño cambia. Se puede importar tanto como named export (`{ Breadcrumbs }`) o default.
 
+Cada crumb (clicable o actual) mide su propio ancho en runtime (`scrollWidth` vs. `clientWidth`) y, solo si el `text-overflow: ellipsis` realmente lo está cortando, se envuelve en [ModalTooltip](#modaltooltip) para revelar el label completo al pasar el mouse — en vez de dejarlo cortado sin forma de leerlo. Esto no agrega un tooltip en crumbs que ya entran completos. El link clicable trunca a `max-width: 200px` (antes no truncaba individualmente, solo el contenedor general con `overflow: hidden`); el crumb actual sigue truncando a `max-width: 360px` como antes.
+
 ---
 
 ### Button
@@ -453,7 +458,7 @@ import Button, { VARIANTS, SIZES, COLORS } from '../Button'; // export default +
 | `children` | node | — | Contenido del botón |
 | `variant` | `'primary' \| 'secondary' \| 'ghost' \| 'danger' \| 'outline' \| 'tab' \| 'list-item'` (`VARIANTS`) | `'primary'` | Estilo visual; mapea a `variant`/`color` de MUI |
 | `size` | `'small' \| 'medium' \| 'large'` (`SIZES`) | `'medium'` | Tamaño del botón e ícono |
-| `active` | boolean | `false` | Aplica un fondo levemente oscurecido (estado activo/seleccionado) |
+| `active` | boolean | `false` | Aplica el fondo de `activeColor` (estado activo/seleccionado) |
 | `fullWidth` | boolean | `false` | Ancho completo del contenedor |
 | `icon` | componente (lucide-react) | — | Ícono inicial (`startIcon`) o único contenido si `circle` |
 | `onClick` | function | — | Handler de click (no se dispara si está deshabilitado/loading) |
@@ -463,6 +468,8 @@ import Button, { VARIANTS, SIZES, COLORS } from '../Button'; // export default +
 | `color` | string (valor CSS o de `COLORS`) | — | Color custom o uno de los colores estándar MUI/`COLORS` |
 | `border` | string | — | Color de borde (fuerza variante `outlined`) |
 | `borderColor` | string | — | Igual que `border` |
+| `hoverColor` | string | `color-mix(in srgb, currentColor 10%, transparent)` | Fondo del hover. Por default se deriva de `currentColor`, así se adapta automáticamente al color de texto resultante (útil en botones `color="transparent"`/`ghost` cuyo fondo real lo define el contenedor, ej. filas de `Sidebar` o items de un popover oscuro — evita el hover blanco fijo de MUI sobre fondos de color) |
+| `activeColor` | string | `color-mix(in srgb, currentColor 16%, transparent)` | Fondo aplicado cuando `active={true}`. Mismo criterio de default que `hoverColor` |
 | `style` | object | `{}` | Estilos `sx` adicionales, se aplican al final (mayor prioridad) |
 | `loading` | boolean | `false` | Muestra un `CircularProgress` en lugar del contenido y deshabilita el botón |
 | `success` | boolean \| undefined | `undefined` | Si es `false`, deshabilita el botón |
@@ -484,9 +491,26 @@ import Button, { VARIANTS, SIZES, COLORS } from '../Button'; // export default +
   title="Marcar como favorito"
   onClick={handleFavorite}
 />
+
+{/* Botón "transparent" sobre un contenedor de color propio (ej. sidebar azul oscuro):
+    sin hoverColor/activeColor, el hover/active ya se adapta solo vía currentColor */}
+<Button color="transparent" active={isActive} onClick={handleSelect}>
+  Inicio
+</Button>
+
+{/* Override explícito del hover/active, ej. para un contraste puntual distinto al default */}
+<Button
+  color="transparent"
+  active={isActive}
+  hoverColor="rgba(13, 82, 248, 0.12)"
+  activeColor="rgba(13, 82, 248, 0.2)"
+  onClick={handleSelect}
+>
+  Inicio
+</Button>
 ```
 
-**Notas:** Es un `React.forwardRef`. Expone `Button.VARIANTS`, `Button.SIZES` y `Button.COLORS` como propiedades estáticas además de los named exports. Para asignarle un atajo de teclado global, envolverlo con `KeyboardShortcut` (ver sección correspondiente) en vez de una prop propia — así el mismo wrapper sirve para `Button`, `Input` o cualquier otro elemento.
+**Notas:** Es un `React.forwardRef`. Expone `Button.VARIANTS`, `Button.SIZES` y `Button.COLORS` como propiedades estáticas además de los named exports. Para asignarle un atajo de teclado global, envolverlo con `KeyboardShortcut` (ver sección correspondiente) en vez de una prop propia — así el mismo wrapper sirve para `Button`, `Input` o cualquier otro elemento. El hover/active de los botones `color="transparent"` (y en general cualquiera con `muiColor` `inherit`) ya no usa el blanco/negro translúcido fijo de MUI — se deriva de `currentColor`, por lo que se adapta solo al color de texto resultante sobre cualquier fondo heredado del contenedor (ej. filas de `Sidebar`, items de un popover con fondo de color). Usar `hoverColor`/`activeColor` solo cuando se necesite un color puntual distinto a ese default.
 
 ---
 
@@ -1987,6 +2011,10 @@ Las 12 variantes elaboradas (`'bounce-bar'`, `'continuous-bar'`, `'neon-scanner'
 
 Renderiza una cadena markdown como HTML, con soporte GFM (tablas, listas de tareas, etc.) vía `react-markdown` + `remark-gfm`. Los bloques de código (` ``` `) y los encabezados (`#` a `######`) muestran, al pasar el mouse (o al enfocarlos con teclado), un botón con ícono de copiar en la esquina que copia respectivamente el código completo o el texto del título al portapapeles (con feedback visual de "copiado" por ~1.6s). El color de texto es `inherit` por default (hereda del contenedor donde se use), así que se puede soltar directamente dentro de cualquier componente (`Frame`, `DrawPanel`, `Callout`, burbujas de chat, etc.) sin quedar ilegible por un color fijo; usar `style`/`linkColor` para un color puntual.
 
+Las imágenes usan la sintaxis estándar de markdown (`![alt](url)`) — `react-markdown` las soporta nativamente, sin ninguna prop extra; el CSS ya las limita a `max-width: 100%` con `border-radius: 6px`. Además, **una URL http(s) pegada sola en su propia línea** (sin texto alrededor ni la sintaxis `![alt](url)`) se detecta automáticamente y se muestra como imagen — útil para URLs de Google Images u otros servicios que no terminan en una extensión reconocible (`.png`/`.jpg`/etc.), donde exigir extensión dejaría afuera el caso más común. Si la URL autodetectada en realidad no es una imagen y falla la carga, cae a un link clickeable normal (`<a target="_blank">`) en vez de mostrar un ícono de imagen rota.
+
+Para colorear texto puntual (markdown no tiene sintaxis nativa para esto) se soporta una convención propia del repo: `{color:X}texto{/color}`, donde `X` es cualquier color CSS válido (hex, `rgb()`, nombre). Internamente se reescribe a un link markdown con protocolo custom (`[texto](color:X)`) antes de pasarlo a `react-markdown`; como `react-markdown` sanea por default los `href` con protocolos no estándar (para prevenir XSS, ej. `javascript:`), se pasa un `urlTransform` propio que deja pasar `color:` intacto y delega el resto al saneo default. El renderer de `a` intercepta ese protocolo devolviendo un `<span style="color: X">` en vez de un `<a>` — por eso el contenido de bloques/inline code (` ``` ` o `` ` ``) queda exento tanto de este reemplazo como del de imágenes (un snippet que contenga ese texto literal no se toca). `MarkdownEditor` ya trae un botón de toolbar con selector de color que inserta esta sintaxis (ver [MarkdownEditor](#markdowneditor)).
+
 **Import:**
 ```jsx
 import { MarkdownContent } from '../MarkdownContent/index'; // named export (también default export)
@@ -2023,12 +2051,30 @@ import { MarkdownContent } from '../MarkdownContent/index'; // named export (tam
   {'# My Title\n\n```js\nconsole.log("hi");\n```'}
 </MarkdownContent>
 ```
+```jsx
+<MarkdownContent>{'![Logo](https://ejemplo.com/logo.png)'}</MarkdownContent>
+```
+```jsx
+{/* URL sola, pegada directamente sin escribir ![alt](url) — se autodetecta como imagen */}
+<MarkdownContent>{'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFvLKiCCYeL-dqH4i8rEAHVcLw9aMIxp3qFmMk-CMDjg&s=10'}</MarkdownContent>
+```
+```jsx
+<MarkdownContent>
+  {'Este texto tiene {color:#ef4444}una palabra en rojo{/color} en el medio.'}
+</MarkdownContent>
+```
+
+**Notas sobre imágenes pegadas (URL sola en su línea):** el criterio es deliberadamente amplio (cualquier línea que sea únicamente una URL `http(s)://`, sin exigir extensión de archivo) porque las URLs de imagen de Google Images y otros servicios casi nunca terminan en `.png`/`.jpg`. Esto significa que una URL que el usuario pegó pensando en un link normal (no una imagen) también se intentará mostrar como `<img>`; si la carga falla, el fallback a `<a target="_blank">` cubre ese caso sin dejar un ícono de imagen rota. El bloque de código (` ``` ` o `` ` ``) también queda exento de esta detección.
+
+**Notas sobre `{color:X}`:** el patrón solo soporta texto plano simple adentro (no anida otro `{color:}` dentro del mismo bloque); `X` acepta cualquier valor CSS de color (`#ef4444`, `rgb(239, 68, 68)`, `red`). Como se implementa reescribiendo a un link `[texto](color:X)`, un markdown que por casualidad contenga un link real cuya URL empiece literalmente con `color:` (muy improbable) se renderizaría como texto coloreado en vez de como link.
 
 ---
 
 ### MarkdownEditor
 
-Editor de texto markdown con barra de herramientas (negrita, cursiva, título, encabezados, listas, cita, código, enlace, tabla), atajos de teclado, modos Editor/Dividido/Vista previa y altura ajustable con arrastre. El botón de título inserta un encabezado `# ` y el de código un bloque ` ``` `; ambos, al previsualizarse (con `MarkdownContent`), muestran un botón de copiar rápido (ver [MarkdownContent](#markdowncontent)).
+Editor de texto markdown con barra de herramientas (negrita, cursiva, título, encabezados, listas, cita, código, enlace, imagen, tabla, color de texto), atajos de teclado, modos Editor/Dividido/Vista previa y altura ajustable con arrastre. El botón de título inserta un encabezado `# ` y el de código un bloque ` ``` `; ambos, al previsualizarse (con `MarkdownContent`), muestran un botón de copiar rápido (ver [MarkdownContent](#markdowncontent)).
+
+El botón de imagen (ícono de imagen) inserta `![descripción](url-de-la-imagen)` alrededor de la selección (o del texto placeholder si no hay selección) — mismo mecanismo que el botón de enlace. El botón de color (ícono de paleta) abre un popover con el panel de [ColorPicker](#colorpicker) (saturación/matiz + HEX/RGB/HSL); mientras se arrastra el selector solo cambia el color de preview del ícono de la paleta, y recién al tocar el botón "Aplicar" del popover se envuelve el texto seleccionado (o el texto placeholder) en `{color:HEX}...{/color}` y se cierra el popover — así evita insertar texto en cada frame del arrastre. Ver la sintaxis `{color:X}...{/color}` en [MarkdownContent](#markdowncontent).
 
 **Import:**
 ```jsx
@@ -2054,7 +2100,7 @@ const [value, setValue] = useState('# Hello world');
 | onChange | function | — | Se llama con un evento simulado `{ target: { value } }`. |
 | placeholder | string | `''` | Placeholder del textarea. |
 | defaultHeight | number | `320` | Alto inicial (px) del área de contenido; ajustable arrastrando el handle inferior (entre 180 y 1200px). |
-| labels | object | `{}` | Textos personalizables: `editorTab`, `splitTab`, `previewTab`, tooltips de cada botón (incluye `titleTooltip` para el botón de título), textos por defecto al insertar formato, encabezados de la tabla de ejemplo. |
+| labels | object | `{}` | Textos personalizables: `editorTab`, `splitTab`, `previewTab`, tooltips de cada botón (incluye `titleTooltip`, `imageTooltip`, `colorTooltip`), textos por defecto al insertar formato (incluye `imageAltDefaultText`, `imageUrlPlaceholder`, `colorDefaultText`), `applyColorLabel` (texto del botón "Aplicar" del popover de color), encabezados de la tabla de ejemplo. |
 | activeColor | string | — | Color de acento del modo/pestaña activa (`--markdown-editor-active`). |
 
 **Ejemplos:**
@@ -2074,7 +2120,7 @@ const [value, setValue] = useState('# Hello world');
 />
 ```
 
-**Notas:** Es un componente controlado (`value`/`onChange` obligatorios); el modo de vista es estado interno. Soporta atajos `Ctrl+B`, `Ctrl+I`, `Ctrl+K` y continuación automática de listas al presionar Enter. Usa `MarkdownContent` para la vista previa.
+**Notas:** Es un componente controlado (`value`/`onChange` obligatorios); el modo de vista es estado interno. Soporta atajos `Ctrl+B`, `Ctrl+I`, `Ctrl+K` y continuación automática de listas al presionar Enter. Usa `MarkdownContent` para la vista previa. El popover de color reutiliza directamente `ColorPickerPanel` (la pieza interna de [ColorPicker](#colorpicker), sin su botón trigger propio) dentro de un `Popper`/`ClickAwayListener` propio anclado al botón de paleta de la toolbar.
 
 ---
 
@@ -3374,6 +3420,25 @@ import Sidebar from 'screens/components/Sidebar/index';
 | `avatarBgColor` | `string` | — | Color del avatar de usuario. |
 | `pinnedIconColor` | `string` | — | Color del icono de "fijado". |
 | `methodBadgeColors` | `{ post?, get?, put?, delete?, info?: { bg, color } }` | — | Sobrescribe los colores de badge por método HTTP. |
+| `subItemActiveBgColor` | `string` | — | Color de fondo de un subitem activo (dentro de un item con `subItems`). |
+| `subItemActiveTextColor` | `string` | — | Color de texto de un subitem activo. |
+| `isMobileOpen` | `boolean` | `false` | Controla la apertura del drawer en modo mobile (ver "Responsive" abajo). |
+| `onCloseMobile` | `function()` | — | Callback al cerrar el drawer mobile (backdrop, Escape, X, o al seleccionar un item). |
+| `style` | `object` | — | Estilos inline adicionales para el `<aside>` raíz; se mergea con las CSS custom properties que generan las props de color. |
+| `enableFilter` | `boolean` | `false` | Muestra el botón de filtro (ícono embudo) en el header, que despliega un popover con las opciones de `currentFilter`. |
+| `currentFilter` | `string`\|`null` | — | Key del filtro activo (`'date'`, `'name'`, `'recent'`); resalta esa opción en el popover con un check. |
+| `onFilterChange` | `function(filterKey \| null)` | — | Callback al elegir una opción del popover. Si se vuelve a elegir la opción ya activa, se llama con `null` (deselecciona). |
+| `filterIcon` | componente (lucide-react) \| `node` | `ArrowUpDown` | Ícono del botón de filtro. |
+| `filterBtnActiveBg` | `string` | `#eff6ff` | Fondo del botón de filtro cuando el popover está abierto o hay un filtro activo. |
+| `filterBtnActiveColor` | `string` | `#0d52f8` | Color de texto/ícono del botón de filtro en ese mismo estado. |
+| `filterPopoverBg` | `string` | `#ffffff` | Fondo del popover del filtro (vía portal, fuera del árbol del sidebar). |
+| `filterPopoverTextColor` | `string` | `--sidebar-text` (`#0f172a`) | Color de texto base de las opciones del popover. |
+| `filterPopoverTitleColor` | `string` | `--sidebar-text-muted` (`#64748b`) | Color del título "FILTRAR POR". |
+| `filterPopoverBorderColor` | `string` | `--sidebar-border` (`#e2e8f0`) | Color de borde del popover y del separador bajo el título. |
+| `filterPopoverHoverBg` | `string` | derivado de `filterPopoverTextColor` (ver Notas) | Fondo al pasar el mouse sobre una opción del popover. |
+| `filterPopoverActiveBg` | `string` | derivado de `filterPopoverTextColor` (ver Notas) | Fondo de la opción actualmente seleccionada (`currentFilter`). |
+| `filterPopoverActiveTextColor` | `string` | `--sidebar-text-active` (`#0d52f8`) | Color de texto de la opción seleccionada. |
+| `filterPopoverCheckColor` | `string` | = `filterPopoverActiveTextColor` | Color del ícono de check en la opción seleccionada. |
 
 **Ejemplos:**
 ```jsx
@@ -3424,9 +3489,26 @@ import Sidebar from 'screens/components/Sidebar/index';
   ]}
   userFooterAction={{ icon: Settings, tooltip: 'Configuración', onClick: () => navigate('/settings') }}
 />
+
+// Botón de filtro con popover personalizado por completo, incluyendo un fondo oscuro
+<Sidebar
+  groups={groups}
+  user={{ email: 'jane.doe@example.com' }}
+  enableFilter
+  currentFilter={currentFilter}
+  onFilterChange={setCurrentFilter}
+  filterPopoverBg="#140e46"
+  filterPopoverTextColor="#e6e8ec"
+  filterBtnActiveColor="#2207c4"
+  // filterPopoverHoverBg / filterPopoverActiveBg no se pasan a propósito:
+  // al quedar sin especificar, se derivan solos de filterPopoverTextColor
+  // (ver Notas) y ya se ven bien sobre el fondo oscuro de filterPopoverBg.
+/>
 ```
 
 **Notas:** Persiste el estado colapsado en `localStorage` bajo la clave `sidebar_collapsed`. Los subitems no soportan drag & drop (`onReorderItems`), menú contextual (`onItemEdit`/`onItemDelete`/`onItemPin`/`onItemCollaborators`) ni colapsado individual persistido — solo navegación simple vía `onSelect`. Cuando el sidebar está colapsado (`isCollapsed`), los grupos con `subItems` se muestran colapsados y sin chevron (igual que cualquier item simple, con tooltip); hay que expandir el sidebar para ver/navegar los subitems. `onSearch`/`filterMenuGroups` matchea por `label` del item padre o de cualquiera de sus `subItems`, pero si matchea, se muestra el item completo con **todos** sus subitems (no solo el que matcheó).
+
+**Popover de filtro — hover/active derivados por default:** si no se pasan `filterPopoverHoverBg`/`filterPopoverActiveBg` explícitamente, ya no caen en el tema claro fijo del propio Sidebar (`#f1f5f9`/`#eff6ff`) — eso producía un hover/active blanco o celeste pálido que se veía mal cuando `filterPopoverBg` se personalizaba a un color oscuro (el fondo quedaba oscuro pero el hover/active de las opciones seguía claro, sin relación con ese fondo). Ahora el fallback se deriva mezclando `filterPopoverTextColor` (el color de texto del propio popover, que normalmente ya contrasta con `filterPopoverBg`) con transparencia (`color-mix`), así se adapta solo a cualquier fondo de popover, claro u oscuro. `filterPopoverHoverBg`/`filterPopoverActiveBg` siguen existiendo para fijar un color puntual distinto a ese default.
 
 **Responsive (mobile):** por debajo de 767px de viewport, el sidebar se comporta como un drawer: queda oculto fuera de pantalla y aparece un botón flotante con ícono de hamburguesa (esquina superior izquierda) para abrirlo. Al abrirse, se desliza como overlay a ancho completo (280px, hasta 85vw) sobre un backdrop oscuro; se cierra al tocar el backdrop, al presionar Escape, al tocar la X del propio drawer, o automáticamente al seleccionar un item (`onSelect`). El botón de colapsar (`collapsible`) se oculta en este modo, ya que no aplica a un drawer full-width. No requiere ninguna prop nueva — la detección de mobile es automática vía `matchMedia`.
 
@@ -3891,7 +3973,7 @@ const [enabled, setEnabled] = useState(false);
 
 ### Text
 
-Bloque de texto genérico (título o párrafo) para usar dentro de layouts como `Container` o `Frame` cuando se necesita meter texto suelto sin armar un componente nuevo. La `variant` define tanto el tag HTML semántico (`h1`/`h2`/`h3`/`p`/`span`) como su tamaño de fuente por defecto.
+Bloque de texto genérico (título o párrafo) para usar dentro de layouts como `Container` o `Frame` cuando se necesita meter texto suelto sin armar un componente nuevo. La `variant` define tanto el tag HTML semántico (`h1`/`h2`/`h3`/`p`/`span`) como su tamaño de fuente por defecto. Incluye además un set de animaciones de entrada/salida opcionales (`animate`) para títulos o textos destacados.
 
 **Import:**
 ```jsx
@@ -3908,19 +3990,50 @@ import Text from '../Text'; // export default (index.jsx)
 
 | Prop | Tipo | Default | Descripción |
 |---|---|---|---|
-| `children` | node | — | Contenido del texto |
+| `children` | node | — | Contenido del texto. Solo se usa como texto plano (string) en las animaciones `typing` y `letter-fade-in`/`letter-fade-out`; con cualquier otro `animate` (o sin animación) puede ser cualquier `node`. |
 | `variant` | `'h1' \| 'h2' \| 'h3' \| 'body' \| 'caption'` | `'body'` | Define el tag HTML (`h1`/`h2`/`h3`/`p`/`span`) y el tamaño/peso de fuente |
-| `color` | string | — | Color del texto (`--text-color`) |
+| `color` | string | — | Color del texto (`--text-color`; default `#0f172a`, `#64748b` en `caption`) |
 | `align` | `'left' \| 'center' \| 'right'` | `'left'` | Alineación del texto (`text-align`) |
 | `className` | string | `''` | Clase CSS adicional |
 | `style` | object | — | Estilos inline adicionales, mergeados con los internos |
+| `animate` | `'fade-in' \| 'fade-out' \| 'typing' \| 'letter-fade-in' \| 'letter-fade-out' \| 'rise-and-fade'` | — | Animación aplicada al montar. Sin esta prop, el texto se muestra estático. |
+| `duration` | number (ms) | `800` | Duración total de la animación para `fade-in`, `fade-out`, `letter-fade-in` y `letter-fade-out`. En las letter-fade, se reparte entre todas las letras (cada una anima con un delay escalonado). |
+| `typingSpeed` | number (ms) | `50` | Milisegundos entre cada letra en `animate="typing"`. |
+| `riseDuration` | number (ms) | `1000` | Duración de la animación en `animate="rise-and-fade"`. |
+| `riseDelay` | number (ms) | `400` | Espera antes de que arranque `rise-and-fade` (útil para encadenar varios `Text` en secuencia). |
 
 **Ejemplos:**
 ```jsx
 <Text variant="h1">Título principal</Text>
 <Text variant="h3" color="#2563eb" align="center">Subtítulo centrado</Text>
 <Text variant="caption">Nota aclaratoria</Text>
+
+{/* Aparece letra por letra como si se tipeara */}
+<Text animate="typing" typingSpeed={30}>Escribiendo texto...</Text>
+
+{/* Fade-in del bloque completo */}
+<Text variant="h1" animate="fade-in" duration={1000} color="#0d52f8">
+  Apareciendo suavemente
+</Text>
+
+{/* Cada letra aparece/desaparece con su propio delay escalonado */}
+<Text animate="letter-fade-in" duration={1500}>Texto letra por letra...</Text>
+<Text animate="letter-fade-out" duration={1500}>Desaparece de atrás hacia adelante...</Text>
+
+{/* Sube y se desvanece tras un delay — útil para intros/splash */}
+<Text
+  variant="h1"
+  animate="rise-and-fade"
+  riseDelay={500}
+  riseDuration={1200}
+  color="#8b5cf6"
+  align="center"
+>
+  Palabra que sube y desaparece
+</Text>
 ```
+
+**Notas:** `fade-in`/`fade-out`/`rise-and-fade` animan el bloque completo (el `Tag` resultante); `letter-fade-in`/`letter-fade-out` envuelven cada carácter en su propio `span` con `animationDelay` escalonado (de izquierda a derecha para `-in`, de derecha a izquierda para `-out`) — por eso solo soportan `children` como string, cualquier otro nodo se ignora en el cálculo de letras. `typing` reconstruye el string letra por letra con `setInterval` y muestra un cursor parpadeante (`border-right`) mientras dura la animación. Ninguna animación hace loop ni se revierte sola: son de una sola pasada al montar (controlar su repetición vía `key` desde el padre, como hace `KeyboardShortcut`/`ModalTooltip` en otros componentes del repo para resetear animaciones).
 
 ---
 

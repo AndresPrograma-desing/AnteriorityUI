@@ -1,7 +1,7 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import UserAvatar from '../../../Profile/Avatar/index';
-import styles from '../../index.module.css';
+import styles from './index.module.css';
 import { DEFAULT_USER_MENU_LABEL } from '../../constants.js';
 
 function UserMenu({ user, userMenuItems = [] }) {

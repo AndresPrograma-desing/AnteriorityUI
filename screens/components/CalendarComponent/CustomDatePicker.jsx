@@ -130,6 +130,7 @@ const CustomDatePicker = ({ label, name, value, onChange, required = false, disa
         label={label}
         value={selectedDate ? format(selectedDate, 'dd/MM/yyyy') : ''}
         readOnly
+        autoComplete="off"
         placeholder="dd/mm/aaaa"
         onClick={() => !disabled && setIsOpen(true)}
         disabled={disabled}
