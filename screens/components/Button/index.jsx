@@ -19,6 +19,8 @@ const Button = React.forwardRef(({
   color,
   border,
   borderColor,
+  hoverColor,
+  activeColor,
   style = {},
   loading = false,
   success = undefined,
@@ -68,7 +70,13 @@ const Button = React.forwardRef(({
   const isCustomColor = color && color !== 'transparent' && !standardMuiColors.includes(muiColor) && !standardMuiColors.includes(color);
 
   // Active state styling
-  const activeStyle = active ? { backgroundColor: 'rgba(0, 0, 0, 0.08)' } : {};
+  // Por defecto, el fondo de active/hover se deriva de currentColor (el color de texto
+  // resultante del botón) en vez de un negro/blanco fijo, para que se adapte automáticamente
+  // sea cual sea el color de fondo heredado (ej. un Button color="transparent" dentro de un
+  // Sidebar/Popover con bg azul oscuro) — ver convención de props de color en CLAUDE.md.
+  const resolvedHoverColor = hoverColor || 'color-mix(in srgb, currentColor 10%, transparent)';
+  const resolvedActiveColor = activeColor || 'color-mix(in srgb, currentColor 16%, transparent)';
+  const activeStyle = active ? { backgroundColor: resolvedActiveColor } : {};
 
   // Circle styling
   const circleStyle = circle ? { 
@@ -92,6 +100,14 @@ const Button = React.forwardRef(({
           customColors.color = color;
           customColors['&:hover'] = { backgroundColor: 'rgba(0, 0, 0, 0.04)' };
       }
+  } else if (color === 'transparent' || muiColor === 'inherit') {
+      // Caso no cubierto por isCustomColor: botones "transparent"/ghost cuyo fondo real es el
+      // del contenedor (ej. filas de Sidebar, items de un Popover oscuro). MUI por defecto les
+      // aplica un hover/selected blanco translúcido fijo (pensado para fondos oscuros estándar
+      // de MUI), que se ve mal sobre un bg de color custom. Se reemplaza por el hover/active
+      // derivado de currentColor (o por hoverColor/activeColor si el consumidor los pasa).
+      customColors['&:hover'] = { backgroundColor: resolvedHoverColor };
+      customColors['&.Mui-focusVisible'] = { backgroundColor: resolvedHoverColor };
   }
 
   // Handle explicit border and borderColor

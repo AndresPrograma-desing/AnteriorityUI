@@ -1,0 +1,132 @@
+.userFooter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.userFooterButton {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: var(--sidebar-radius);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.18s ease;
+  overflow: hidden;
+}
+
+.userFooterButton:hover {
+  background-color: var(--sidebar-hover-bg);
+  border-color: var(--sidebar-border);
+}
+
+.avatar {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--sidebar-avatar-bg);
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.85rem;
+  box-shadow: 0 2px 4px rgba(13, 82, 248, 0.2);
+}
+
+.userEmail {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--sidebar-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Nota: .userFooterActionBtn se referencia en el JSX pero no tiene regla definida aquí ni
+   la tenía en el index.module.css original del Sidebar antes de este split — se preserva
+   tal cual (sin estilo propio aplicado, el Button ya trae el suyo) para no introducir un
+   cambio visual nuevo. */
+
+/* Menú Flotante de Usuario (Portal) */
+.userMenu {
+  position: fixed;
+  background: #ffffff;
+  border: 1px solid var(--sidebar-border);
+  border-radius: var(--sidebar-radius);
+  box-shadow: var(--sidebar-shadow);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 2000;
+  min-width: 210px;
+}
+
+.userMenuEmail {
+  padding: 8px 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--sidebar-text-muted);
+  border-bottom: 1px solid var(--sidebar-border);
+  margin-bottom: 2px;
+  word-break: break-all;
+}
+
+.userMenuItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  font-size: 0.84rem;
+  font-weight: 500;
+  color: var(--sidebar-text);
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.15s ease;
+}
+
+.userMenuItem:hover {
+  background-color: var(--sidebar-hover-bg);
+}
+
+.userMenuItemDanger {
+  color: #ef4444;
+}
+
+.userMenuItemDanger:hover {
+  background-color: #fef2f2;
+}
+
+/* Enlaces del pie de usuario (Legales) */
+.userMenuLinks {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
+  padding: 8px 10px 4px;
+  border-top: 1px solid var(--sidebar-border);
+}
+
+.userMenuLinkItem {
+  font-size: 0.75rem;
+  color: var(--sidebar-text-muted);
+  text-decoration: none;
+  transition: color 0.15s ease;
+  display: block;
+}
+
+.userMenuLinkItem:hover {
+  color: var(--sidebar-text-active);
+  text-decoration: underline;
+}

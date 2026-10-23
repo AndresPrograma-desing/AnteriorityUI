@@ -1,7 +1,7 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
-import NavDropdown from '../NavDropdown/index';
-import styles from '../../index.module.css';
+import { NavDropdown } from './components/index.js';
+import styles from './index.module.css';
 
 function NavLinks({ navLinks, navLinkColor, navLinkActiveColor }) {
     const [openIndex, setOpenIndex] = useState(null);

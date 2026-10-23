@@ -90,3 +90,22 @@ export const NarrowContainer = {
     ],
   },
 };
+
+// Crumbs cuyo label no entra ni truncado: en vez de quedar cortado sin forma
+// de leerlo, al pasar el mouse aparece un ModalTooltip con el texto completo.
+// Pasa un crumb clicable largo y el crumb actual (más largo típicamente, como
+// un título de sesión) para ejercitar ambos casos.
+export const TruncatedWithTooltip = {
+  render: (args) => (
+    <div style={{ width: 320, border: '1px dashed #cbd5e1', padding: 8, background: '#13161c' }}>
+      <Breadcrumbs {...args} />
+    </div>
+  ),
+  args: {
+    items: [
+      { label: 'ContextHub', icon: Home, onClick: () => console.log('go home') },
+      { label: 'Gubernamentales-API / Sesiones', icon: Gem, onClick: () => console.log('go sessions') },
+      { label: '# Fix propuesto: memoización de `available_amount` para evitar recálculo en cada render de la tabla de compensación' },
+    ],
+  },
+};

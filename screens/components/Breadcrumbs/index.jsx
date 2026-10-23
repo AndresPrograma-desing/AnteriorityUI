@@ -1,8 +1,51 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import MenuItem from '@mui/material/MenuItem';
 import { Home, MoreHorizontal } from 'lucide-react';
 import MenuPopover from '../Material-UI/Components/MenuPopover/index';
+import ModalTooltip from '../ModalTooltip/ModalTooltip';
 import styles from './index.module.css';
+
+// Envuelve el texto de un crumb con ModalTooltip solo si el ellipsis realmente
+// lo está cortando (scrollWidth > clientWidth) — evita tooltips de más en
+// crumbs que ya entran completos. Usa ResizeObserver en vez de medir una sola
+// vez al montar: el ancho final del crumb depende del flex-shrink del padre
+// (y de la animación de entrada `currentPulse`), que todavía no se asentó en
+// el primer layout pass.
+const CrumbLabel = ({ as: Tag = 'span', className, children, tooltipBgColor, tooltipTextColor, ...rest }) => {
+  const ref = useRef(null);
+  const [isTruncated, setIsTruncated] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    console.log('[CrumbLabel DEBUG] effect running, el=', el, 'children=', children);
+    if (!el) return undefined;
+
+    const checkTruncation = () => {
+      const truncated = el.scrollWidth > el.clientWidth;
+      console.log('[CrumbLabel DEBUG] checkTruncation', { scrollWidth: el.scrollWidth, clientWidth: el.clientWidth, truncated });
+      setIsTruncated(truncated);
+    };
+    checkTruncation();
+
+    const observer = new ResizeObserver(checkTruncation);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [children]);
+
+  const label = (
+    <Tag ref={ref} className={className} {...rest}>
+      {children}
+    </Tag>
+  );
+
+  if (!isTruncated) return label;
+
+  return (
+    <ModalTooltip text={children} bgColor={tooltipBgColor} textColor={tooltipTextColor} style={{ minWidth: 0 }}>
+      {label}
+    </ModalTooltip>
+  );
+};
 
 /**
  * Generic breadcrumb trail. `items` is the full path in order — the last
@@ -29,12 +72,15 @@ export const Breadcrumbs = ({
   iconColor,
   linkColor,
   currentColor,
+  separatorColor,
   separator = '/',
   maxItems,
   itemsBeforeCollapse = 1,
   itemsAfterCollapse = 1,
   menuBgColor = '#1b1f27',
   menuTextColor = '#e6e8ec',
+  tooltipBgColor,
+  tooltipTextColor,
 }) => {
   if (!items.length) return null;
 
@@ -51,6 +97,7 @@ export const Breadcrumbs = ({
         ...(iconColor ? { '--crumb-icon-color': iconColor } : {}),
         ...(linkColor ? { '--crumb-link-color': linkColor } : {}),
         ...(currentColor ? { '--crumb-current-color': currentColor } : {}),
+        ...(separatorColor ? { '--crumb-separator-color': separatorColor } : {}),
       }}
     >
       <ol className={styles.list}>
@@ -108,15 +155,23 @@ export const Breadcrumbs = ({
 
               {!isLast && item.onClick ? (
                 <button type="button" className={styles.link} onClick={item.onClick}>
-                  <span className={styles.linkLabel}>{item.label}</span>
+                  <CrumbLabel
+                    className={styles.linkLabel}
+                    tooltipBgColor={tooltipBgColor}
+                    tooltipTextColor={tooltipTextColor}
+                  >
+                    {item.label}
+                  </CrumbLabel>
                 </button>
               ) : (
-                <span
+                <CrumbLabel
                   className={`${styles.crumbText} ${isLast ? styles.current : ''}`}
                   aria-current={isLast ? 'page' : undefined}
+                  tooltipBgColor={tooltipBgColor}
+                  tooltipTextColor={tooltipTextColor}
                 >
                   {item.label}
-                </span>
+                </CrumbLabel>
               )}
 
               {!isLast && <span className={styles.separator} aria-hidden="true">{separator}</span>}

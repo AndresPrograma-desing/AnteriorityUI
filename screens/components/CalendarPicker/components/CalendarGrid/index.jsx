@@ -37,7 +37,7 @@ const CalendarGrid = ({
   onDayMouseEnter,
   onClear,
   onSetToday,
-  showFooter = false,
+  showFooter = true,
   accentColor,
   selectedColor,
   country,

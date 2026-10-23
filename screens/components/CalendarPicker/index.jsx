@@ -30,7 +30,7 @@ const CalendarPicker = ({
   tooltipTextColor,
   moonPhaseColor,
   variant = 'popover',
-  showFooter = false,
+  showFooter = true,
   renderDay,
   country,
   showHolidays,
@@ -46,8 +46,23 @@ const CalendarPicker = ({
   const [showSelectors, setShowSelectors] = useState(false);
   const [hoveredDay, setHoveredDay] = useState(null);
   const [dragStartDay, setDragStartDay] = useState(null);
+  const [popoverAlign, setPopoverAlign] = useState('left');
   const dragStateRef = useRef({ didDrag: false, hoveredDay: null });
   const wrapperRef = useRef(null);
+
+  // El popover (320px fijo) por default se ancla al borde izquierdo del
+  // input (left: 0). Si el input está cerca del borde derecho del viewport
+  // (ej. un filtro en una toolbar a la derecha de la pantalla), anclarlo a
+  // la izquierda lo desborda hacia afuera — se mide una sola vez al abrir y
+  // se ancla a la derecha del input en su lugar si no entra.
+  useEffect(() => {
+    if (isInline || !isOpen || !wrapperRef.current) return;
+    const rect = wrapperRef.current.getBoundingClientRect();
+    const POPOVER_WIDTH = 320;
+    const fitsLeft = rect.left + POPOVER_WIDTH <= window.innerWidth;
+    setPopoverAlign(fitsLeft ? 'left' : 'right');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
 
   const isPopoverOpen = isInline || isOpen;
 
@@ -305,6 +320,7 @@ const CalendarPicker = ({
         label={label}
         value={displayText}
         readOnly
+        autoComplete="off"
         placeholder={range ? 'dd/mm/aaaa – dd/mm/aaaa' : 'dd/mm/aaaa'}
         onClick={() => !disabled && setIsOpen(true)}
         disabled={disabled}
@@ -324,7 +340,13 @@ const CalendarPicker = ({
       />
 
       {isOpen && (
-        <div className={styles.calendarPopover} style={colorVars}>
+        <div
+          className={styles.calendarPopover}
+          style={{
+            ...colorVars,
+            ...(popoverAlign === 'right' ? { left: 'auto', right: 0 } : undefined),
+          }}
+        >
           {grid}
         </div>
       )}

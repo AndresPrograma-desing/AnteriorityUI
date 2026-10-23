@@ -1,0 +1,117 @@
+/* Envoltorio del Botón del Filtro */
+.filterBtnWrapper {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+/* Botón del Filtro */
+.filterBtn {
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 8px !important;
+  border: 1px solid var(--sidebar-border) !important;
+  background-color: #ffffff !important;
+  color: var(--sidebar-text-muted) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease !important;
+}
+
+.filterBtn:hover {
+  background-color: var(--sidebar-hover-bg) !important;
+  color: var(--sidebar-text) !important;
+  border-color: #cbd5e1 !important;
+}
+
+.filterBtnActive {
+  background-color: var(--sidebar-filter-btn-active-bg) !important;
+  color: var(--sidebar-filter-btn-active-color) !important;
+  border-color: var(--sidebar-filter-btn-active-color) !important;
+}
+
+.filterBtnActive :global(svg) {
+  color: var(--sidebar-filter-btn-active-color) !important;
+}
+
+/* Popover del Filtro animado con soporte de variables dinámicas */
+.filterMenu {
+  position: fixed;
+  background: var(--popover-bg, #ffffff);
+  color: var(--popover-text, #0f172a);
+  border: 1px solid var(--popover-border, var(--sidebar-border));
+  border-radius: var(--sidebar-radius);
+  box-shadow: var(--sidebar-shadow);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 2000;
+  min-width: 165px;
+
+  opacity: 0;
+  transform: translateY(-6px) scale(0.98);
+  transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+.filterMenuOpen {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.filterMenuClosing {
+  opacity: 0;
+  transform: translateY(-6px) scale(0.98);
+  pointer-events: none;
+}
+
+.filterMenuTitle {
+  padding: 6px 10px 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--popover-title, var(--sidebar-text-muted));
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--popover-border, var(--sidebar-border));
+  margin-bottom: 4px;
+}
+
+.filterMenuItem {
+  padding: 7px 10px !important;
+  border-radius: 6px !important;
+  text-transform: none !important;
+  color: var(--popover-text, var(--sidebar-text)) !important;
+}
+
+.filterMenuItem:hover {
+  /* Sin --popover-hover-bg explícito, se deriva del color de texto del propio popover
+     (--popover-text) en vez de caer en el tema claro del Sidebar (--sidebar-hover-bg) —
+     si el consumidor pasa solo filterPopoverBg con un fondo oscuro, el hover queda
+     oscuro/claro acorde en vez de un blanco fijo que no se ve sobre ese fondo. */
+  background-color: var(--popover-hover-bg, color-mix(in srgb, var(--popover-text, var(--sidebar-text)) 8%, transparent)) !important;
+}
+
+.filterMenuItemLayout {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+
+.filterMenuItemActive {
+  color: var(--popover-active-text, var(--sidebar-text-active)) !important;
+  font-weight: 600 !important;
+  /* Mismo criterio que .filterMenuItem:hover: fallback derivado de --popover-text en vez
+     del tema claro del Sidebar, para que se adapte solo a un --popover-bg oscuro. */
+  background-color: var(--popover-active-bg, color-mix(in srgb, var(--popover-text, var(--sidebar-text)) 14%, transparent)) !important;
+}
+
+.filterCheckIcon {
+  color: var(--popover-check-color, var(--popover-active-text, var(--sidebar-text-active)));
+}

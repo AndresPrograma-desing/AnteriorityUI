@@ -69,3 +69,33 @@ export const CircleWithTooltip = {
     onClick: () => console.log('clicked'),
   },
 };
+
+export const TransparentOnColoredBackground = {
+  render: () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: 20, background: '#0d1b4c', borderRadius: 8, width: 320 }}>
+      <span style={{ color: '#aab3d6', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' }}>
+        Default (currentColor)
+      </span>
+      <Button color="transparent" fullWidth style={{ color: '#e6e8ec', justifyContent: 'flex-start' }}>
+        Inicio
+      </Button>
+      <Button color="transparent" active fullWidth style={{ color: '#e6e8ec', justifyContent: 'flex-start' }}>
+        Documentos (activo)
+      </Button>
+
+      <span style={{ color: '#aab3d6', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', marginTop: 8 }}>
+        hoverColor / activeColor explícitos
+      </span>
+      <Button
+        color="transparent"
+        active
+        fullWidth
+        hoverColor="rgba(13, 82, 248, 0.12)"
+        activeColor="rgba(13, 82, 248, 0.25)"
+        style={{ color: '#e6e8ec', justifyContent: 'flex-start' }}
+      >
+        Equipos (activo, color custom)
+      </Button>
+    </div>
+  ),
+};

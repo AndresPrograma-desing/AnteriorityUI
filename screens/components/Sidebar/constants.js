@@ -13,7 +13,11 @@ export const TEXTS = {
   pinItem: "Fijar",
   unpinItem: "Desfijar",
   collaboratorsItem: "Colaboradores",
-  closeMobileMenu: "Cerrar menú"
+  closeMobileMenu: "Cerrar menú",
+  filterTooltip: "Filtrar por",
+  filterByDate: "Fecha",
+  filterByName: "Nombre (A-Z)",
+  filterByRecent: "Más reciente"
 };
 
 export const DEFAULT_METHOD_BADGE_COLORS = {

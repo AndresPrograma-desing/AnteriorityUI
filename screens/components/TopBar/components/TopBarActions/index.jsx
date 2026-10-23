@@ -1,7 +1,8 @@
 import React from 'react';
 import Button from '../../../Button/index';
 import ModalTooltip from '../../../ModalTooltip/ModalTooltip';
-import styles from '../../index.module.css';
+import topbarStyles from '../../index.module.css';
+import styles from './index.module.css';
 
 function TopBarActions({ actions, hasGlobalHover }) {
     return actions.map((action, index) => {
@@ -24,7 +25,7 @@ function TopBarActions({ actions, hasGlobalHover }) {
         };
 
         const button = (
-            <span key={action.key ?? index} className={styles.actionBtnWrapper}>
+            <span key={action.key ?? index} className={topbarStyles.actionBtnWrapper}>
                 <Button
                     size="small"
                     variant={Button.VARIANTS.GHOST}
@@ -38,7 +39,7 @@ function TopBarActions({ actions, hasGlobalHover }) {
                     {Icon && <Icon size={18} />}
                 </Button>
                 {hasBadge && (
-                    <span className={`${styles.actionBadge} ${isDotBadge ? styles.actionBadgeDot : styles.actionBadgeCount}`}>
+                    <span className={`${topbarStyles.actionBadge} ${isDotBadge ? topbarStyles.actionBadgeDot : topbarStyles.actionBadgeCount}`}>
                         {!isDotBadge && action.badge}
                     </span>
                 )}

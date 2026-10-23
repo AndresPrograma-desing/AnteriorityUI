@@ -1,6 +1,7 @@
 import React from 'react';
 import { Search } from 'lucide-react';
-import styles from '../../index.module.css';
+import topbarStyles from '../../index.module.css';
+import styles from './index.module.css';
 import { DEFAULT_SEARCH_PLACEHOLDER, DEFAULT_SEARCH_SHORTCUT } from '../../constants.js';
 
 function SearchBar({ centerContent, searchProps, commandItems, commandPaletteShortcut, commandPalettePlaceholder, onOpenCommandPalette }) {
@@ -8,7 +9,7 @@ function SearchBar({ centerContent, searchProps, commandItems, commandPaletteSho
 
     if (searchProps) {
         return (
-            <div className={styles.searchWrapper}>
+            <div className={topbarStyles.searchWrapper}>
                 <Search size={16} className={styles.searchIcon} />
                 <input
                     type="text"
@@ -30,7 +31,7 @@ function SearchBar({ centerContent, searchProps, commandItems, commandPaletteSho
 
     if (commandItems !== undefined) {
         return (
-            <button type="button" className={styles.searchWrapper} onClick={onOpenCommandPalette}>
+            <button type="button" className={topbarStyles.searchWrapper} onClick={onOpenCommandPalette}>
                 <Search size={16} className={styles.searchIcon} />
                 <span className={styles.searchInput} style={{ display: 'flex', alignItems: 'center' }}>
                     {commandPalettePlaceholder}

@@ -32,6 +32,7 @@ export default function Search({
         placeholder={placeholder}
         size="small"
         fullWidth
+        autoComplete="off"
         {...props}
       />
     );

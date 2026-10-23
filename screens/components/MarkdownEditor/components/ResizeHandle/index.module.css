@@ -1,0 +1,38 @@
+/* Barra de redimensionamiento estilo VS Code */
+.resizeHandle {
+  height: 14px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: ns-resize;
+  background-color: rgba(255, 255, 255, 0.02);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  user-select: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+  flex-shrink: 0;
+}
+
+.resizeHandle:hover {
+  background-color: rgba(124, 156, 255, 0.12);
+  border-top-color: rgba(124, 156, 255, 0.5);
+}
+
+.resizeHandleDragging {
+  background-color: rgba(124, 156, 255, 0.22);
+  border-top-color: #7c9cff;
+}
+
+.gripPill {
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background-color: rgba(255, 255, 255, 0.2);
+  transition: background-color 0.15s ease, width 0.15s ease;
+}
+
+.resizeHandle:hover .gripPill,
+.resizeHandleDragging .gripPill {
+  background-color: #7c9cff;
+  width: 48px;
+}
