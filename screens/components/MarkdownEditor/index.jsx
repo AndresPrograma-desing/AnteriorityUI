@@ -23,6 +23,7 @@ export const MarkdownEditor = ({
   defaultHeight = 320,
   labels = {},
   activeColor,
+  scrollbarColor,
   className = '',
   style,
   images,
@@ -48,6 +49,7 @@ export const MarkdownEditor = ({
     imageTooltip,
     colorTooltip,
     tableTooltip,
+    copyableTooltip,
     resizeHandleTitle,
     boldDefaultText,
     italicDefaultText,
@@ -59,6 +61,7 @@ export const MarkdownEditor = ({
     applyColorLabel,
     tableColumnLabels,
     tableRowLabels,
+    copyableDefaultText,
   } = { ...DEFAULT_LABELS, ...labels };
 
   const [viewMode, setViewMode] = useState('write'); // 'write' | 'split' | 'preview'
@@ -294,7 +297,11 @@ export const MarkdownEditor = ({
   return (
     <div
       className={`${styles.editorContainer} ${className}`.trim()}
-      style={{ ...(activeColor ? { '--markdown-editor-active': activeColor } : {}), ...style }}
+      style={{
+        ...(activeColor ? { '--markdown-editor-active': activeColor } : {}),
+        ...(scrollbarColor ? { '--markdown-editor-scrollbar-thumb': scrollbarColor } : {}),
+        ...style,
+      }}
     >
       <Toolbar
         viewMode={viewMode}
@@ -311,6 +318,7 @@ export const MarkdownEditor = ({
         onLink={() => insertFormatting('[', '](https://)', linkDefaultText)}
         onImage={insertImage}
         onTable={insertTable}
+        onCopyable={() => insertFormatting('{copy}', '{/copy}', copyableDefaultText)}
         colorButtonRef={colorButtonRef}
         pendingColor={pendingColor}
         isColorPickerOpen={isColorPickerOpen}
@@ -336,6 +344,7 @@ export const MarkdownEditor = ({
           colorTooltip,
           tableTooltip,
           applyColorLabel,
+          copyableTooltip,
         }}
       />
 

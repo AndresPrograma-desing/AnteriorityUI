@@ -19,6 +19,7 @@ export { default as CalendarPicker } from './screens/components/CalendarPicker/i
 export { default as Callout } from './screens/components/Callout/index.js';
 export { default as CardV1 } from './screens/components/CardV1/index.js';
 export { default as ChatWindow } from './screens/components/ChatWindow/index.js';
+export { default as Chart } from './screens/components/Chart/index.js';
 export { default as Checks } from './screens/components/Checks/index.js';
 export { default as ColorPicker } from './screens/components/ColorPicker/index.js';
 export { default as CommandPalette } from './screens/components/CommandPalette/index.js';

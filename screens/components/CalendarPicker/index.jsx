@@ -46,22 +46,44 @@ const CalendarPicker = ({
   const [showSelectors, setShowSelectors] = useState(false);
   const [hoveredDay, setHoveredDay] = useState(null);
   const [dragStartDay, setDragStartDay] = useState(null);
-  const [popoverAlign, setPopoverAlign] = useState('left');
+  // En vez de un flip binario izquierda/derecha (que asume que alguno de los
+  // dos anclajes fijos siempre entra), se calcula un offset horizontal en px
+  // que clampea el popover dentro del viewport — cubre también el caso de un
+  // contenedor angosto donde ni anclarlo a left:0 ni a right:0 del input
+  // alcanza para que quepa completo (ver bug: popover desbordando el borde
+  // derecho de la pantalla dentro de una card angosta).
+  const [popoverOffsetX, setPopoverOffsetX] = useState(0);
   const dragStateRef = useRef({ didDrag: false, hoveredDay: null });
   const wrapperRef = useRef(null);
+  const popoverRef = useRef(null);
 
-  // El popover (320px fijo) por default se ancla al borde izquierdo del
-  // input (left: 0). Si el input está cerca del borde derecho del viewport
-  // (ej. un filtro en una toolbar a la derecha de la pantalla), anclarlo a
-  // la izquierda lo desborda hacia afuera — se mide una sola vez al abrir y
-  // se ancla a la derecha del input en su lugar si no entra.
   useEffect(() => {
-    if (isInline || !isOpen || !wrapperRef.current) return;
-    const rect = wrapperRef.current.getBoundingClientRect();
-    const POPOVER_WIDTH = 320;
-    const fitsLeft = rect.left + POPOVER_WIDTH <= window.innerWidth;
-    setPopoverAlign(fitsLeft ? 'left' : 'right');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (isInline || !isOpen || !wrapperRef.current) return undefined;
+
+    const VIEWPORT_MARGIN = 8;
+
+    const reposition = () => {
+      if (!wrapperRef.current) return;
+      const wrapperRect = wrapperRef.current.getBoundingClientRect();
+      const popoverWidth = popoverRef.current?.offsetWidth || 320;
+
+      // Por default el popover nace alineado a left:0 del wrapper (offset 0).
+      // Si eso lo desborda por la derecha del viewport, se desplaza hacia la
+      // izquierda lo justo y necesario para que su borde derecho quede
+      // dentro del viewport (con margen), sin que eso lo saque por la
+      // izquierda tampoco — si el contenedor es más angosto que el popover,
+      // se prioriza no desbordar por la izquierda (offset mínimo = -wrapperRect.left + margin).
+      const rightOverflow = wrapperRect.left + popoverWidth - (window.innerWidth - VIEWPORT_MARGIN);
+      let offset = rightOverflow > 0 ? -rightOverflow : 0;
+      const minOffset = -wrapperRect.left + VIEWPORT_MARGIN;
+      if (offset < minOffset) offset = minOffset;
+
+      setPopoverOffsetX(offset);
+    };
+
+    reposition();
+    window.addEventListener('resize', reposition);
+    return () => window.removeEventListener('resize', reposition);
   }, [isOpen]);
 
   const isPopoverOpen = isInline || isOpen;
@@ -341,10 +363,11 @@ const CalendarPicker = ({
 
       {isOpen && (
         <div
+          ref={popoverRef}
           className={styles.calendarPopover}
           style={{
             ...colorVars,
-            ...(popoverAlign === 'right' ? { left: 'auto', right: 0 } : undefined),
+            transform: popoverOffsetX ? `translateX(${popoverOffsetX}px)` : undefined,
           }}
         >
           {grid}

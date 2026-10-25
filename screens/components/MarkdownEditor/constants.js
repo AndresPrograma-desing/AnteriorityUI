@@ -17,6 +17,7 @@ export const DEFAULT_LABELS = {
   imageTooltip: 'Insertar imagen',
   colorTooltip: 'Color de texto',
   tableTooltip: 'Insertar tabla',
+  copyableTooltip: 'Texto copiable',
   resizeHandleTitle: 'Arrastra para cambiar la altura (doble click para expandir/reducir)',
   boldDefaultText: 'negrita',
   italicDefaultText: 'cursiva',
@@ -26,6 +27,7 @@ export const DEFAULT_LABELS = {
   imageUrlPlaceholder: 'url-de-la-imagen',
   colorDefaultText: 'texto en color',
   applyColorLabel: 'Aplicar',
+  copyableDefaultText: 'texto copiable',
   tableColumnLabels: ['Columna 1', 'Columna 2', 'Columna 3'],
   tableRowLabels: ['Dato 1', 'Dato 2', 'Dato 3'],
 };

@@ -4,11 +4,14 @@ import remarkGfm from 'remark-gfm';
 import styles from './index.module.css';
 import { MermaidBlock } from './MermaidBlock';
 import { CopyButton } from './CopyButton';
+import { extractCopyBlocks, remarkCopyBlocks } from './copyBlocks.js';
 
 const isMermaidLanguage = (className = '') => /(^|\s)language-mermaid(\s|$)/.test(className);
 
 const COLOR_TAG_PATTERN = /\{color:([^}]+)\}([\s\S]+?)\{\/color\}/g;
 const COLOR_LINK_PROTOCOL = 'color:';
+const COPY_TAG_PATTERN = /\{copy\}([\s\S]+?)\{\/copy\}/g;
+const COPY_LINK_PROTOCOL = 'copy:';
 // Bloques de código (```fence``` o `inline`) no deben tocarse: un snippet que por
 // casualidad contenga literalmente "{color:...}" no debe convertirse en texto coloreado.
 const CODE_SPAN_PATTERN = /(```[\s\S]*?```|`[^`\n]*`)/g;
@@ -30,6 +33,23 @@ const preprocessColorTags = (markdown) => {
     .join('');
 };
 
+// Mismo mecanismo que preprocessColorTags: {copy}texto{/copy} -> [texto](copy:), el
+// renderer de "a" de abajo lo intercepta y lo convierte en un <span> con un CopyButton
+// al lado (el mismo que ya usan los bloques de código y los títulos), sin afectar esos
+// otros copiables existentes.
+const preprocessCopyTags = (markdown) => {
+  if (typeof markdown !== 'string' || !markdown.includes('{copy}')) return markdown;
+
+  return markdown
+    .split(CODE_SPAN_PATTERN)
+    .map((segment, index) => {
+      const isCodeSpan = index % 2 === 1;
+      if (isCodeSpan) return segment;
+      return segment.replace(COPY_TAG_PATTERN, (_, text) => `[${text}](${COPY_LINK_PROTOCOL})`);
+    })
+    .join('');
+};
+
 // react-markdown sanea los href por default (defaultUrlTransform) y solo permite un
 // allowlist de protocolos (http/https/irc/mailto/xmpp) — tanto el protocolo "color:"
 // custom de arriba como "data:" (usado por MarkdownEditor para imágenes pegadas del
@@ -38,7 +58,7 @@ const preprocessColorTags = (markdown) => {
 // data:text/html u otros tipos de contenido potencialmente peligrosos en un href/src.
 const DATA_IMAGE_PROTOCOL_PATTERN = /^data:image\//i;
 const urlTransform = (url) => {
-  if (url.startsWith(COLOR_LINK_PROTOCOL) || DATA_IMAGE_PROTOCOL_PATTERN.test(url)) return url;
+  if (url.startsWith(COLOR_LINK_PROTOCOL) || url === COPY_LINK_PROTOCOL || DATA_IMAGE_PROTOCOL_PATTERN.test(url)) return url;
   return defaultUrlTransform(url);
 };
 
@@ -133,6 +153,23 @@ const createPreRenderer = (UserPre, copyCodeLabel, copiedCodeLabel) =>
     );
   };
 
+const createCopyBlockRenderer = (blocks, copyTextLabel, copiedTextLabel) =>
+  function CopyBlockRenderer(props) {
+    const { node, children, 'data-copy-block': blockId, ...rest } = props;
+
+    return (
+      <div className={styles.copyBlockWrapper} {...rest}>
+        <CopyButton
+          text={blocks[blockId] ?? ''}
+          className={styles.copyBlockButton}
+          label={copyTextLabel}
+          copiedLabel={copiedTextLabel}
+        />
+        {children}
+      </div>
+    );
+  };
+
 const createHeadingRenderer = (Tag, UserHeading, copyTitleLabel, copiedTitleLabel) =>
   function HeadingRenderer(props) {
     const { children, className = '', ...rest } = props;
@@ -176,13 +213,27 @@ const createImageRenderer = (UserImage) =>
     return <img src={src} alt={alt} onError={() => setFailed(true)} {...rest} />;
   };
 
-const createLinkRenderer = (UserLink) =>
+const createLinkRenderer = (UserLink, copyTextLabel, copiedTextLabel) =>
   function LinkRenderer(props) {
     const { href, children, ...rest } = props;
 
     if (typeof href === 'string' && href.startsWith(COLOR_LINK_PROTOCOL)) {
       const color = href.slice(COLOR_LINK_PROTOCOL.length);
       return <span style={{ color }}>{children}</span>;
+    }
+
+    if (href === COPY_LINK_PROTOCOL) {
+      return (
+        <span className={styles.copyableText}>
+          {children}
+          <CopyButton
+            text={getPlainText(children)}
+            className={styles.copyableTextButton}
+            label={copyTextLabel}
+            copiedLabel={copiedTextLabel}
+          />
+        </span>
+      );
     }
 
     if (UserLink) {
@@ -203,13 +254,23 @@ export const MarkdownContent = ({
   copiedCodeLabel = 'Código copiado',
   copyTitleLabel = 'Copiar título',
   copiedTitleLabel = 'Título copiado',
+  copyTextLabel = 'Copiar',
+  copiedTextLabel = 'Copiado',
 }) => {
+  const { markdown: withoutCopyBlocks, blocks: copyBlocks } = extractCopyBlocks(children ?? '');
+
   const mergedComponents = {
     ...components,
     code: createCodeRenderer(components?.code),
     pre: createPreRenderer(components?.pre, copyCodeLabel, copiedCodeLabel),
-    a: createLinkRenderer(components?.a),
+    a: createLinkRenderer(components?.a, copyTextLabel, copiedTextLabel),
     img: createImageRenderer(components?.img),
+    div: (props) =>
+      props['data-copy-block']
+        ? createCopyBlockRenderer(copyBlocks, copyTextLabel, copiedTextLabel)(props)
+        : components?.div
+          ? <components.div {...props} />
+          : <div {...props} />,
     ...Object.fromEntries(
       HEADING_TAGS.map((tag) => [
         tag,
@@ -218,8 +279,10 @@ export const MarkdownContent = ({
     ),
   };
 
-  const processedMarkdown = preprocessColorTags(
-    preprocessBareImageUrls(resolveImageTokens(children ?? '', images))
+  const processedMarkdown = preprocessCopyTags(
+    preprocessColorTags(
+      preprocessBareImageUrls(resolveImageTokens(withoutCopyBlocks, images))
+    )
   );
 
   return (
@@ -227,7 +290,7 @@ export const MarkdownContent = ({
       className={`${styles.markdown} ${className}`}
       style={{ ...(linkColor ? { '--markdown-link': linkColor } : {}), ...style }}
     >
-      <ReactMarkdown remarkPlugins={[remarkGfm]} components={mergedComponents} urlTransform={urlTransform}>
+      <ReactMarkdown remarkPlugins={[remarkGfm, remarkCopyBlocks]} components={mergedComponents} urlTransform={urlTransform}>
         {processedMarkdown}
       </ReactMarkdown>
     </div>

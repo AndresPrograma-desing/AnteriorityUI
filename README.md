@@ -4,7 +4,7 @@
 
 # anteriority-ui
 
-Librería interna de componentes React (UI) para reutilizar entre proyectos. Construida sobre [MUI](https://mui.com/), [lucide-react](https://lucide.dev/) y CSS Modules, con [Storybook](https://storybook.js.org/) para navegar y probar cada componente de forma aislada.
+Librería interna de componentes React (UI) para reutilizar entre proyectos. Construida sobre [MUI](https://mui.com/), [lucide-react](https://lucide.dev/) y CSS Modules, con [Storybook](https://storybook.js.org/) para navegar y probar cada componente de forma aislada. El componente `Chart` se apoya en [Recharts](https://recharts.org/) y en los paquetes de [Nivo](https://nivo.rocks/) (`@nivo/pie`, `@nivo/calendar`) para sus distintos tipos de gráfico — ambos vienen empaquetados como `dependencies`, sin que el proyecto consumidor tenga que instalarlos aparte.
 
 ## Instalación
 
@@ -158,6 +158,7 @@ Documentación completa de props y ejemplos de uso de los ~50 componentes en **[
 | [CalendarPicker](AnteriorityUI.md#calendarpicker) | Selector de fecha integrado a un `TextField` |
 | [Callout](AnteriorityUI.md#callout) | Caja de aviso/notificación con variantes de color y cuerpo en Markdown |
 | [CardV1](AnteriorityUI.md#cardv1) | Tarjeta con badges, acción e indicadores de estado |
+| [Chart](AnteriorityUI.md#chart) | Gráficos (línea, barra, torta, calendario de actividad), con título/descripción en Markdown y slot de acciones |
 | [ChatWindow](AnteriorityUI.md#chatwindow) | Ventana de chat completa (mensajes, input, avatar) |
 | [Checks](AnteriorityUI.md#checks) | Checkbox de permisos/ítem seleccionable |
 | [ColorPicker](AnteriorityUI.md#colorpicker) | Selector de color (HEX/RGB/HSL) con popover de saturación/matiz |
@@ -204,3 +205,35 @@ Documentación completa de props y ejemplos de uso de los ~50 componentes en **[
 | [UserEditPopover](AnteriorityUI.md#usereditpopover) | Popover de edición de nombre de usuario (usa `features/user-profile`) |
 
 > `screens/components/Avatar/` existe pero está sin implementar (archivos vacíos) — no se documenta hasta que tenga contenido.
+
+## Créditos
+
+`anteriority-ui` es una capa fina de componentes construida sobre estas librerías — todo el trabajo pesado de renderizado, accesibilidad y lógica de interacción lo hacen ellas:
+
+<p align="left">
+  <a href="https://mui.com/"><img alt="MUI" src="https://img.shields.io/badge/MUI-007FFF?style=for-the-badge&logo=mui&logoColor=white"></a>
+  <a href="https://lucide.dev/"><img alt="lucide-react" src="https://img.shields.io/badge/lucide--react-F56565?style=for-the-badge&logo=lucide&logoColor=white"></a>
+  <a href="https://react-icons.github.io/react-icons/"><img alt="react-icons" src="https://img.shields.io/badge/react--icons-61DAFB?style=for-the-badge&logo=react&logoColor=black"></a>
+  <a href="https://recharts.org/"><img alt="Recharts" src="https://img.shields.io/badge/Recharts-22B5BF?style=for-the-badge&logoColor=white"></a>
+  <a href="https://nivo.rocks/"><img alt="Nivo" src="https://img.shields.io/badge/Nivo-E8762D?style=for-the-badge&logoColor=white"></a>
+  <a href="https://storybook.js.org/"><img alt="Storybook" src="https://img.shields.io/badge/Storybook-FF4785?style=for-the-badge&logo=storybook&logoColor=white"></a>
+  <a href="https://github.com/remarkjs/react-markdown"><img alt="react-markdown" src="https://img.shields.io/badge/react--markdown-000000?style=for-the-badge&logo=markdown&logoColor=white"></a>
+  <a href="https://mermaid.js.org/"><img alt="Mermaid" src="https://img.shields.io/badge/Mermaid-FF3670?style=for-the-badge&logo=mermaid&logoColor=white"></a>
+  <a href="https://date-fns.org/"><img alt="date-fns" src="https://img.shields.io/badge/date--fns-770C56?style=for-the-badge&logoColor=white"></a>
+</p>
+
+| Librería | Uso en la librería |
+|---|---|
+| [**MUI**](https://mui.com/) | Base de los componentes `Material-UI/Components/*` (`Selector`, `Search`, `TextField`, `Paginador`, etc.) y de piezas como `Button`, `Checks`, `Swich`. |
+| [**lucide-react**](https://lucide.dev/) | Set principal de íconos de interfaz, empaquetado y re-exportado en `anteriority-ui/lucide`. |
+| [**react-icons**](https://react-icons.github.io/react-icons/) | Set de íconos de marcas/tecnologías/UI adicional, empaquetado y documentado en la sección "Icons (react-icons)" de [AnteriorityUI.md](AnteriorityUI.md). |
+| [**Recharts**](https://recharts.org/) | Motor de `Chart` para `type="line"` y `type="bar"`. |
+| [**Nivo**](https://nivo.rocks/) (`@nivo/pie`, `@nivo/calendar`) | Motor de `Chart` para `type="pie"` y `type="nivo-calendar"`. |
+| [**Storybook**](https://storybook.js.org/) | Catálogo navegable de los ~50 componentes, con variantes de ejemplo reales. |
+| [**react-markdown**](https://github.com/remarkjs/react-markdown) + [**remark-gfm**](https://github.com/remarkjs/remark-gfm) | Motor de `MarkdownContent`/`MarkdownEditor` (tablas, listas de tareas, GFM completo). |
+| [**Mermaid**](https://mermaid.js.org/) | Renderizado de diagramas dentro de bloques ` ```mermaid ` en `MarkdownContent`. |
+| [**date-fns**](https://date-fns.org/) | Manejo de fechas en `CalendarPicker`/`CalendarComponent`. |
+| [**date-holidays**](https://github.com/commenthol/date-holidays) | Feriados reales por país en `CalendarPicker`. |
+| [**pdfjs-dist**](https://mozilla.github.io/pdf.js/) | Render de PDFs en `MediaViewer` (peer dependency opcional). |
+| [**docx-preview**](https://github.com/VolodymyrBaydalka/docxjs) | Preview de documentos `.docx` en `MediaViewer`. |
+| [**@rjsf/core**](https://rjsf-team.github.io/react-jsonschema-form/) | Motor de `SchemaForm` (formularios desde JSON Schema). |

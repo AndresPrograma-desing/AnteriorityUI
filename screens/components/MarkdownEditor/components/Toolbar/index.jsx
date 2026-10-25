@@ -13,6 +13,7 @@ import {
   Link as LinkIcon,
   Image as ImageIcon,
   Table as TableIcon,
+  Copy as CopyIcon,
   Eye,
   Edit3,
   Columns,
@@ -35,6 +36,7 @@ function Toolbar({
   onLink,
   onImage,
   onTable,
+  onCopyable,
   colorButtonRef,
   pendingColor,
   isColorPickerOpen,
@@ -62,6 +64,7 @@ function Toolbar({
     colorTooltip,
     tableTooltip,
     applyColorLabel,
+    copyableTooltip,
   } = labels;
 
   const disabled = viewMode === 'preview';
@@ -144,6 +147,12 @@ function Toolbar({
         <Tooltip title={tableTooltip} arrow>
           <button type="button" className={styles.toolButton} onClick={onTable} disabled={disabled}>
             <TableIcon size={16} />
+          </button>
+        </Tooltip>
+
+        <Tooltip title={copyableTooltip} arrow>
+          <button type="button" className={styles.toolButton} onClick={onCopyable} disabled={disabled}>
+            <CopyIcon size={16} />
           </button>
         </Tooltip>
 

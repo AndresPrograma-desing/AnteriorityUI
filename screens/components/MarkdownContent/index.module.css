@@ -137,6 +137,54 @@
   color: inherit;
 }
 
+.copyableText {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.copyableTextButton {
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.copyableText:hover .copyableTextButton,
+.copyableText:focus-within .copyableTextButton,
+.copyableTextButton:focus-visible {
+  opacity: 1;
+}
+
+.copyBlockWrapper {
+  position: relative;
+  padding: 0.75rem 1rem;
+  border: 1px solid rgba(128, 128, 128, 0.2);
+  border-radius: 8px;
+  margin: 0 0 0.75em 0;
+}
+
+.copyBlockWrapper > *:first-child {
+  margin-top: 0;
+}
+
+.copyBlockWrapper > *:last-child {
+  margin-bottom: 0;
+}
+
+.copyBlockButton {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.copyBlockWrapper:hover .copyBlockButton,
+.copyBlockWrapper:focus-within .copyBlockButton,
+.copyBlockButton:focus-visible {
+  opacity: 1;
+}
+
 .codeBlockWrapper {
   position: relative;
 }
