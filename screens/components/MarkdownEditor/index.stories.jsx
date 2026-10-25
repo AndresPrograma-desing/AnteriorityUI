@@ -63,6 +63,16 @@ export const WithImageAndColor = {
   },
 };
 
+export const WithCopyableText = {
+  render: (args) => <EditorWithState {...args} />,
+  args: {
+    value:
+      'Usa el ícono de clip (copiar) de la toolbar para envolver el texto seleccionado en `{copy}texto{/copy}` — en la vista previa aparece con un botón de copiar al lado, sin afectar el copy de títulos o bloques de código.\n\nEjemplo ya escrito: el correo {copy}soporte@ejemplo.com{/copy} es copiable.',
+    placeholder: 'Write your markdown here...',
+    defaultHeight: 380,
+  },
+};
+
 export const CustomLabels = {
   render: (args) => <EditorWithState {...args} />,
   args: {
@@ -74,5 +84,15 @@ export const CustomLabels = {
       splitTab: 'Dividido',
       previewTab: 'Vista previa',
     },
+  },
+};
+
+export const WithCustomScrollbar = {
+  render: (args) => <EditorWithState {...args} />,
+  args: {
+    value: Array.from({ length: 30 }, (_, i) => `Línea ${i + 1} de contenido de ejemplo.`).join('\n\n'),
+    placeholder: 'Write your markdown here...',
+    defaultHeight: 220,
+    scrollbarColor: '#38bdf8',
   },
 };

@@ -1,0 +1,30 @@
+.wrapper {
+  background-color: var(--chart-bg, #ffffff);
+  border: 2px solid var(--chart-border, #e5e7eb);
+  border-radius: 6px;
+  padding: 12px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.title {
+  margin-bottom: 0;
+  min-width: 0;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.description {
+  margin-top: 8px;
+}

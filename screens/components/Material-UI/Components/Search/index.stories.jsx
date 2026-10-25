@@ -66,3 +66,59 @@ export const FreeSolo = {
     placeholder: 'Escribe texto libre...',
   },
 };
+
+export const FreeSoloWithValue = {
+  render: (args) => {
+    const [value, setValue] = useState('Texto precargado');
+    return <Search {...args} value={value} onChange={setValue} />;
+  },
+  args: {
+    freeSolo: true,
+    options: [],
+    label: 'Buscar',
+    placeholder: 'Escribe texto libre...',
+  },
+};
+
+export const WithError = {
+  render: (args) => {
+    const [value, setValue] = useState('ab');
+    return <Search {...args} value={value} onChange={setValue} />;
+  },
+  args: {
+    freeSolo: true,
+    options: [],
+    label: 'Buscar',
+    error: true,
+    helperText: 'Ingresa al menos 3 caracteres',
+  },
+};
+
+export const MediumSize = {
+  render: (args) => {
+    const [value, setValue] = useState('');
+    return <Search {...args} value={value} onChange={setValue} />;
+  },
+  args: {
+    freeSolo: true,
+    options: [],
+    label: 'Buscar',
+    size: 'medium',
+  },
+};
+
+export const CustomColors = {
+  render: (args) => {
+    const [value, setValue] = useState('Texto de ejemplo');
+    return <Search {...args} value={value} onChange={setValue} />;
+  },
+  args: {
+    freeSolo: true,
+    options: [],
+    label: 'Buscar',
+    bgColor: '#0f172a',
+    textColor: '#e2e8f0',
+    borderColor: '#38bdf8',
+    iconColor: '#38bdf8',
+  },
+};

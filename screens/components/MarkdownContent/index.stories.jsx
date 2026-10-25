@@ -50,6 +50,20 @@ export const WithColoredText = {
   },
 };
 
+export const WithCopyableText = {
+  args: {
+    children:
+      'Pasa el mouse sobre el texto para ver el botón de copiar.\n\nEl correo de soporte es {copy}soporte@ejemplo.com{/copy} y la IP del servidor es {copy}192.168.1.1{/copy}.\n\nEsto no afecta a los demás copiables: el título y el bloque de código de abajo siguen funcionando igual.\n\n# Título copiable\n\n```js\nconst apiKey = "abc123";\n```',
+  },
+};
+
+export const WithCopyableBlock = {
+  args: {
+    children:
+      '{copy}# Colocar un Storage al Paginador\n\n## Objetivo\n\nEvitar que al entrar a un detalle y volver, el paginador se reinicie a la página 1.\n\n### Guardar la página\n\n```javascript\nconst handlePageChange = (newPage) => {\n  setPage(newPage);\n  localStorage.setItem(\'currentPage\', newPage);\n};\n```\n\n### Leer la página al iniciar\n\n```javascript\nconst [page, setPage] = useState(() => {\n  const saved = localStorage.getItem(\'currentPage\');\n  return saved ? Number(saved) : 1;\n});\n```\n{/copy}\n\nEste texto queda afuera del bloque copiable.',
+  },
+};
+
 export const WithBarePastedImageUrl = {
   args: {
     children:
