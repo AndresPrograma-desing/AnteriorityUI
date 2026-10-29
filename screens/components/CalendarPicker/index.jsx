@@ -29,6 +29,7 @@ const CalendarPicker = ({
   tooltipBgColor,
   tooltipTextColor,
   moonPhaseColor,
+  selectorsPopperZIndex,
   variant = 'popover',
   showFooter = true,
   renderDay,
@@ -328,6 +329,7 @@ const CalendarPicker = ({
       tooltipTextColor={tooltipTextColor}
       showMoonPhases={showMoonPhases}
       moonPhaseColor={moonPhaseColor}
+      selectorsPopperZIndex={selectorsPopperZIndex}
     />
   );
 

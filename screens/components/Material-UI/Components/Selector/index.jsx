@@ -4,6 +4,7 @@ import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import Checks from '../../../Checks/index';
 import styles from './index.module.css';
+import { DEFAULT_POPPER_Z_INDEX } from './constants.js';
 
 export default function Selector({
     label,
@@ -25,7 +26,8 @@ export default function Selector({
     scrollbarColor,
     chipBgColor,
     chipTextColor,
-    chipIconColor
+    chipIconColor,
+    popperZIndex = DEFAULT_POPPER_Z_INDEX
 }) {
     const normalizeVal = (val) => String(val || '').toLowerCase().replace(/[_\s\/-]+/g, '');
 
@@ -78,7 +80,7 @@ export default function Selector({
             }
             slotProps={{
                 popper: {
-                    sx: { zIndex: 100000 }
+                    sx: { zIndex: popperZIndex }
                 },
                 chip: (chipBgColor || chipTextColor || chipIconColor) ? {
                     sx: {

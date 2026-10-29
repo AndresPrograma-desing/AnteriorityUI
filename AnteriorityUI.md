@@ -626,6 +626,7 @@ import CalendarPicker from '../CalendarPicker/index'; // export default
 | `borderColor` | string | — | Solo `variant="inline"`. Color de las líneas divisorias del grid (`--cp-agenda-border`). |
 | `hoverColor` | string | — | Solo `variant="inline"`. Fondo al pasar el mouse sobre una celda (`--cp-agenda-hover`). |
 | `holidayColor` | string | — | Solo `variant="inline"`. Color del nombre del feriado/efeméride en la celda (`--cp-agenda-holiday`) — el popover no tiene este, el nombre nunca se muestra como texto ahí (ver nota). |
+| `selectorsPopperZIndex` | number | `100000` (default interno de `Selector`) | Solo `variant="popover"`. `z-index` del `Popper` de los `Selector` (Material-UI) de "Mes"/"Año" que se abren al clickear el título del calendario — ese `Popper` se renderiza vía portal al final de `<body>`, fuera del popover del calendario (`z-index: 20`). Ajustar si un modal/drawer propio del proyecto consumidor tiene un `z-index` mayor y "tapa" los clics del listado de años (ver nota). |
 
 **Ejemplos:**
 ```jsx
@@ -695,6 +696,7 @@ import CalendarPicker from '../CalendarPicker/index'; // export default
 - `bgColor`/`textColor`/`mutedColor`/`mutedBgColor`/`borderColor`/`hoverColor` (paleta general del calendario grande) solo existen en `variant="inline"` — el popover usa su propia paleta fija (ver `selectedColor`/`accentColor`).
 - El cálculo de feriados usa `date-holidays` (datos reales por país, no hardcodeados en la librería); el de fase lunar es un cálculo astronómico aproximado por ciclo sinódico (sin dependencia de red), con ±1 día de margen de error — no reemplaza una efeméride astronómica oficial.
 - El popover (`variant="popover"`) se reposiciona automáticamente para no desbordar el viewport: si el input está cerca del borde derecho (o dentro de un contenedor angosto), se desplaza hacia la izquierda lo necesario para quedar completo en pantalla, clampeando también por la izquierda si el contenedor es más angosto que el popover (320px). Se recalcula al abrir y en cada `resize` de la ventana — no requiere ninguna prop.
+- Si al abrir el selector de "Año"/"Mes" dentro de un modal/drawer propio (ej. un panel lateral) la lista se ve pero los clics no registran, es un conflicto de capas: el `Popper` de MUI vive en un portal a `<body>`, fuera de ese modal, y si el modal tiene su propio overlay con `z-index` mayor al default del `Popper` (`100000`), ese overlay intercepta los clics aunque visualmente el listado quede encima. Subir `selectorsPopperZIndex` por encima del `z-index` de ese overlay soluciona el bloqueo.
 
 ---
 
@@ -2772,6 +2774,7 @@ import Selector from '../Material-UI/Components/Selector/index'; // export defau
 | chipBgColor | string | — | Fondo de los chips de selección (modo `multiSelect`). |
 | chipTextColor | string | — | Color de texto de los chips. |
 | chipIconColor | string | — | Color del ícono "X" de cada chip. |
+| popperZIndex | number | `100000` | `z-index` del `Popper` del listado desplegable (se renderiza en un portal al final de `<body>`, fuera del árbol del componente). Ajustar si un overlay/modal propio del proyecto consumidor tiene un `z-index` mayor y tapa los clics del listado. |
 
 **Ejemplos:**
 ```jsx
@@ -2797,7 +2800,7 @@ import Selector from '../Material-UI/Components/Selector/index'; // export defau
 />
 ```
 
-**Notas:** El matching de `value` contra `options` ignora mayúsculas, espacios, guiones y guiones bajos si no hay coincidencia exacta por `value`. `fullWidth` default es `true` — si solo se pasa `className` para controlar el ancho sin `fullWidth={false}`, el `sx.width: '100%'` default sigue ganando; para un ancho custom, combinar `fullWidth={false}` con `style={{ width }}`. En `multiSelect`, `disableCloseOnSelect` se activa automáticamente (el dropdown no se cierra después de cada click).
+**Notas:** El matching de `value` contra `options` ignora mayúsculas, espacios, guiones y guiones bajos si no hay coincidencia exacta por `value`. `fullWidth` default es `true` — si solo se pasa `className` para controlar el ancho sin `fullWidth={false}`, el `sx.width: '100%'` default sigue ganando; para un ancho custom, combinar `fullWidth={false}` con `style={{ width }}`. En `multiSelect`, `disableCloseOnSelect` se activa automáticamente (el dropdown no se cierra después de cada click). `popperZIndex`: el `Popper` de MUI se monta vía portal al final de `<body>`, fuera de cualquier contenedor con overflow/scroll o `z-index` local del componente padre (ej. el popover de `CalendarPicker`, con `z-index: 20`) — si el proyecto consumidor tiene un modal/drawer propio con `z-index` superior al default (`100000`), esa capa puede interceptar los clics sobre el listado aunque se vea visualmente encima; subir `popperZIndex` por encima de esa capa resuelve el bloqueo de clics.
 
 ---
 

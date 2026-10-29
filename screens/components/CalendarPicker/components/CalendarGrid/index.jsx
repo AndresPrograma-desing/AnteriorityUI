@@ -48,6 +48,7 @@ const CalendarGrid = ({
   moonPhaseColor,
   tooltipBgColor,
   tooltipTextColor,
+  selectorsPopperZIndex,
   className = '',
 }) => {
   const currentYear = currentDate.getFullYear();
@@ -105,6 +106,7 @@ const CalendarGrid = ({
               value={currentDate.getMonth()}
               onChange={onMonthChange}
               options={MONTHS.map((m, index) => ({ value: index, label: m }))}
+              {...(selectorsPopperZIndex !== undefined ? { popperZIndex: selectorsPopperZIndex } : {})}
             />
           </div>
           <div className={styles.selectorGroup}>
@@ -113,6 +115,7 @@ const CalendarGrid = ({
               value={currentDate.getFullYear()}
               onChange={onYearChange}
               options={years.map(y => ({ value: y, label: String(y) }))}
+              {...(selectorsPopperZIndex !== undefined ? { popperZIndex: selectorsPopperZIndex } : {})}
             />
           </div>
           <Button
