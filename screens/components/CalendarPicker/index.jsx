@@ -119,6 +119,11 @@ const CalendarPicker = ({
       }
     };
     const handleClickOutside = (e) => {
+      // El dropdown de los Selector de Mes/Año (MUI Autocomplete) se renderiza
+      // en un Popper vía portal a document.body, fuera de wrapperRef — sin este
+      // chequeo, clickear una opción de esa lista se interpreta como "click
+      // afuera" y cierra todo el calendario en el mismo gesto de selección.
+      if (e.target.closest && e.target.closest('.MuiAutocomplete-popper')) return;
       if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
         setIsOpen(false);
         setShowSelectors(false);
