@@ -95,6 +95,13 @@ const CalendarPicker = ({
   const selectedDate = !range ? parseValueToDate(value) : null;
 
   useEffect(() => {
+    if (isInline || !isOpen) return undefined;
+    const anchorDate = range ? (rangeStart || rangeEnd) : selectedDate;
+    if (anchorDate) setCurrentDate(anchorDate);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
+
+  useEffect(() => {
     if (!isPopoverOpen) {
       setHoveredDay(null);
       setDragStartDay(null);
