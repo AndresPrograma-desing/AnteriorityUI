@@ -264,3 +264,27 @@ export const PopoverWithHolidaysAndMoonPhases = {
     onChange: (e) => console.log('changed', e.target.value),
   },
 };
+
+// Repro del bug: el dropdown del Selector de "Mes"/"Año" (MUI Autocomplete)
+// se renderiza en un Popper vía portal a document.body, fuera del wrapper del
+// CalendarPicker. El listener de "click afuera" no lo contemplaba, así que
+// elegir una opción de esa lista cerraba todo el calendario en el mismo
+// click, antes de poder confirmar la selección de fecha.
+//
+// Pasos para verificar manualmente en Storybook:
+// 1. Click en el input para abrir el popover.
+// 2. Click en "Octubre 2026" (el título del mes) para mostrar los selectores.
+// 3. Abrir el dropdown de "Año" y elegir, por ej., 2010.
+// 4. El calendario debe seguir abierto y mostrar los selectores con el año ya
+//    cambiado a 2010 — no debe cerrarse solo por elegir la opción.
+// 5. Clickear un día del mes mostrado: ahí sí se confirma la fecha y se
+//    cierra el popover.
+export const PopoverYearSelectorDoesNotCloseCalendar = {
+  args: {
+    label: 'Fecha de nacimiento',
+    name: 'birthDateYearSelectorRepro',
+    value: '',
+    showFooter: true,
+    onChange: (e) => console.log('changed', e.target.value),
+  },
+};
