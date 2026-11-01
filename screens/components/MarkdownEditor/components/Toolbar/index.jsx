@@ -17,6 +17,7 @@ import {
   Eye,
   Edit3,
   Columns,
+  Smile,
 } from 'lucide-react';
 import { ColorPickerButton } from './components/index.js';
 import styles from './index.module.css';
@@ -38,6 +39,9 @@ function Toolbar({
   onTable,
   onCopyable,
   colorButtonRef,
+  emojiButtonRef,
+  isEmojiOpen,
+  onToggleEmoji,
   pendingColor,
   isColorPickerOpen,
   onToggleColorPicker,
@@ -65,6 +69,7 @@ function Toolbar({
     tableTooltip,
     applyColorLabel,
     copyableTooltip,
+    emojiTooltip,
   } = labels;
 
   const disabled = viewMode === 'preview';
@@ -153,6 +158,20 @@ function Toolbar({
         <Tooltip title={copyableTooltip} arrow>
           <button type="button" className={styles.toolButton} onClick={onCopyable} disabled={disabled}>
             <CopyIcon size={16} />
+          </button>
+        </Tooltip>
+
+        <Tooltip title={emojiTooltip} arrow>
+          <button
+            type="button"
+            ref={emojiButtonRef}
+            className={styles.toolButton}
+            onClick={onToggleEmoji}
+            disabled={disabled}
+            aria-expanded={isEmojiOpen}
+            aria-haspopup="dialog"
+          >
+            <Smile size={16} />
           </button>
         </Tooltip>
 

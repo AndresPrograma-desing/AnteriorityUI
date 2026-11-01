@@ -8,3 +8,7 @@ export const VARIANT_TAGS = {
 
 export const DEFAULT_VARIANT = 'body';
 export const DEFAULT_ALIGN = 'left';
+
+export const DEFAULT_ICON_SIZE = '1.1em';
+export const DEFAULT_ICON_GAP = '0.4em';
+export const DEFAULT_ICON_POSITION = 'start';

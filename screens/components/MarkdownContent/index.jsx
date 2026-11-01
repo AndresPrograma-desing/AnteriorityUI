@@ -5,6 +5,7 @@ import styles from './index.module.css';
 import { MermaidBlock } from './MermaidBlock';
 import { CopyButton } from './CopyButton';
 import { extractCopyBlocks, remarkCopyBlocks } from './copyBlocks.js';
+import DynamicIcon from '../DynamicIcon/index';
 
 const isMermaidLanguage = (className = '') => /(^|\s)language-mermaid(\s|$)/.test(className);
 
@@ -50,6 +51,28 @@ const preprocessCopyTags = (markdown) => {
     .join('');
 };
 
+const ICON_TAG_PATTERN = /\{icon:([A-Za-z][A-Za-z0-9]*)(?::([^}]+))?\}/g;
+const ICON_LINK_PROTOCOL = 'icon:';
+
+// {icon:Nombre} o {icon:Nombre:color} -> [icon](icon:Nombre:color-codificado), mismo truco que
+// {color:X}: el renderer de "a" lo convierte en un <DynamicIcon>. El color se codifica porque
+// un destino de link markdown no admite espacios (ej. rgb(1, 2, 3)).
+const preprocessIconTags = (markdown) => {
+  if (typeof markdown !== 'string' || !markdown.includes('{icon:')) return markdown;
+
+  return markdown
+    .split(CODE_SPAN_PATTERN)
+    .map((segment, index) => {
+      const isCodeSpan = index % 2 === 1;
+      if (isCodeSpan) return segment;
+      return segment.replace(
+        ICON_TAG_PATTERN,
+        (_, name, color) => `[icon](${ICON_LINK_PROTOCOL}${name}${color ? `:${encodeURIComponent(color.trim())}` : ''})`
+      );
+    })
+    .join('');
+};
+
 // react-markdown sanea los href por default (defaultUrlTransform) y solo permite un
 // allowlist de protocolos (http/https/irc/mailto/xmpp) — tanto el protocolo "color:"
 // custom de arriba como "data:" (usado por MarkdownEditor para imágenes pegadas del
@@ -58,7 +81,7 @@ const preprocessCopyTags = (markdown) => {
 // data:text/html u otros tipos de contenido potencialmente peligrosos en un href/src.
 const DATA_IMAGE_PROTOCOL_PATTERN = /^data:image\//i;
 const urlTransform = (url) => {
-  if (url.startsWith(COLOR_LINK_PROTOCOL) || url === COPY_LINK_PROTOCOL || DATA_IMAGE_PROTOCOL_PATTERN.test(url)) return url;
+  if (url.startsWith(COLOR_LINK_PROTOCOL) || url.startsWith(ICON_LINK_PROTOCOL) || url === COPY_LINK_PROTOCOL || DATA_IMAGE_PROTOCOL_PATTERN.test(url)) return url;
   return defaultUrlTransform(url);
 };
 
@@ -222,6 +245,11 @@ const createLinkRenderer = (UserLink, copyTextLabel, copiedTextLabel) =>
       return <span style={{ color }}>{children}</span>;
     }
 
+    if (typeof href === 'string' && href.startsWith(ICON_LINK_PROTOCOL)) {
+      const [name, color] = href.slice(ICON_LINK_PROTOCOL.length).split(':');
+      return <DynamicIcon name={name} color={color ? decodeURIComponent(color) : undefined} />;
+    }
+
     if (href === COPY_LINK_PROTOCOL) {
       return (
         <span className={styles.copyableText}>
@@ -279,9 +307,11 @@ export const MarkdownContent = ({
     ),
   };
 
-  const processedMarkdown = preprocessCopyTags(
-    preprocessColorTags(
-      preprocessBareImageUrls(resolveImageTokens(withoutCopyBlocks, images))
+  const processedMarkdown = preprocessIconTags(
+    preprocessCopyTags(
+      preprocessColorTags(
+        preprocessBareImageUrls(resolveImageTokens(withoutCopyBlocks, images))
+      )
     )
   );
 

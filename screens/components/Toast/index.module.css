@@ -1,0 +1,128 @@
+.toast {
+  --toast-accent: #2563eb;
+  --toast-bg: #eff6ff;
+  --toast-text: #0f172a;
+  --toast-muted: #475569;
+  --toast-border: #93c5fd;
+  --toast-icon: #3b82f6;
+  --toast-icon-fg: #ffffff;
+
+  position: relative;
+  width: 360px;
+  max-width: calc(100vw - 32px);
+  background: var(--toast-bg);
+  color: var(--toast-text);
+  border: 1px solid var(--toast-border);
+  border-radius: 8px;
+  overflow: hidden;
+  font-family: var(--font-sans, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+  animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* Colores por tipo: tarjeta tintada, borde y chip del ícono. Las props de color pisan esto desde el style inline. */
+.success {
+  --toast-accent: #16a34a;
+  --toast-bg: #f0fdf4;
+  --toast-border: #86efac;
+  --toast-icon: #22c55e;
+}
+.info {
+  --toast-accent: #2563eb;
+  --toast-bg: #eff6ff;
+  --toast-border: #93c5fd;
+  --toast-icon: #3b82f6;
+}
+.warning {
+  --toast-accent: #a16207;
+  --toast-bg: #fefce8;
+  --toast-border: #fde047;
+  --toast-icon: #eab308;
+}
+.error {
+  --toast-accent: #dc2626;
+  --toast-bg: #fef2f2;
+  --toast-border: #fca5a5;
+  --toast-icon: #ef4444;
+}
+
+.leave {
+  pointer-events: none;
+  animation: slideOut 0.3s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+.body {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 12px 14px 14px;
+}
+
+.iconChip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  color: var(--toast-icon-fg);
+  background: var(--toast-icon);
+}
+
+.content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: 2px;
+}
+
+.actions {
+  display: flex;
+  margin-top: 6px;
+  margin-left: -8px;
+}
+
+.closeButton {
+  flex-shrink: 0;
+  margin: -4px -4px 0 0;
+}
+
+/* Línea de caducidad: la dibuja CountdownBar, pegada al borde inferior de la tarjeta */
+.progressBar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+@keyframes slideOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    animation: none;
+  }
+}

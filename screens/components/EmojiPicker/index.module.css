@@ -1,0 +1,47 @@
+/* Paleta oscura: solo cambia los fallbacks; cada --ep-* inline (props de color) sigue ganando. */
+.dark {
+  --ep-bg: #1e293b;
+  --ep-surface: #0f172a;
+  --ep-text: #f1f5f9;
+  --ep-muted: #94a3b8;
+  --ep-icon: #cbd5e1;
+  --ep-border: #334155;
+  --ep-accent: #60a5fa;
+  --ep-backdrop: rgba(0, 0, 0, 0.65);
+}
+
+.container {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-sans, system-ui, sans-serif);
+}
+
+.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.selectedEmoji {
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.selectedIcon {
+  color: var(--ep-accent, #2563eb);
+}
+
+.placeholderIcon {
+  color: var(--ep-muted, #64748b);
+}
+
+.labelActive {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--ep-text, #1e293b);
+}
+
+.labelPlaceholder {
+  font-size: 0.875rem;
+  color: var(--ep-muted, #64748b);
+}

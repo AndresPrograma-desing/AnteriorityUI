@@ -1,0 +1,40 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1300;
+}
+
+.centered {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  max-width: calc(100vw - 16px);
+  padding: 6px 8px;
+  overflow-x: auto;
+  background: var(--ep-bg, #ffffff);
+  color: var(--ep-text, #1e293b);
+  border: 1px solid var(--ep-border, #e2e8f0);
+  border-radius: 999px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 4px 10px -6px rgba(0, 0, 0, 0.15);
+  animation: popIn 0.14s ease;
+  font-family: var(--font-sans, system-ui, sans-serif);
+}
+
+.divider {
+  align-self: stretch;
+  width: 1px;
+  margin: 4px 6px;
+  background: var(--ep-border, #e2e8f0);
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: translateY(4px) scale(0.96); }
+  to { opacity: 1; transform: none; }
+}

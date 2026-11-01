@@ -3,3 +3,5 @@
 // registro real, que vive junto a los 31 packs generados en screens/components/Icons/.
 export { findIcons } from '../../screens/components/Icons/findIcons.js';
 export { ICON_PACKS, ICON_PACK_NAMES } from '../../screens/components/Icons/registry.js';
+export { useIcon, getIconSync } from './useIcon.js';
+export { splitIconTokens, hasIconTokens } from './iconTokens.js';

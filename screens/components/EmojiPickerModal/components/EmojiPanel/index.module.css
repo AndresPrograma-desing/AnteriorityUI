@@ -1,0 +1,45 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  min-height: 0;
+}
+
+.tabs {
+  display: flex;
+  justify-content: space-between;
+  gap: 2px;
+}
+
+.infoRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.counter {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  color: var(--ep-muted, #64748b);
+}
+
+.grid {
+  display: grid;
+  gap: 2px;
+  align-content: start;
+}
+
+.status {
+  margin: 0;
+  padding: 16px 0;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--ep-muted, #64748b);
+}

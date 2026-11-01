@@ -83,3 +83,51 @@ export const FastTyping = {
     color: '#16a34a',
   },
 };
+
+export const WithIcon = {
+  args: { variant: 'h2', children: 'Título con ícono', icon: 'SiReact', iconColor: '#06b6d4' },
+};
+
+export const WithEmoji = {
+  args: { variant: 'h2', children: 'Título con emoji', icon: '🚀' },
+};
+
+export const IconAtEnd = {
+  args: { children: 'Ícono al final', icon: 'FaHeart', iconColor: '#e11d48', iconPosition: 'end' },
+};
+
+export const InlineIconsAndEmojis = {
+  args: {
+    children: 'Hecho con {icon:SiReact:#06b6d4} React y {icon:FaHeart:#e11d48} mucho cariño 🚀🎉',
+  },
+};
+
+export const InlineIconsTyping = {
+  args: {
+    animate: 'typing',
+    typingSpeed: 60,
+    children: 'Escribiendo con {icon:SiReact:#06b6d4} íconos y emojis 👨‍👩‍👧 incluidos',
+  },
+};
+
+export const Markdown = {
+  args: {
+    markdown: true,
+    children: [
+      '## Markdown con {icon:SiMarkdown} íconos',
+      '',
+      'Texto **en negrita**, _cursiva_ y {color:#2563eb}color{/color} con emojis 🎉 y {icon:FaHeart:#e11d48} íconos.',
+      '',
+      '- Item con {icon:LuCheck:#16a34a} check',
+      '- Otro item ✅',
+      '',
+      '| Pack | Íconos |',
+      '|---|---|',
+      '| Simple Icons | {icon:SiGithub} |',
+    ].join('\n'),
+  },
+};
+
+export const MarkdownWithIconProp = {
+  args: { markdown: true, icon: '💡', children: 'Un **tip** con el emoji elegido en `EmojiPicker`.' },
+};

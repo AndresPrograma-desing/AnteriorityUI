@@ -76,4 +76,8 @@ export { default as Text } from './screens/components/Text/index.js';
 export { default as ToggleCard } from './screens/components/ToggleCard/index.js';
 export { default as TopBar } from './screens/components/TopBar/index.js';
 export { default as UserEditPopover } from './screens/components/UserEditPopover/index.js';
+export { default as DynamicIcon } from './screens/components/DynamicIcon/index.js';
+export { default as EmojiPickerModal } from './screens/components/EmojiPickerModal/index.js';
+export { default as EmojiPicker } from './screens/components/EmojiPicker/index.js';
+export { default as Toast } from './screens/components/Toast/index.js';
 export { registerAnteriority } from './screens/plasmic/index.js';
