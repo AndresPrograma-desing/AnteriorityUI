@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import usePasteImage from '../../../common/hooks/usePasteImage';
 import { Toolbar, EditorContent, ResizeHandle } from './components/index.js';
+import EmojiPickerModal, { toInlineValue } from '../EmojiPickerModal/index';
 import styles from './index.module.css';
 import { DEFAULT_LABELS, DEFAULT_PENDING_COLOR, DOUBLE_CLICK_COLLAPSED_HEIGHT, DOUBLE_CLICK_EXPANDED_HEIGHT, DOUBLE_CLICK_EXPAND_THRESHOLD } from './constants.js';
 import {
@@ -29,6 +30,7 @@ export const MarkdownEditor = ({
   images,
   onImagesChange,
   onImageUpload,
+  locale,
 }) => {
   const {
     editorTab,
@@ -50,6 +52,7 @@ export const MarkdownEditor = ({
     colorTooltip,
     tableTooltip,
     copyableTooltip,
+    emojiTooltip,
     resizeHandleTitle,
     boldDefaultText,
     italicDefaultText,
@@ -75,6 +78,10 @@ export const MarkdownEditor = ({
   const [pastedImages, setPastedImages] = useState(() => images ?? {});
   const textareaRef = useRef(null);
   const colorButtonRef = useRef(null);
+  const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
+  const emojiButtonRef = useRef(null);
+  // Igual que el color: el clic en el botón le quita la selección al textarea, así que se guarda antes.
+  const emojiSelectionRef = useRef({ start: 0, end: 0 });
   // Guarda la selección actual (y su rango) antes de abrir el popover del ColorPicker,
   // porque hacer click en el botón de color le quita el foco/selección al textarea.
   const colorSelectionRef = useRef({ start: 0, end: 0 });
@@ -270,6 +277,31 @@ export const MarkdownEditor = ({
     setIsColorPickerOpen((prev) => !prev);
   };
 
+  const toggleEmojiPicker = () => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      emojiSelectionRef.current = { start: textarea.selectionStart, end: textarea.selectionEnd };
+    }
+    setIsEmojiPickerOpen((prev) => !prev);
+  };
+
+  // Un emoji se inserta tal cual; un ícono como {icon:Nombre[:color]}, que MarkdownContent renderiza.
+  const handleEmojiSelect = (item, { color: itemColor } = {}) => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const { start, end } = emojiSelectionRef.current;
+    const { newContent, newSelectionStart, newSelectionEnd } = buildPlainInsertion(
+      value,
+      start,
+      end,
+      toInlineValue(item, { color: itemColor })
+    );
+
+    emitChange(newContent);
+    focusSelection(textarea, newSelectionStart, newSelectionEnd);
+  };
+
   // ColorPickerPanel dispara onChange en cada frame mientras se arrastra (throttled, no
   // solo al soltar) — acá solo actualiza el color elegido (preview visual del swatch);
   // la inserción real en el textarea queda para el botón "Aplicar" (ver applyPendingColor).
@@ -326,6 +358,9 @@ export const MarkdownEditor = ({
         onCloseColorPicker={() => setIsColorPickerOpen(false)}
         onColorPreview={handleColorPreview}
         onApplyColor={applyPendingColor}
+        emojiButtonRef={emojiButtonRef}
+        isEmojiOpen={isEmojiPickerOpen}
+        onToggleEmoji={toggleEmojiPicker}
         labels={{
           editorTab,
           splitTab,
@@ -345,7 +380,16 @@ export const MarkdownEditor = ({
           tableTooltip,
           applyColorLabel,
           copyableTooltip,
+          emojiTooltip,
         }}
+      />
+
+      <EmojiPickerModal
+        anchorEl={emojiButtonRef}
+        open={isEmojiPickerOpen}
+        onClose={() => setIsEmojiPickerOpen(false)}
+        onSelect={handleEmojiSelect}
+        locale={locale}
       />
 
       <EditorContent

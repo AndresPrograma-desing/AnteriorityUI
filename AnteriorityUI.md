@@ -1270,6 +1270,10 @@ import CountdownBar from '../CountdownBar'; // export default (index.jsx)
 | `increment` | boolean | `false` | Cuando se usa `value`, invierte la barra para que se vea "creciente" en vez de "decreciente" |
 | `isOverlay` | boolean | `false` | Renderiza la barra centrada como overlay de pantalla, con `overlayMessage` |
 | `overlayMessage` | string | — | Mensaje mostrado sobre la barra en modo overlay |
+| `showTooltip` | boolean | `true` | Envuelve la barra en `ModalTooltip` (porcentaje o segundos). `false` la deja sin tooltip |
+| `color` | string | — | Color sólido de la barra; si se pasa, reemplaza el gradiente de `colors` |
+| `trackColor` | string | `#f1f5f9` | Fondo de la pista (`transparent` para que solo se vea la barra) |
+| `borderColor` | string | `#e2e8f0` | Borde de la pista |
 
 **Ejemplos:**
 ```jsx
@@ -1927,6 +1931,155 @@ const { Icon } = results[0];
 
 ---
 
+### DynamicIcon
+
+Renderiza el valor que devuelve [EmojiPicker](#emojipicker): un **nombre de ícono** de react-icons (de cualquiera de los 31 packs) o un **emoji**. Los packs se cargan bajo demanda la primera vez que se pide un ícono, así que usar `DynamicIcon` (o [Text](#text) / [MarkdownContent](#markdowncontent), que lo usan por dentro) no suma todos los packs al bundle inicial. Mientras carga, o si el nombre no existe, no renderiza nada.
+
+**Import:**
+```jsx
+import { DynamicIcon } from 'anteriority-ui';
+```
+
+**Uso básico:**
+```jsx
+<DynamicIcon name="SiReact" color="#06b6d4" size={32} />
+<DynamicIcon name="🚀" size={32} />
+```
+
+**Props:**
+
+| Prop | Tipo | Default | Descripción |
+|---|---|---|---|
+| `name` | string | — | Nombre de ícono de react-icons (`'SiReact'`, `'LuHome'`) o un emoji |
+| `color` | string | — | Color del ícono. Sin valor hereda el color del texto (`currentColor`). No afecta a los emojis |
+| `size` | number \| string | `'1.1em'` | Tamaño (acepta `em`, `px`, número) |
+| `className`, `style` | string, object | — | Clase/estilos adicionales |
+| `title` | string | — | Texto accesible; sin él el ícono es decorativo (`aria-hidden`) |
+
+**Notas:** Un valor se considera nombre de ícono si es alfanumérico (`/^[A-Za-z][A-Za-z0-9]+$/`); cualquier otra cosa se muestra como texto (emoji). La resolución sincrónica/asíncrona vive en `common/icons/useIcon.js` (`useIcon`, `getIconSync`).
+
+---
+
+### EmojiPickerModal
+
+Modal selector de emoji **o ícono** **sin botón propio**: se abre y cierra desde afuera (`open` / `onClose`), así que se puede disparar desde cualquier botón — el de un chat, una toolbar, un atajo de teclado. [EmojiPicker](#emojipicker) es este mismo modal con un botón disparador de formulario ya incluido.
+
+**Abre primero una franja compacta estilo Slack** con los últimos emojis/íconos usados (completada con unos sugeridos si todavía hay pocos) y un botón redondo `+` al final que expande al selector completo. Con `anchorEl` la franja se ancla junto a ese elemento (debajo, o arriba si no hay lugar); sin él queda centrada. Los recientes se guardan en `localStorage` (valor + color del ícono). Con `initialView="full"` se salta la franja y abre directo el selector completo.
+
+El selector completo es un modal centrado (portal en `<body>`, backdrop, cierre por `Esc` / clic fuera / botón ✕, bloquea el scroll del fondo) con dos pestañas: **Emojis** (buscador, categorías, tono de piel) e **Íconos** (búsqueda + filtro sobre los 31 packs de react-icons, y [ColorPicker](#colorpicker) para teñir el ícono). Las grillas usan [Search](#search), [Selector](#selector), [Button](#button) y [ScrollBar](#scrollbar) de la librería.
+
+**Import:**
+```jsx
+import { EmojiPickerModal } from 'anteriority-ui';
+import { toInlineValue } from 'anteriority-ui/screens/components/EmojiPickerModal/index';
+```
+
+**Uso básico (botón propio, ej. un chat):**
+```jsx
+const [open, setOpen] = useState(false);
+const buttonRef = useRef(null);
+
+<Button ref={buttonRef} variant="ghost" circle icon={Smile} onClick={() => setOpen(true)} />
+
+<EmojiPickerModal
+  anchorEl={buttonRef}
+  open={open}
+  onClose={() => setOpen(false)}
+  onSelect={(value, { color }) => setDraft((d) => d + toInlineValue(value, { color }))}
+/>
+```
+
+`toInlineValue(value, { color })` devuelve el texto listo para insertar en un mensaje que luego se muestra con [Text](#text) o [MarkdownContent](#markdowncontent): un emoji tal cual (`'🚀'`) y un ícono como `{icon:SiReact:#06b6d4}`.
+
+**Props:**
+
+| Prop | Tipo | Default | Descripción |
+|---|---|---|---|
+| `open` | boolean | `false` | Muestra el modal (controlado) |
+| `onClose` | function | — | `() => void`; se llama con `Esc`, clic fuera, botón ✕ y al elegir si `closeOnSelect` |
+| `onSelect` | function | — | `(value: string, { color }) => void`. `value` es el emoji o el nombre del ícono de react-icons; `color` es el hex elegido (`''` para emojis o sin color) |
+| `closeOnSelect` | boolean | `true` | Cierra el modal al elegir. Con `false` queda abierto para insertar varios seguidos |
+| `value` | string | `''` | Valor actual, solo para resaltar el ícono ya elegido en la grilla |
+| `color` | string | `''` | Color inicial/controlado del ícono (hex) |
+| `onColorChange` | function | — | `(hex: string) => void`; `''` con "Sin color" |
+| `allowColor` | boolean | `true` | Muestra el selector de color en la pestaña Íconos |
+| `colorPickerProps` | object | — | Props extra para el [ColorPicker](#colorpicker) (`placement`, `className`, `disabled`, `labels`, colores) |
+| `initialView` | `'compact' \| 'full'` | `'compact'` | Vista con la que abre: franja de usados recientemente o selector completo. Se restablece cada vez que `open` pasa a `true` |
+| `anchorEl` | HTMLElement \| ref | — | Elemento junto al que se ancla la franja compacta (el botón que la abre). Sin él la franja queda centrada |
+| `quickEmojis` | string[] | `['👍','❤️','😂','🎉','🙏','👀','🔥','✅']` | Sugeridos que completan la franja cuando hay pocos recientes |
+| `recentLimit` | number | `8` | Cantidad máxima de ítems en la franja y de recientes guardados |
+| `recentsStorageKey` | string | `'anteriority-ui:emoji-recents'` | Clave de `localStorage` donde se guardan los recientes (usar una distinta por contexto, ej. un chat vs. un formulario) |
+| `locale` | `'es' \| 'en'` | `'es'` | Idioma de la UI y del dataset de emojis |
+| `labels` | object | — | Override parcial de los textos del idioma (ver `LABELS` en `constants.js`) |
+| `title` | string | según `locale` | Título del modal |
+| `theme` | `'light' \| 'dark'` | `'light'` | Paleta base |
+| `bgColor` | string | `#ffffff` (dark: `#1e293b`) | Fondo del modal |
+| `surfaceColor` | string | `#f8fafc` (dark: `#0f172a`) | Header, celdas, inputs |
+| `textColor` | string | `#1e293b` | Texto principal |
+| `mutedColor` | string | `#64748b` | Texto secundario, pestañas inactivas |
+| `iconColor` | string | `#334155` | Color de los íconos de la grilla |
+| `borderColor` | string | `#e2e8f0` | Bordes |
+| `accentColor` | string | `#2563eb` | Pestaña activa, hover/selección |
+| `backdropColor` | string | `rgba(15,23,42,0.5)` | Fondo detrás del modal |
+| `dangerColor` | string | `#ef4444` | Hover de "Sin color" |
+
+**Notas:** Elegir algo de la franja o del selector completo lo agrega a recientes (el emoji/ícono va al frente y sin duplicados; un ícono guarda también su color). [EmojiPicker](#emojipicker) ancla la franja a su propio botón automáticamente. Mientras `open` es `false` no renderiza nada (el dataset de emojis y los packs de íconos se cargan recién al abrir). El valor elegido se puede mostrar con [DynamicIcon](#dynamicicon), [Text](#text) (`icon` o `{icon:...}`) o [MarkdownContent](#markdowncontent).
+
+---
+
+### EmojiPicker
+
+Selector de emoji **o ícono** como campo de formulario: un botón disparador (muestra la selección, con botón para quitarla) que abre el modal de [EmojiPickerModal](#emojipickermodal). Para abrir el selector desde **tu propio botón** (ej. el de un chat) usar directamente [EmojiPickerModal](#emojipickermodal). El modal es centrado (portal en `<body>`, backdrop, cierre por `Esc` / clic fuera / botón ✕, bloquea el scroll del fondo). Tiene dos pestañas: **Emojis** (buscador, categorías, selector de tono de piel y grilla con [ScrollBar](#scrollbar), armados con [Search](#search), [Button](#button) y los datasets de `emoji-picker-react`, que se cargan por idioma bajo demanda) e **Íconos** (búsqueda + filtro por pack sobre los 31 packs de react-icons empaquetados en [Icons (react-icons)](#icons-react-icons), no solo Simple Icons; la grilla se carga por scroll).
+
+**Import:**
+```jsx
+import { EmojiPicker } from 'anteriority-ui';
+import { resolveIcon } from 'anteriority-ui/screens/components/EmojiPicker/index';
+```
+
+**Uso básico:**
+```jsx
+const [icon, setIcon] = useState('');
+const [iconTint, setIconTint] = useState('');
+<EmojiPicker value={icon} onChange={setIcon} color={iconTint} onColorChange={setIconTint} locale="en" />
+
+// Mostrar el valor guardado:
+const Icon = resolveIcon(icon); // null si es un emoji
+{Icon ? <Icon size={24} color={iconTint || undefined} /> : icon}
+```
+
+**Props:**
+
+| Prop | Tipo | Default | Descripción |
+|---|---|---|---|
+| `value` | string | `''` | Emoji (`'🚀'`) o nombre de ícono de react-icons (`'SiReact'`, `'LuHome'`) |
+| `onChange` | function | — | `(value: string, { color }) => void`; `value` es `''` al quitar la selección. `color` es el hex elegido para un ícono (`''` para emojis o sin color) |
+| `color` | string | `''` | Color del ícono (hex), controlado. `''` = sin color (el ícono hereda el del texto) |
+| `onColorChange` | function | — | `(hex: string) => void`; `''` al usar "Sin color" |
+| `allowColor` | boolean | `true` | Muestra el [ColorPicker](#colorpicker) en la pestaña Íconos (como el resto de las props de [EmojiPickerModal](#emojipickermodal): `closeOnSelect`, etc., se reenvían al modal) (los emojis no se tiñen) |
+| `colorPickerProps` | object | — | Props extra para el [ColorPicker](#colorpicker) del ícono (`placement`, `className`, `disabled`, `labels`, y los colores `bgColor`/`textColor`/`borderColor`/`accentColor`, que pisan los del tema). El resultado se muestra con [DynamicIcon](#dynamicicon) |
+| `locale` | `'es' \| 'en'` | `'es'` | Idioma de toda la UI (pestañas, placeholders, tooltips, ColorPicker) y del dataset de emojis (nombres de categorías, búsqueda) |
+| `labels` | object | — | Override parcial de los textos del idioma elegido (claves como `placeholder`, `modalTitle`, `tabs`, `search`, `iconColor`, `noColor`, `colorPicker`... ver `LABELS` en `constants.js`) |
+| `placeholder` | string | según `locale` (`'Seleccionar ícono o emoji'`) | Texto del botón sin selección |
+| `modalTitle` | string | según `locale` (`'Selector de Elementos'`) | Título del modal |
+| `allowClear` | boolean | `true` | Muestra el botón para quitar la selección |
+| `disabled` | boolean | `false` | Deshabilita el selector |
+| `theme` | `'light' \| 'dark'` | `'light'` | Paleta base del modal |
+| `className`, `style` | string, object | — | Para el contenedor del botón |
+| `bgColor` | string | `#ffffff` (dark: `#1e293b`) | Fondo del modal y del botón |
+| `surfaceColor` | string | `#f8fafc` (dark: `#0f172a`) | Header, celdas, inputs |
+| `textColor` | string | `#1e293b` | Texto principal |
+| `mutedColor` | string | `#64748b` | Texto secundario, placeholder, pestañas inactivas |
+| `iconColor` | string | `#334155` | Color de los íconos de la grilla |
+| `borderColor` | string | `#e2e8f0` | Bordes |
+| `accentColor` | string | `#2563eb` | Pestaña activa, hover/selección, ícono seleccionado |
+| `backdropColor` | string | `rgba(15,23,42,0.5)` | Fondo detrás del modal |
+| `dangerColor` | string | `#ef4444` | Hover del botón de quitar |
+
+**Notas:** Los íconos se guardan por nombre (los nombres de react-icons llevan prefijo de pack, así que son únicos). El tono de piel elegido se aplica a los emojis que lo soportan. Al pasar el mouse sobre un emoji o ícono, su nombre aparece sobre la grilla. Las grillas se renderizan por páginas (scroll infinito) para no montar miles de botones. El color del ícono se previsualiza en la grilla y en el botón; el popover del `ColorPicker` recibe los colores del tema (props `bgColor`, `textColor`, `borderColor`, `accentColor`).
+
+---
+
 ### IconCatalog
 
 Página/panel navegable para buscar y copiar el nombre exacto de cualquier ícono de cualquier pack de react-icons empaquetado en [Icons (react-icons)](#icons-react-icons). Pensado para que un proyecto consumidor lo monte en una ruta propia (ej. `/dev/icons`) y así explorar qué íconos tiene disponibles la librería sin depender del Storybook de `anteriority-ui`.
@@ -2211,6 +2364,8 @@ Para marcar texto como copiable (con un botón de copiar al lado) se soporta `{c
 - **Inline** (una línea, sin salto de línea ni ` ``` `): se resuelve con el mismo truco de link markdown que `{color:X}` (protocolo `copy:`), renderizando un `<span>` con el texto seguido de un botón de copiar.
 - **Bloque** (contiene saltos de línea y/o ` ``` `fences` ``` `, ej. una sección completa con headings + código + texto): se resuelve con un plugin remark propio (`remarkCopyBlocks`, en `copyBlocks.js`) que agrupa los nodos del AST entre marcadores en un `<div>` contenedor con un botón de copiar flotante — el markdown interno se sigue renderizando normal (headings, code fences, listas, etc.), y el botón copia el **markdown fuente** tal cual se escribió (no el HTML renderizado).
 
+Para insertar un ícono de react-icons inline se soporta `{icon:Nombre}` o `{icon:Nombre:color}` (ej. `{icon:SiReact:#06b6d4}`, el color es cualquier color CSS). Se resuelve con el mismo truco de link markdown que `{color:X}` (protocolo `icon:`, color codificado con `encodeURIComponent`) y se renderiza con [DynamicIcon](#dynamicicon), que hereda el tamaño y color del texto si no se indica color. Los emojis son texto Unicode normal y funcionan sin sintaxis especial; el contenido de bloques/inline code queda exento. Un nombre que no existe no renderiza nada.
+
 **Import:**
 ```jsx
 import { MarkdownContent } from '../MarkdownContent/index'; // named export (también default export)
@@ -2283,7 +2438,7 @@ import { MarkdownContent } from '../MarkdownContent/index'; // named export (tam
 
 ### MarkdownEditor
 
-Editor de texto markdown con barra de herramientas (negrita, cursiva, título, encabezados, listas, cita, código, enlace, imagen, tabla, texto copiable, color de texto), atajos de teclado, modos Editor/Dividido/Vista previa y altura ajustable con arrastre. El botón de título inserta un encabezado `# ` y el de código un bloque ` ``` `; ambos, al previsualizarse (con `MarkdownContent`), muestran un botón de copiar rápido (ver [MarkdownContent](#markdowncontent)).
+Editor de texto markdown con barra de herramientas (negrita, cursiva, título, encabezados, listas, cita, código, enlace, imagen, tabla, texto copiable, color de texto, emoji o ícono), atajos de teclado, modos Editor/Dividido/Vista previa y altura ajustable con arrastre. El botón de título inserta un encabezado `# ` y el de código un bloque ` ``` `; ambos, al previsualizarse (con `MarkdownContent`), muestran un botón de copiar rápido (ver [MarkdownContent](#markdowncontent)).
 
 El botón de texto copiable (ícono `Copy`) envuelve la selección actual en `{copy}...{/copy}` — en la vista previa aparece con su propio botón de copiar al lado, sin afectar los copiables de título/código (ver la sintaxis en [MarkdownContent](#markdowncontent)).
 
@@ -2313,7 +2468,8 @@ const [value, setValue] = useState('# Hello world');
 | onChange | function | — | Se llama con un evento simulado `{ target: { value } }`. |
 | placeholder | string | `''` | Placeholder del textarea. |
 | defaultHeight | number | `320` | Alto inicial (px) del área de contenido; ajustable arrastrando el handle inferior (entre 180 y 1200px). |
-| labels | object | `{}` | Textos personalizables: `editorTab`, `splitTab`, `previewTab`, tooltips de cada botón (incluye `titleTooltip`, `imageTooltip`, `colorTooltip`, `copyableTooltip`), textos por defecto al insertar formato (incluye `imageAltDefaultText`, `imageUrlPlaceholder`, `colorDefaultText`, `copyableDefaultText`), `applyColorLabel` (texto del botón "Aplicar" del popover de color), encabezados de la tabla de ejemplo. |
+| locale | `'es' \| 'en'` | `'es'` | Idioma del selector de emojis e íconos que abre el botón de la toolbar. Al elegir, inserta el emoji tal cual o un ícono como `{icon:Nombre:color}` en la posición del cursor (lo renderiza [MarkdownContent](#markdowncontent)). |
+| labels | object | `{}` | Textos personalizables: `emojiTooltip` (tooltip del botón de emoji), `editorTab`, `splitTab`, `previewTab`, tooltips de cada botón (incluye `titleTooltip`, `imageTooltip`, `colorTooltip`, `copyableTooltip`), textos por defecto al insertar formato (incluye `imageAltDefaultText`, `imageUrlPlaceholder`, `colorDefaultText`, `copyableDefaultText`), `applyColorLabel` (texto del botón "Aplicar" del popover de color), encabezados de la tabla de ejemplo. |
 | activeColor | string | — | Color de acento del modo/pestaña activa (`--markdown-editor-active`). |
 | scrollbarColor | string | — | Color del thumb del scrollbar del textarea (mismo estilo delgado que usa `Selector`). |
 
@@ -4231,7 +4387,7 @@ const [enabled, setEnabled] = useState(false);
 
 ### Text
 
-Bloque de texto genérico (título o párrafo) para usar dentro de layouts como `Container` o `Frame` cuando se necesita meter texto suelto sin armar un componente nuevo. La `variant` define tanto el tag HTML semántico (`h1`/`h2`/`h3`/`p`/`span`) como su tamaño de fuente por defecto. Incluye además un set de animaciones de entrada/salida opcionales (`animate`) para títulos o textos destacados.
+Bloque de texto genérico (título o párrafo) para usar dentro de layouts como `Container` o `Frame` cuando se necesita meter texto suelto sin armar un componente nuevo. La `variant` define tanto el tag HTML semántico (`h1`/`h2`/`h3`/`p`/`span`) como su tamaño de fuente por defecto. Incluye además un set de animaciones de entrada/salida opcionales (`animate`) para títulos o textos destacados. Soporta **emojis**, **íconos** de react-icons (con la prop `icon` o inline con `{icon:Nombre:color}`) y **markdown** (`markdown`), pensado para mostrar lo que devuelve [EmojiPicker](#emojipicker).
 
 **Import:**
 ```jsx
@@ -4254,6 +4410,12 @@ import Text from '../Text'; // export default (index.jsx)
 | `align` | `'left' \| 'center' \| 'right'` | `'left'` | Alineación del texto (`text-align`) |
 | `className` | string | `''` | Clase CSS adicional |
 | `style` | object | — | Estilos inline adicionales, mergeados con los internos |
+| `icon` | string | — | Ícono (nombre de react-icons, ej. `'SiReact'`) o emoji (`'🚀'`) junto al texto — acepta directo el `value` de `EmojiPicker` (se renderiza con [DynamicIcon](#dynamicicon)) |
+| `iconColor` | string | — | Color del ícono de `icon` (hereda el del texto por default; no afecta a emojis) |
+| `iconSize` | string \| number | `'1.1em'` | Tamaño del ícono (también el de los `{icon:...}` inline) |
+| `iconGap` | string | `'0.4em'` | Separación entre el ícono y el texto |
+| `iconPosition` | `'start' \| 'end'` | `'start'` | Lado del texto donde va `icon` |
+| `markdown` | boolean | `false` | Renderiza `children` (string) como markdown vía [MarkdownContent](#markdowncontent) (carga perezosa). El contenedor pasa a ser un `<div>` en vez del tag de `variant`; `typing` y `letter-fade-*` se ignoran (se muestra estático) |
 | `animate` | `'fade-in' \| 'fade-out' \| 'typing' \| 'letter-fade-in' \| 'letter-fade-out' \| 'rise-and-fade'` | — | Animación aplicada al montar. Sin esta prop, el texto se muestra estático. |
 | `duration` | number (ms) | `800` | Duración total de la animación para `fade-in`, `fade-out`, `letter-fade-in` y `letter-fade-out`. En las letter-fade, se reparte entre todas las letras (cada una anima con un delay escalonado). |
 | `typingSpeed` | number (ms) | `50` | Milisegundos entre cada letra en `animate="typing"`. |
@@ -4268,6 +4430,13 @@ import Text from '../Text'; // export default (index.jsx)
 
 {/* Aparece letra por letra como si se tipeara */}
 <Text animate="typing" typingSpeed={30}>Escribiendo texto...</Text>
+
+{/* Íconos y emojis: prop `icon` (acepta el valor de EmojiPicker) o tokens inline en el texto */}
+<Text variant="h2" icon={value} iconColor={color}>Título con ícono</Text>
+<Text>Hecho con {'{icon:SiReact:#06b6d4}'} React y {'{icon:FaHeart:#e11d48}'} cariño 🚀</Text>
+
+{/* Markdown (soporta también {icon:...}, {color:...}{/color} y el resto de MarkdownContent) */}
+<Text markdown>{'## Hola {icon:SiMarkdown}\n\nTexto **en negrita** con emojis 🎉'}</Text>
 
 {/* Fade-in del bloque completo */}
 <Text variant="h1" animate="fade-in" duration={1000} color="#0d52f8">
@@ -4292,6 +4461,72 @@ import Text from '../Text'; // export default (index.jsx)
 ```
 
 **Notas:** `fade-in`/`fade-out`/`rise-and-fade` animan el bloque completo (el `Tag` resultante); `letter-fade-in`/`letter-fade-out` envuelven cada carácter en su propio `span` con `animationDelay` escalonado (de izquierda a derecha para `-in`, de derecha a izquierda para `-out`) — por eso solo soportan `children` como string, cualquier otro nodo se ignora en el cálculo de letras. `typing` reconstruye el string letra por letra con `setInterval` y muestra un cursor parpadeante (`border-right`) mientras dura la animación. Ninguna animación hace loop ni se revierte sola: son de una sola pasada al montar (controlar su repetición vía `key` desde el padre, como hace `KeyboardShortcut`/`ModalTooltip` en otros componentes del repo para resetear animaciones).
+
+---
+
+### Toast
+
+Notificación flotante (tarjeta con ícono por tipo, título, mensaje, acción opcional y barra de caducidad). Título y mensaje se renderizan con [Text](#text), así que heredan sus animaciones. Se cierra sola tras `duration` ms — la barra se pausa al pasar el mouse — o con el botón ✕. Montala dentro de tu propio contenedor fijo (esquina de la pantalla) y quitala de tu estado en `onClose`.
+
+**Import:**
+```jsx
+import { Toast } from 'anteriority-ui';
+```
+
+**Uso básico:**
+```jsx
+const [toasts, setToasts] = useState([]);
+const remove = (id) => setToasts((prev) => prev.filter((t) => t.id !== id));
+
+<Toast id={1} type="success" title="¡Listo!" message="Los cambios se guardaron." onClose={remove} />
+```
+
+**Props:**
+
+| Prop | Tipo | Default | Descripción |
+|---|---|---|---|
+| `id` | string \| number | — | Identificador que recibe `onClose` |
+| `type` | `'success' \| 'error' \| 'info' \| 'warning'` | `'success'` | Define el ícono y el color de acento. `error` se anuncia como `role="alert"`, el resto como `role="status"` |
+| `title` | node | — | Título en negrita |
+| `message` | node | — | Cuerpo del mensaje (acepta texto o nodos) |
+| `animate` | string | `'letter-fade-in'` | Animación de [Text](#text) aplicada al mensaje (`'letter-fade-in'`, `'fade-in'`, `'typing'`, etc.). Solo aplica si `message` es texto |
+| `action` | `{ label, onClick }` | — | Botón de acción. Al usarlo ejecuta `onClick` y cierra la notificación |
+| `icon` | componente (lucide-react) | según `type` | Reemplaza el ícono del tipo |
+| `duration` | number (ms) | `4000` | Tiempo antes de cerrarse solo. `0` = no se cierra sola |
+| `showProgress` | boolean | `true` | Muestra la línea de caducidad inferior, dibujada con [CountdownBar](#countdownbar) en el color de acento (se encoge en `duration` ms y se pausa con el hover) |
+| `pauseOnHover` | boolean | `true` | Pausa el temporizador y la barra mientras el mouse está encima |
+| `closable` | boolean | `true` | Muestra el botón ✕ |
+| `closeLabel` | string | `'Cerrar notificación'` | `aria-label` del botón ✕ |
+| `onClose` | function | — | `(id) => void`, se llama al terminar la animación de salida (por tiempo, ✕ o acción) |
+| `bgColor` | string | tinte del tipo (ej. `#f0fdf4` en `success`) | Fondo de la tarjeta |
+| `textColor` | string | `#0f172a` | Color del título |
+| `mutedColor` | string | `#64748b` | Color del mensaje |
+| `iconColor` | string | color sólido del tipo (ej. `#22c55e` en `success`) | Fondo del círculo del ícono |
+| `iconTextColor` | string | `#ffffff` | Color del ícono dentro del círculo |
+| `borderColor` | string | borde del tipo (ej. `#86efac` en `success`) | Borde de la tarjeta |
+| `accentColor` | string | color oscuro del tipo (ej. `#16a34a` en `success`) | Color del texto de la acción y de la barra de caducidad |
+| `hoverColor` | string | `#f1f5f9` | Fondo del botón ✕ al pasar el mouse |
+| `className`, `style` | string, object | — | Clase y estilos del contenedor |
+
+Colores por tipo (tarjeta / borde / círculo del ícono): `success` `#f0fdf4` / `#86efac` / `#22c55e`; `info` `#eff6ff` / `#93c5fd` / `#3b82f6`; `warning` `#fefce8` / `#fde047` / `#eab308`; `error` `#fef2f2` / `#fca5a5` / `#ef4444`.
+
+**Ejemplos:**
+```jsx
+<Toast type="error" title="Error de conexión" message="No se pudo contactar al servidor." duration={5000} onClose={remove} />
+
+<Toast
+  type="info"
+  title="Mensaje eliminado"
+  message="La conversación se movió a la papelera."
+  action={{ label: 'Deshacer', onClick: undo }}
+  onClose={remove}
+/>
+
+{/* No se cierra sola: el usuario la descarta con ✕ */}
+<Toast type="warning" title="Sesión por expirar" duration={0} onClose={remove} />
+```
+
+**Notas:** La animación de salida dura 300 ms (se desvanece y sube suavemente) antes de llamar a `onClose`, así que quitar el elemento de tu estado en ese callback no corta la transición. Si la prop `duration` cambia, el temporizador se reinicia. Con `prefers-reduced-motion` se desactivan las animaciones de entrada, salida y barra.
 
 ---
 

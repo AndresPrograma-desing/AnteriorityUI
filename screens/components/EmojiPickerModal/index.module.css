@@ -1,0 +1,24 @@
+/* Paleta oscura: solo cambia los fallbacks; cada --ep-* inline (props de color) sigue ganando. */
+.dark {
+  --ep-bg: #1e293b;
+  --ep-surface: #0f172a;
+  --ep-text: #f1f5f9;
+  --ep-muted: #94a3b8;
+  --ep-icon: #cbd5e1;
+  --ep-border: #334155;
+  --ep-accent: #60a5fa;
+  --ep-backdrop: rgba(0, 0, 0, 0.65);
+}
+
+/* Contenido del modal (vive en un portal: usa las vars aplicadas en el overlay) */
+.modalRoot {
+  font-family: var(--font-sans, system-ui, sans-serif);
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  padding: 8px 12px 0;
+  border-bottom: 1px solid var(--ep-border, #e2e8f0);
+}
+

@@ -140,3 +140,20 @@
     transform: translateY(-2px);
   }
 }
+
+/* --- MARKDOWN / ÍCONOS --- */
+
+/* El contenedor de markdown es un <div> (los bloques de markdown no caben en un <p>). */
+.markdown {
+  display: block;
+}
+
+.markdownWithIcon {
+  display: flex;
+  align-items: flex-start;
+}
+
+.markdownBody {
+  min-width: 0;
+  flex: 1;
+}

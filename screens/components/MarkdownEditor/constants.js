@@ -16,6 +16,7 @@ export const DEFAULT_LABELS = {
   linkTooltip: 'Insertar enlace (Ctrl+K)',
   imageTooltip: 'Insertar imagen',
   colorTooltip: 'Color de texto',
+  emojiTooltip: 'Insertar emoji o ícono',
   tableTooltip: 'Insertar tabla',
   copyableTooltip: 'Texto copiable',
   resizeHandleTitle: 'Arrastra para cambiar la altura (doble click para expandir/reducir)',

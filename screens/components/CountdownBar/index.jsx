@@ -16,6 +16,10 @@ export default function CountdownBar({
   increment = false,
   isOverlay = false,
   overlayMessage,
+  showTooltip = true, // false = sin ModalTooltip (útil dentro de otros componentes)
+  color, // color sólido; si se pasa, reemplaza el gradiente de `colors`
+  trackColor, // fondo de la pista (default #f1f5f9)
+  borderColor, // borde de la pista (default #e2e8f0)
   className = '',
   style
 }) {
@@ -36,8 +40,22 @@ export default function CountdownBar({
     ? `${Math.round(progress)}% completado` 
     : `${remainingTime}s restantes`;
 
+  const colorVars = {
+    ...(trackColor ? { '--countdown-track': trackColor } : {}),
+    ...(borderColor ? { '--countdown-border': borderColor } : {}),
+  };
+
+  const withTooltip = (node) =>
+    showTooltip ? (
+      <ModalTooltip text={tooltipText} style={{ width: '100%', display: 'block' }}>
+        {node}
+      </ModalTooltip>
+    ) : (
+      node
+    );
+
   const barContent = (
-    <div className={`${styles.wrapper} ${className}`.trim()} style={{ width, ...style }}>
+    <div className={`${styles.wrapper} ${className}`.trim()} style={{ width, ...colorVars, ...style }}>
       <div 
         className={styles.container} 
         style={{ height }}
@@ -50,8 +68,10 @@ export default function CountdownBar({
           className={styles.bar} 
           style={{ 
             width: `${progress}%`,
-            // Crea un sutil gradiente interno que se mezcla de forma suave
-            backgroundImage: `linear-gradient(90deg, ${currentColor}, ${currentColor}dd)`
+            ...(color
+              ? { backgroundColor: color }
+              // Crea un sutil gradiente interno que se mezcla de forma suave
+              : { backgroundImage: `linear-gradient(90deg, ${currentColor}, ${currentColor}dd)` }),
           }} 
         />
       </div>
@@ -67,17 +87,11 @@ export default function CountdownBar({
           </p>
         )}
         <div style={{ width: '80%' }}>
-          <ModalTooltip text={tooltipText} style={{ width: '100%', display: 'block' }}>
-            {barContent}
-          </ModalTooltip>
+          {withTooltip(barContent)}
         </div>
       </div>
     );
   }
 
-  return (
-    <ModalTooltip text={tooltipText} style={{ width, display: 'block' }}>
-      {barContent}
-    </ModalTooltip>
-  );
+  return withTooltip(barContent);
 }
