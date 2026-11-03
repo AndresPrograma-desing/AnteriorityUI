@@ -95,6 +95,24 @@ export const ConTimestamp = {
   },
 };
 
+// Título y cuerpo con strings largos sin espacios (emails, URLs) en un contenedor angosto: el
+// texto debe partirse dentro de la tarjeta en vez de desbordarla.
+export const TextoLargoSinEspacios = {
+  args: {
+    variant: 'info',
+    title: 'fordeveloper167@gmail.com',
+    children: '@ignacioangel671@gmail.com',
+    timestamp: '15:36',
+  },
+  decorators: [
+    (Story) => (
+      <div style={{ width: 260 }}>
+        <Story />
+      </div>
+    ),
+  ],
+};
+
 export const ClickableConOnClick = {
   args: {
     variant: 'neutral',

@@ -41,6 +41,8 @@ export { default as ImagePastePreview } from './screens/components/ImagePastePre
 export { default as InfoTooltip } from './screens/components/InfoTooltip/index.js';
 export { default as Input } from './screens/components/Input/index.js';
 export { default as KeyboardShortcut } from './screens/components/KeyboardShortcut/index.js';
+export { default as Resizable } from './screens/components/Resizable/index.js';
+export { default as ChatComposer } from './screens/components/ChatComposer/index.js';
 export { default as Loading } from './screens/components/Loading/index.js';
 export { default as MarkdownContent } from './screens/components/MarkdownContent/index.js';
 export { default as MarkdownEditor } from './screens/components/MarkdownEditor/index.js';
@@ -70,6 +72,7 @@ export { default as Slider } from './screens/components/Slider/index.js';
 export { default as SubSidebarLayout } from './screens/components/SubSidebarLayout/index.js';
 export { default as SummaryCard } from './screens/components/SummaryCard/index.js';
 export { default as Swich } from './screens/components/Swich/index.js';
+export { default as Table } from './screens/components/Table/index.js';
 export { default as TableA } from './screens/components/TableA/index.js';
 export { default as TableB } from './screens/components/TableB/index.js';
 export { default as Text } from './screens/components/Text/index.js';

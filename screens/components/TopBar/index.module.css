@@ -340,3 +340,29 @@ button.searchWrapper {
         margin: 0 2px;
     }
 }
+
+/* Auto-ocultado (prop `autoHide`): la barra pasa a overlay absoluto dentro de AutoHideShell (que
+   ocupa 0 de alto) y se desliza hacia arriba al ocultarse. No se usa `transform` cuando está
+   visible: un ancestro con transform rompería el `position: fixed` de .mobileSearchOverlay.
+   Oculta no usa `visibility: hidden` a propósito: así sigue alcanzable con Tab, y el foco la
+   vuelve a mostrar (la franja de revelado solo responde al mouse). */
+.autoHideBar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: auto;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.autoHideBarHidden {
+    transform: translateY(-100%);
+    opacity: 0;
+    pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .autoHideBar {
+        transition: none;
+    }
+}

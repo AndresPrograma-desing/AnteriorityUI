@@ -4,10 +4,15 @@ import Breadcrumbs from '../Breadcrumbs/index';
 import CommandPalette from '../CommandPalette/index';
 import Button from '../Button/index';
 import KeyboardShortcut from '../KeyboardShortcut/index';
-import { TopBarSkeleton, SearchBar, TopBarActions, UserMenu, NavLinks, MobileActionsPanel } from './components/index.js';
+import { TopBarSkeleton, SearchBar, TopBarActions, UserMenu, NavLinks, MobileActionsPanel, AutoHideShell } from './components/index.js';
 import styles from './index.module.css';
 import { buildThemeVars, hasActionHoverEnabled, hasCenterSearch } from './utils.js';
+import useAutoHide from './useAutoHide.js';
 import {
+    DEFAULT_AUTO_HIDE_DELAY_MS,
+    DEFAULT_AUTO_HIDE_TRIGGER_HEIGHT,
+    DEFAULT_AUTO_HIDE_HANDLE_LABEL,
+    DEFAULT_AUTO_HIDE_HANDLE_POSITION,
     DEFAULT_BREADCRUMB_LINK_COLOR,
     DEFAULT_BREADCRUMB_CURRENT_COLOR,
     DEFAULT_COMMAND_PALETTE_PLACEHOLDER,
@@ -76,6 +81,12 @@ function TopBar(props) {
         ctaButton,
         onMenuClick,
         mobileMenuLabel = DEFAULT_MOBILE_MENU_LABEL,
+        autoHide = false,
+        autoHideDelay = DEFAULT_AUTO_HIDE_DELAY_MS,
+        autoHideTriggerHeight = DEFAULT_AUTO_HIDE_TRIGGER_HEIGHT,
+        autoHideShowHandle = true,
+        autoHideHandlePosition = DEFAULT_AUTO_HIDE_HANDLE_POSITION,
+        autoHideHandleLabel = DEFAULT_AUTO_HIDE_HANDLE_LABEL,
     } = props;
 
     const isTopBarLoading = Boolean(loading || isLoading);
@@ -83,6 +94,14 @@ function TopBar(props) {
     const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
     const [isMobileActionsOpen, setIsMobileActionsOpen] = useState(false);
     const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+
+    // Auto-ocultado: no se oculta mientras haya algo abierto desde la barra (paleta de comandos,
+    // panel de acciones mobile o búsqueda mobile), porque quedarían flotando sin su origen.
+    const autoHideState = useAutoHide({
+        enabled: autoHide,
+        hideDelay: autoHideDelay,
+        keepVisible: isCommandPaletteOpen || isMobileActionsOpen || isMobileSearchOpen,
+    });
 
     const openCommandPalette = useCallback(() => {
         setIsCommandPaletteOpen(true);
@@ -160,7 +179,21 @@ function TopBar(props) {
             enabled={commandItems !== undefined && commandPaletteShortcut !== false}
             onTrigger={toggleCommandPalette}
         >
-        <header className={`${styles.topbar} ${className}`} style={themeVars}>
+        <AutoHideShell
+            active={autoHideState.active}
+            isHidden={autoHideState.isHidden}
+            onReveal={autoHideState.reveal}
+            triggerHeight={autoHideTriggerHeight}
+            showHandle={autoHideShowHandle}
+            handlePosition={autoHideHandlePosition}
+            handleLabel={autoHideHandleLabel}
+            style={themeVars}
+        >
+        <header
+            className={`${styles.topbar} ${autoHideState.active ? styles.autoHideBar : ''} ${autoHideState.isHidden ? styles.autoHideBarHidden : ''} ${className}`}
+            style={themeVars}
+            {...(autoHideState.active ? autoHideState.barHandlers : {})}
+        >
             <div className={styles.leftSection}>
                 {onMenuClick && (
                     <button
@@ -315,6 +348,7 @@ function TopBar(props) {
                 </div>
             )}
         </header>
+        </AutoHideShell>
         </KeyboardShortcut>
     );
 }

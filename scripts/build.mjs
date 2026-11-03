@@ -79,6 +79,19 @@ async function main() {
     }
   }
 
+  // Skill para la IA del proyecto consumidor (ver skill/anteriority-ui/SKILL.md y README).
+  // Se publica dentro del paquete en dist/skill/, y el bin de dist/bin/ la copia a
+  // .claude/skills/ del consumidor (ver bin/install-skill.mjs).
+  for (const dir of ['skill', 'bin']) {
+    const src = path.join(rootDir, dir);
+    try {
+      await stat(src);
+      await cp(src, path.join(outDir, dir), { recursive: true });
+    } catch {
+      // opcional
+    }
+  }
+
   // pnpm publish empaqueta desde `dist/` (ver publishConfig.directory en package.json),
   // así que este subset de campos es el package.json que va a terminar publicado.
   const rootPkg = JSON.parse(await readFile(path.join(rootDir, 'package.json'), 'utf8'));
@@ -87,6 +100,7 @@ async function main() {
     version,
     description,
     main,
+    bin,
     license,
     author,
     type,
@@ -105,6 +119,7 @@ async function main() {
         version,
         description,
         main,
+        bin,
         license,
         author,
         type,

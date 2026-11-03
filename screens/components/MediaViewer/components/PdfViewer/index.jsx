@@ -14,6 +14,9 @@ import {
   PDF_ZOOM_STEP,
   DEFAULT_PDF_ZOOM,
   PDF_VIEWPORT_HEIGHT,
+  PDF_MIN_OUTPUT_SCALE,
+  PDF_MAX_OUTPUT_SCALE,
+  PDF_MAX_CANVAS_PIXELS,
   DEFAULT_LOADING_VARIANT,
   DEFAULT_LOADING_SIZE,
 } from '../../constants.js';
@@ -79,8 +82,12 @@ const PdfViewer = ({
         pdfDocRef.current = doc;
         setPageCount(doc.numPages);
         setIsLoading(false);
-      } catch {
+      } catch (err) {
         if (!cancelled) {
+          // Sin este log el motivo real (CORS, 403 por URL firmada vencida, worker que no carga,
+          // PDF corrupto) queda oculto detrás del mensaje genérico. No se loguea la url: puede ser
+          // una URL firmada.
+          console.error('[PdfViewer] No se pudo cargar el PDF:', err);
           setHasError(true);
           setIsLoading(false);
         }
@@ -123,11 +130,24 @@ const PdfViewer = ({
 
     const baseViewport = pdfPage.getViewport({ scale: 1 });
     const fitScale = (container.clientWidth - 16) / baseViewport.width;
-    const viewport = pdfPage.getViewport({ scale: fitScale * zoom });
+    const cssScale = fitScale * zoom;
+    const cssViewport = pdfPage.getViewport({ scale: cssScale });
+
+    // El canvas se dibuja a más resolución que el tamaño en que se muestra (outputScale) y se
+    // reduce por CSS; si no, en pantallas con escala el browser agranda un canvas de baja
+    // resolución y el texto se ve borroso.
+    const maxScaleByArea = Math.sqrt(PDF_MAX_CANVAS_PIXELS / (cssViewport.width * cssViewport.height));
+    const wantedScale = Math.min(
+      Math.max(window.devicePixelRatio || 1, PDF_MIN_OUTPUT_SCALE),
+      PDF_MAX_OUTPUT_SCALE,
+    );
+    const outputScale = Math.max(1, Math.min(wantedScale, maxScaleByArea));
+    const viewport = pdfPage.getViewport({ scale: cssScale * outputScale });
 
     const context = canvas.getContext('2d');
-    canvas.width = viewport.width;
-    canvas.height = viewport.height;
+    canvas.width = Math.floor(viewport.width);
+    canvas.height = Math.floor(viewport.height);
+    canvas.style.width = `${Math.floor(cssViewport.width)}px`;
     context.clearRect(0, 0, canvas.width, canvas.height);
 
     const renderTask = pdfPage.render({ canvasContext: context, viewport });

@@ -24,10 +24,14 @@ import {
   DEFAULT_DOCX_TEXT_COLOR,
   DEFAULT_DOCX_BG_COLOR,
   DEFAULT_DOCX_ERROR_LABEL,
+  DEFAULT_MARKDOWN_ACCENT,
+  DEFAULT_MARKDOWN_TEXT_COLOR,
+  DEFAULT_MARKDOWN_BG_COLOR,
+  DEFAULT_MARKDOWN_ERROR_LABEL,
 } from './constants.js';
 import { resolveMediaKind, getFileName, formatFileSize } from './utils.js';
 import { getFileTypeInfo } from '../../../common/icons/fileType.js';
-import { VideoPlayer, AudioPlayer, PdfViewer, DocxViewer } from './components/index.js';
+import { VideoPlayer, AudioPlayer, PdfViewer, DocxViewer, MarkdownViewer } from './components/index.js';
 
 // Prueba si `url` carga como <img>/<video>/<audio> real, sin tocar el DOM visible.
 // A diferencia de fetch(), cargar un <img>/<video>/<audio> NO está sujeto a CORS para
@@ -132,6 +136,10 @@ const MediaViewer = ({
   audioControlsColor = DEFAULT_AUDIO_CONTROLS_COLOR,
   audioIconBgColor = DEFAULT_AUDIO_ICON_BG,
   audioErrorLabel = DEFAULT_AUDIO_ERROR_LABEL,
+  senderName,
+  senderAvatar,
+  avatarBgColor,
+  avatarTextColor,
   pdfAccentColor = DEFAULT_PDF_ACCENT,
   pdfTextColor = DEFAULT_PDF_TEXT_COLOR,
   pdfBgColor = DEFAULT_PDF_BG_COLOR,
@@ -140,6 +148,10 @@ const MediaViewer = ({
   docxTextColor = DEFAULT_DOCX_TEXT_COLOR,
   docxBgColor = DEFAULT_DOCX_BG_COLOR,
   docxErrorLabel = DEFAULT_DOCX_ERROR_LABEL,
+  markdownAccentColor = DEFAULT_MARKDOWN_ACCENT,
+  markdownTextColor = DEFAULT_MARKDOWN_TEXT_COLOR,
+  markdownBgColor = DEFAULT_MARKDOWN_BG_COLOR,
+  markdownErrorLabel = DEFAULT_MARKDOWN_ERROR_LABEL,
   onError,
   className = '',
   style,
@@ -268,6 +280,10 @@ const MediaViewer = ({
           <AudioPlayer
             src={resolvedUrl}
             fileName={fileName}
+            senderName={senderName}
+            senderAvatar={senderAvatar}
+            avatarBgColor={avatarBgColor}
+            avatarTextColor={avatarTextColor}
             loop={loop}
             muted={muted}
             autoPlay={autoPlay}
@@ -326,6 +342,21 @@ const MediaViewer = ({
           accentColor={docxAccentColor}
           textColor={docxTextColor}
           bgColor={docxBgColor}
+        />
+      </div>
+    );
+  }
+
+  if (kind === MEDIA_KIND.MARKDOWN && controls) {
+    return (
+      <div className={`${styles.wrapper} ${styles.pdfWrapper} ${className}`} style={wrapperStyle}>
+        <MarkdownViewer
+          url={resolvedUrl}
+          openLabel={openLabel}
+          errorLabel={markdownErrorLabel}
+          accentColor={markdownAccentColor}
+          textColor={markdownTextColor}
+          bgColor={markdownBgColor}
         />
       </div>
     );

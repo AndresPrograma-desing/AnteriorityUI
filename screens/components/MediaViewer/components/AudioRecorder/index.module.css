@@ -1,0 +1,104 @@
+.recorder {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--audio-recorder-bg, #ffffff);
+  border: 1px solid var(--audio-recorder-border, #e2e8f0);
+  color: var(--audio-recorder-text, #334155);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  min-width: 0;
+}
+
+.hint {
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.timer {
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.recDot {
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  animation: recPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes recPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.transcript {
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--audio-recorder-transcript-bg, #f1f5f9);
+  font-size: 0.85rem;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.errorRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.errorIcon {
+  flex-shrink: 0;
+  color: var(--audio-recorder-error, #ef4444);
+}
+
+.errorMsg {
+  flex: 1;
+  font-size: 0.78rem;
+}
+
+/* En anchos muy chicos las acciones ocupan su propia línea completa, repartidas a lo ancho. */
+@media (max-width: 360px) {
+  .recorder {
+    padding: 10px;
+  }
+
+  .actions {
+    width: 100%;
+    margin-left: 0;
+    justify-content: flex-end;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .recDot {
+    animation: none;
+  }
+}

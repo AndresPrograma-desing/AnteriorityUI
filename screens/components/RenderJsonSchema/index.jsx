@@ -1,5 +1,6 @@
 import React from 'react';
 import MediaViewer from '../MediaViewer/index';
+import { getDataUrlMime } from '../MediaViewer/utils.js';
 import styles from './index.module.css';
 import { DEFAULT_EMPTY_TEXT } from './constants.js';
 import { formatPrimitiveValue } from './utils.js';
@@ -24,9 +25,21 @@ function FileValue({ rawValue, mediaColors }) {
   const files = getDataURLs(rawValue);
   return (
     <div className={styles.fileList}>
-      {files.map((dataURL, index) => (
-        <MediaViewer key={index} url={dataURL} className={styles.fileItem} {...mediaColors} />
-      ))}
+      {files.map((dataURL, index) => {
+        // Las imágenes se muestran como miniatura (ancho acotado); audio, PDF y demás archivos
+        // necesitan el ancho completo, si no sus controles quedan aplastados (ej. el seek bar del
+        // reproductor de audio se reduce a un punto).
+        const mime = getDataUrlMime(dataURL);
+        const isImage = !mime || mime.startsWith('image/');
+        return (
+          <MediaViewer
+            key={index}
+            url={dataURL}
+            className={isImage ? styles.fileItem : styles.fileItemWide}
+            {...mediaColors}
+          />
+        );
+      })}
     </div>
   );
 }
@@ -41,6 +54,10 @@ function PropertyValue({ propSchema, rawValue, colorProps }) {
     bgColor: colorProps?.bgColor,
     borderColor: colorProps?.borderColor,
     textColor: colorProps?.textColor,
+    // Si el campo es un audio (grabado con el AudioWidget de SchemaForm, por ejemplo), sus
+    // controles usan su propia paleta clara por default: sin esto, en un panel oscuro quedarían
+    // texto/íconos oscuros sobre fondo oscuro.
+    audioControlsColor: colorProps?.textColor,
   };
 
   if (propSchema?.type === 'object') {

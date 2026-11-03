@@ -1,11 +1,15 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { XCircle } from 'lucide-react'; 
+import { XCircle } from 'lucide-react';
 import styles from './index.module.css';
+import { SchemaFormContent } from './components/index.js';
+import { DEFAULT_SCHEMA_FORM_ID_PREFIX, DEFAULT_SCHEMA_MISSING_LABEL } from './constants.js';
+import { isEmptyValue, hasUserValues, getSchemaRequiredFields } from './utils.js';
 
 import Button from '../Button/index';
 import CountdownBar from '../CountdownBar/index';
 import Loading from '../Loading/index';
+import MarkdownContent from '../MarkdownContent/index';
 
 const DrawPanel = ({ 
   isOpen, 
@@ -14,6 +18,8 @@ const DrawPanel = ({
   closeIcon : CloseIcon = XCircle,
   description,
   descriptionPosition = 'top',
+  markdown,
+  markdownProps,
   children,
   width = '400px',
   showActions = true,
@@ -23,6 +29,14 @@ const DrawPanel = ({
   confirmButtonProps,
   cancelButtonProps,
   formId,
+  schema,
+  uiSchema,
+  defaultFormData,
+  onFormDataChange,
+  onSubmit,
+  onSubmitError,
+  schemaFormProps,
+  schemaMissingLabel = DEFAULT_SCHEMA_MISSING_LABEL,
   loading = false,
   contentLoading = false,
   contentLoadingText,
@@ -39,7 +53,7 @@ const DrawPanel = ({
   countdownHeight,
   countdownColors,
   countdownIncrement = true,
-  progressMode = 'count',
+  progressMode,
   totalFields = 0,
   filledFields = 0,
   totalItems = [],
@@ -60,6 +74,15 @@ const DrawPanel = ({
   const [isScrolled, setIsScrolled] = useState(false);
   const pendingCloseTimeoutRef = useRef(null);
 
+  // Modo JSON Schema: si llega `schema`, el panel pinta un formulario dinámico (SchemaForm) en su
+  // área de contenido. Los datos pueden ser controlados (prop `formData`) o internos (el panel los
+  // guarda y los reinicia a `defaultFormData` al cerrarse).
+  const isSchemaMode = Boolean(schema);
+  const isFormDataControlled = formData !== undefined;
+  const [internalFormData, setInternalFormData] = useState(defaultFormData);
+  const generatedFormId = useId();
+  const resolvedFormId = formId ?? (isSchemaMode ? `${DEFAULT_SCHEMA_FORM_ID_PREFIX}${generatedFormId}` : undefined);
+
   useEffect(() => {
     if (isOpen) setRender(true);
   }, [isOpen]);
@@ -74,6 +97,7 @@ const DrawPanel = ({
     if (!isOpen) {
       setRender(false);
       setPendingClose(false);
+      if (!isFormDataControlled) setInternalFormData(defaultFormData);
       if (pendingCloseTimeoutRef.current) {
         clearTimeout(pendingCloseTimeoutRef.current);
         pendingCloseTimeoutRef.current = null;
@@ -86,10 +110,20 @@ const DrawPanel = ({
   // Contenido "sucio": si hay datos cargados en el formulario, un solo clic (fuera
   // o en el botón de cerrar) no cierra el panel, para no perder lo que el usuario
   // escribió; requiere un segundo clic. Sin datos, el panel se cierra normalmente.
-  const formHasValues = formData
-    ? Object.values(formData).some((val) => val !== undefined && val !== null && String(val).trim() !== '')
-    : false;
+  // Con schema los datos pueden ser objetos/arrays anidados y booleanos (String(val) daría falsos
+  // positivos como "[object Object]"), así que se usa una detección recursiva.
+  const currentFormData = isSchemaMode && !isFormDataControlled ? internalFormData : formData;
+  const formHasValues = isSchemaMode
+    ? hasUserValues(currentFormData)
+    : currentFormData
+      ? Object.values(currentFormData).some((val) => val !== undefined && val !== null && String(val).trim() !== '')
+      : false;
   const isDirty = hasUnsavedChanges ?? formHasValues;
+
+  const handleSchemaChange = (nextFormData, event) => {
+    if (!isFormDataControlled) setInternalFormData(nextFormData);
+    onFormDataChange?.(nextFormData, event);
+  };
 
   const handleCloseClick = () => {
     if (!isDirty) {
@@ -109,17 +143,22 @@ const DrawPanel = ({
   // Lógica Genérica de Cálculo de Progreso
   let calculatedProgress = countdownValue ?? 0;
 
-  if (progressMode === 'selection') {
+  // Con schema el progreso por default sigue a los campos `required` del propio schema.
+  const resolvedProgressMode = progressMode ?? (isSchemaMode ? 'form' : 'count');
+  const effectiveRequiredFields =
+    requiredFields?.length > 0 ? requiredFields : isSchemaMode ? getSchemaRequiredFields(schema) : [];
+
+  if (resolvedProgressMode === 'selection') {
     const total = Array.isArray(totalItems) ? totalItems.length : Number(totalItems) || 0;
     const selected = Array.isArray(selectedItems) ? selectedItems.length : Number(selectedItems) || 0;
     calculatedProgress = total > 0 ? (selected / total) * 100 : 0;
-  } else if (progressMode === 'form' && formData && Array.isArray(requiredFields) && requiredFields.length > 0) {
-    const filledCount = requiredFields.filter(field => {
-      const val = formData[field];
-      return val !== undefined && val !== null && String(val).trim() !== '';
+  } else if (resolvedProgressMode === 'form' && currentFormData && effectiveRequiredFields.length > 0) {
+    const filledCount = effectiveRequiredFields.filter(field => {
+      const val = currentFormData[field];
+      return isSchemaMode ? !isEmptyValue(val) : val !== undefined && val !== null && String(val).trim() !== '';
     }).length;
-    calculatedProgress = (filledCount / requiredFields.length) * 100;
-  } else if (progressMode === 'count' && totalFields > 0) {
+    calculatedProgress = (filledCount / effectiveRequiredFields.length) * 100;
+  } else if (resolvedProgressMode === 'count' && totalFields > 0) {
     calculatedProgress = Math.min(100, Math.max(0, (filledFields / totalFields) * 100));
   }
 
@@ -148,8 +187,13 @@ const DrawPanel = ({
           <div className={styles.headerTop}>
             <div className={styles.headerTitleContainer}>
               <h3 className={styles.title} style={{ color: textColor }}>{title}</h3>
-              {description && descriptionPosition === 'top' && (
+              {description && !markdown && descriptionPosition === 'top' && (
                 <p className={styles.description} style={{ color: mutedTextColor }}>{description}</p>
+              )}
+              {markdown && descriptionPosition === 'top' && (
+                <MarkdownContent className={styles.markdownTop} style={{ color: mutedTextColor }} {...markdownProps}>
+                  {markdown}
+                </MarkdownContent>
               )}
             </div>
             <div className={styles.closeButtonWrapper}>
@@ -199,8 +243,32 @@ const DrawPanel = ({
             </div>
           ) : (
             <>
+              {isSchemaMode && (
+                <SchemaFormContent
+                  schema={schema}
+                  uiSchema={uiSchema}
+                  formData={currentFormData}
+                  formId={resolvedFormId}
+                  showSubmitButton={!showActions}
+                  disabled={loading}
+                  onChange={handleSchemaChange}
+                  onSubmit={onSubmit}
+                  onError={onSubmitError}
+                  schemaFormProps={schemaFormProps}
+                  missingLabel={schemaMissingLabel}
+                  textColor={textColor}
+                  loadingColor={mutedTextColor}
+                />
+              )}
               {children}
-              {description && descriptionPosition === 'bottom' && (
+              {markdown && descriptionPosition === 'bottom' && (
+                <div className={styles.descriptionBottom} style={{ borderTopColor: borderColor }}>
+                  <MarkdownContent style={{ color: mutedTextColor }} {...markdownProps}>
+                    {markdown}
+                  </MarkdownContent>
+                </div>
+              )}
+              {description && !markdown && descriptionPosition === 'bottom' && (
                 <div className={styles.descriptionBottom} style={{ borderTopColor: borderColor }}>
                   <h4 className={styles.descriptionBottomTitle} style={{ color: textColor }}>Descripción de Tarea</h4>
                   <p className={styles.descriptionBottomText} style={{ color: mutedTextColor }}>{description}</p>
@@ -223,8 +291,8 @@ const DrawPanel = ({
               {cancelButtonProps?.children ?? cancelText}
             </Button>
             <Button
-              type={formId ? 'submit' : 'button'}
-              form={formId}
+              type={resolvedFormId ? 'submit' : 'button'}
+              form={resolvedFormId}
               variant="primary"
               color={Button.COLORS.PRIMARY}
               onClick={onConfirm}

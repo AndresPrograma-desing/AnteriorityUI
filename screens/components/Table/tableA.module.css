@@ -140,3 +140,41 @@
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
 }
+
+/* Funciones de TableB disponibles también en la variante A (expandable, type 'actions'/'badge').
+   Son aditivas: no afectan a una TableA que no las use. */
+.expandHeader { width: 50px; }
+.expandCell { width: 50px; text-align: center; }
+.expandIconWrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  color: #6b7280;
+  transition: all 0.2s ease;
+}
+.rowExpanded { background-color: rgba(66, 153, 225, 0.03); }
+.rowExpanded .expandIconWrapper { background-color: #4299e1; color: white; }
+.expandedContentRow td {
+  padding: 0;
+  border-bottom: 1px solid var(--tableA-border, #e2e8f0);
+  background-color: var(--tableA-header, #f8fafc);
+}
+.expandedWrapper { padding: 16px; }
+.actionButtons { display: flex; gap: 8px; align-items: center; }
+.actionIcon { width: 16px; height: 16px; object-fit: contain; }
+.actionIconInvert { filter: invert(1) brightness(1.2); }
+.badgeSuccess {
+  background: var(--tableA-badge-success-bg, #dcfce7) !important;
+  color: var(--tableA-badge-success-color, #166534) !important;
+}
+.badgeWarning {
+  background: var(--tableA-badge-warning-bg, #fef3c7) !important;
+  color: var(--tableA-badge-warning-color, #92400e) !important;
+}
+.badgeDanger {
+  background: var(--tableA-badge-danger-bg, #fee2e2) !important;
+  color: var(--tableA-badge-danger-color, #991b1b) !important;
+}

@@ -12,7 +12,7 @@ const Switch = ({
   inactiveColor = '#919191',
   thumbColor = '#ffffff',
   variant = 'default',
-  showIcons = false,
+  showIcons = true,
   icons = false,
   showLabels = false,
   labels = false,
@@ -141,7 +141,10 @@ const Switch = ({
   }
 
   return (
-    <ModalTooltip text={computedTooltipText}>
+    <ModalTooltip
+      text={computedTooltipText}
+      style={{ width: 'fit-content', alignSelf: 'flex-start', cursor: 'default' }}
+    >
       {buttonElement}
     </ModalTooltip>
   );

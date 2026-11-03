@@ -4,6 +4,46 @@ Referencia detallada de uso de cada componente de la librería (props, ejemplos,
 
 ---
 
+## Skill para la IA del proyecto consumidor
+
+La librería incluye una **skill de Claude Code** que enseña a la IA del proyecto consumidor a usar los componentes como están pensados: setup, qué componente usar para cada caso, cómo importar, dónde leer las props exactas y las reglas de color y de API. Está en el repo en `skill/anteriority-ui/SKILL.md` y viaja dentro del paquete publicado, en `node_modules/anteriority-ui/skill/anteriority-ui/SKILL.md`.
+
+### Instalación
+
+Claude Code no lee skills desde `node_modules`: solo lee `.claude/skills/` del proyecto (y `~/.claude/skills/` del usuario). Por eso hay que copiarla una vez, desde la **raíz del proyecto consumidor**:
+
+```bash
+pnpm anteriority-ui-install-skill
+# o: npx anteriority-ui-install-skill
+```
+
+Resultado: `.claude/skills/anteriority-ui/SKILL.md` dentro del proyecto consumidor. El comando:
+
+- Usa como destino la carpeta desde donde se ejecuta (`INIT_CWD` de pnpm/npm, o el cwd actual).
+- Acepta otra carpeta como argumento: `pnpm anteriority-ui-install-skill ../otro-proyecto`.
+- Borra la copia anterior antes de copiar, así que nunca quedan archivos de versiones viejas.
+- Requiere que la librería esté instalada completa; si no encuentra la skill, termina con error y lo informa.
+
+**Actualizar:** después de `pnpm update anteriority-ui`, volver a ejecutar el mismo comando. Claude Code toma la skill nueva en la próxima sesión (o al reiniciar).
+
+**Verificar que quedó instalada:** existe `.claude/skills/anteriority-ui/SKILL.md` y la sesión de Claude Code muestra `anteriority-ui` entre las skills disponibles. Si no aparece, revisar que el archivo esté en la carpeta del proyecto que se abrió en Claude Code (no en la carpeta padre ni en `node_modules`) y reiniciar la sesión.
+
+**Desinstalar:** borrar la carpeta `.claude/skills/anteriority-ui/`.
+
+### Qué contiene y qué no
+
+- Setup mínimo (CSS base, `ThemeProvider`, dependencias opcionales por componente).
+- Cómo importar (barrel, subpaths, íconos) y las trampas de nombres.
+- Índice de componentes agrupado por caso de uso, para reutilizar en vez de reimplementar.
+- Reglas de color (props `bgColor`, `textColor`, `iconColor`, `borderColor`, `accentColor`) y de configuración de API (`configureApiClient`).
+- **No duplica las props de cada componente.** La skill indica a la IA que las busque en `node_modules/anteriority-ui/AnteriorityUI.md` (esta misma página), sección `### NombreComponente`. Por eso la documentación de props siempre corresponde a la versión instalada.
+
+### Cómo se mantiene
+
+Cuando se agrega, renombra o elimina un componente, se actualiza `skill/anteriority-ui/SKILL.md` en el mismo cambio (ver [CLAUDE.md](CLAUDE.md#skill-para-consumidores-skillanteriority-ui)). Los cambios de props solo requieren actualizar esta página, no la skill.
+
+---
+
 ### AlertModal
 
 Modal de alerta/confirmación genérico que se renderiza vía portal sobre `document.body`. Traduce y formatea automáticamente mensajes de error (string, array u objeto con `errors`/`details`) al español, y puede incluir un input de texto o select embebido.
@@ -1385,7 +1425,7 @@ import DesplegablePanel from '../DesplegablePanel'; // export default (index.jsx
 
 ### DrawPanel
 
-Panel lateral (drawer) deslizante renderizado vía portal, con header, footer de acciones opcional, barra de progreso (`CountdownBar`) opcional y protección contra cierre accidental cuando hay cambios sin guardar.
+Panel lateral (drawer) deslizante renderizado vía portal, con header, footer de acciones opcional, barra de progreso (`CountdownBar`) opcional y protección contra cierre accidental cuando hay cambios sin guardar. Además puede **pintar un formulario dinámico a partir de un JSON Schema** (prop `schema`, ver [Modo JSON Schema](#drawpanel-modo-json-schema) más abajo): según el JSON que le llegue, el panel arma los campos, valida, y el botón confirmar del footer envía el formulario.
 
 **Import:**
 ```jsx
@@ -1414,7 +1454,9 @@ import DrawPanel from '../DrawPanel'; // export default (index.jsx)
 | `title` | string | — | Título del panel |
 | `closeIcon` | component | `XCircle` (lucide-react) | Ícono del botón de cerrar; recibe `size` y `color` como props (mismo contrato que cualquier ícono de lucide-react) |
 | `description` | string | — | Texto descriptivo, ubicado según `descriptionPosition` |
-| `descriptionPosition` | `'top' \| 'bottom'` | `'top'` | Dónde se muestra la descripción |
+| `descriptionPosition` | `'top' \| 'bottom'` | `'top'` | Dónde se muestra la descripción (o el `markdown`) |
+| `markdown` | string | — | Texto markdown renderizado con `MarkdownContent` (negritas, listas, links, tablas, `{color:..}`, bloques copiables, Mermaid). Si viene, reemplaza a `description` y respeta `descriptionPosition`. |
+| `markdownProps` | object | — | Props extra para el `MarkdownContent` interno (`components`, `linkColor`, `images`, labels de copiar…). |
 | `children` | node | — | Contenido principal del panel |
 | `width` | string | `'400px'` | Ancho máximo del panel |
 | `showActions` | boolean | `true` | Muestra footer con botones cancelar/confirmar |
@@ -1423,7 +1465,15 @@ import DrawPanel from '../DrawPanel'; // export default (index.jsx)
 | `cancelText` | string | `'Cancelar'` | Texto del botón cancelar (ignorado si `cancelButtonProps.children` viene definido) |
 | `confirmButtonProps` | object | — | Props adicionales spreadeadas sobre el `Button` de confirmar (override total: variant, color, icon, children, etc.) |
 | `cancelButtonProps` | object | — | Props adicionales spreadeadas sobre el `Button` de cancelar (override total: variant, color, icon, children, etc.) |
-| `formId` | string | — | Si se define, el botón confirmar es `type="submit"` con `form={formId}` |
+| `formId` | string | — | Si se define, el botón confirmar es `type="submit"` con `form={formId}`. Con `schema` y sin `formId`, el panel genera uno automáticamente. |
+| `schema` | object | — | JSON Schema que describe el formulario. Si se pasa, el panel renderiza un [SchemaForm](#schemaform) dentro del área de contenido (arriba de `children`). Ver [Modo JSON Schema](#drawpanel-modo-json-schema). |
+| `uiSchema` | object | — | `uiSchema` de rjsf (widget por campo, `ui:options`, orden, etc.). Solo con `schema`. |
+| `defaultFormData` | object | — | Datos iniciales del formulario cuando no se controla con `formData`. El panel vuelve a este valor cada vez que se cierra. Solo con `schema`. |
+| `onFormDataChange` | `function(formData, event)` | — | Se llama en cada cambio de cualquier campo (con datos controlados o internos). Solo con `schema`. |
+| `onSubmit` | `function(formData, event)` | — | Se llama al enviar el formulario **ya validado** (click en confirmar, o Enter). Solo con `schema`. |
+| `onSubmitError` | function | — | Se llama cuando el envío falla la validación del schema (rjsf no llama a `onSubmit` en ese caso). Solo con `schema`. |
+| `schemaFormProps` | object | — | Props extra pasadas al `SchemaForm` interno (`widgets`, `fields`, `templates`, `validator`, `readonly`, etc.). Solo con `schema`. |
+| `schemaMissingLabel` | string | `'No se pudo cargar el formulario. Verificá que @rjsf/core esté instalado.'` | Mensaje mostrado si no se pudo cargar `SchemaForm` (típicamente, falta instalar `@rjsf/core`). Solo con `schema`. |
 | `loading` | boolean | `false` | Estado de carga de los botones del footer |
 | `contentLoading` | boolean | `false` | Reemplaza `children` (y la descripción bottom) por un `Loading` centrado dentro del área de contenido |
 | `contentLoadingText` | string | — | Texto mostrado bajo el spinner cuando `contentLoading` está activo (pasado a `Loading` como `text`; ignorado si `typeLoading` es `'skeleton'`) |
@@ -1440,13 +1490,13 @@ import DrawPanel from '../DrawPanel'; // export default (index.jsx)
 | `countdownHeight` | string | — | Alto de la `CountdownBar` |
 | `countdownColors` | array | — | Colores de la `CountdownBar` |
 | `countdownIncrement` | boolean | `true` | Modo incremental de la `CountdownBar` |
-| `progressMode` | `'count' \| 'selection' \| 'form'` | `'count'` | Cómo se calcula el progreso automáticamente |
+| `progressMode` | `'count' \| 'selection' \| 'form'` | `'count'` (`'form'` si hay `schema`) | Cómo se calcula el progreso automáticamente |
 | `totalFields` | number | `0` | Total de campos (modo `'count'`) |
 | `filledFields` | number | `0` | Campos completados (modo `'count'`) |
 | `totalItems` | array | `[]` | Ítems totales (modo `'selection'`) |
 | `selectedItems` | array | `[]` | Ítems seleccionados (modo `'selection'`) |
-| `formData` | object | — | Datos del formulario (modo `'form'`, y para detectar cambios sin guardar) |
-| `requiredFields` | array | `[]` | Campos requeridos a validar (modo `'form'`) |
+| `formData` | object | — | Datos del formulario (modo `'form'`, y para detectar cambios sin guardar). Con `schema`, son los datos **controlados** del formulario (junto con `onFormDataChange`); si no se pasa, el panel guarda los datos internamente. |
+| `requiredFields` | array | `[]` | Campos requeridos a validar (modo `'form'`). Con `schema`, si no se pasa se usan los `required` del propio schema. |
 | `panelColor` | string | `'#ffffff'` | Color de fondo del panel/header/footer |
 | `textColor` | string | `'#0f172a'` | Color del texto del título |
 | `mutedTextColor` | string | `'#64748b'` | Color de textos secundarios/íconos |
@@ -1511,6 +1561,52 @@ import DrawPanel from '../DrawPanel'; // export default (index.jsx)
   <p>Este contenido no se muestra mientras contentLoading es true.</p>
 </DrawPanel>
 ```
+
+<a id="drawpanel-modo-json-schema"></a>
+
+**Modo JSON Schema:** al pasar `schema`, el contenido del panel se genera a partir del JSON — no hace falta escribir los inputs a mano. Usa [SchemaForm](#schemaform) por dentro, así que soporta todos sus widgets y formatos (texto, número, select, fecha, color, archivos, audio con `AudioWidget`, etc.) y la validación de rjsf.
+
+```jsx
+const schema = {
+  type: 'object',
+  required: ['nombre', 'email'],
+  properties: {
+    nombre: { type: 'string', title: 'Nombre' },
+    email: { type: 'string', title: 'Email', format: 'email' },
+    comentarios: { type: 'string', title: 'Comentarios' },
+  },
+};
+
+// Datos internos: el panel guarda los datos y los reinicia al cerrarse.
+<DrawPanel
+  isOpen={open}
+  onClose={() => setOpen(false)}
+  title="Nueva solicitud"
+  schema={schema}
+  uiSchema={{ comentarios: { 'ui:widget': 'TextareaWidget' } }}
+  confirmText="Enviar"
+  onSubmit={(data) => save(data)}
+/>
+
+// Datos controlados: el formulario vive en el estado del padre (ej. para precargar un registro).
+<DrawPanel
+  isOpen={open}
+  onClose={() => setOpen(false)}
+  title="Editar solicitud"
+  schema={schema}
+  formData={formData}
+  onFormDataChange={setFormData}
+  onSubmit={(data) => save(data)}
+/>
+```
+
+- **Envío:** el botón confirmar del footer (`confirmText`) es `type="submit"` y apunta al formulario por `formId` (generado solo si no lo pasás). Si la validación falla, no se llama a `onSubmit` (sí a `onSubmitError`) y se marcan los campos. Con `showActions={false}` el propio formulario muestra su botón de envío. El panel **no se cierra solo** al enviar: cerrarlo es responsabilidad del consumidor (típico en `onSubmit`).
+- **Datos controlados o internos:** con `formData` + `onFormDataChange` los controlás vos; sin `formData`, el panel los guarda y los reinicia a `defaultFormData` cada vez que se cierra.
+- **Cambios sin guardar:** en modo schema la detección es recursiva (un objeto/array vacío o un toggle en `false` no cuentan como datos cargados); se puede forzar con `hasUnsavedChanges`.
+- **Progreso:** con `showCountdown`, el progreso por default sigue a los campos `required` del schema (`progressMode: 'form'`).
+- **`loading`:** además de deshabilitar el botón confirmar, deshabilita los campos del formulario mientras se guarda.
+- **`@rjsf/core`:** `SchemaForm` depende de `@rjsf/core` (peer dependency opcional de la librería). El panel lo carga **bajo demanda** (import dinámico), solo cuando recibe un `schema`: un `DrawPanel` normal no obliga a instalarlo. Si no está instalado se muestra `schemaMissingLabel` en vez del formulario.
+- **Tema:** los widgets del formulario no heredan `panelColor`/`textColor` del panel (cada widget tiene su paleta; se tematizan vía `ui:options`, ver [SchemaForm](#schemaform)).
 
 **Notas:** Se renderiza con `createPortal` en `document.body`. Si hay `formData` con valores (o `hasUnsavedChanges` es `true`), el primer click fuera del panel o en el botón cerrar solo muestra un aviso (`closeConfirmMessage`); un segundo click sí cierra. Compone `Button`, `CountdownBar` y `Loading` internos del sistema. El header (título + `CountdownBar` si `showCountdown`) queda fijo (`flex-shrink: 0`) mientras solo el contenido (`children`) hace scroll; al scrollear el contenido aparece una sombra interna sutil bajo el header (color derivado de `borderColor`) como indicador de que hay más contenido arriba. En `anchor="top"` el panel queda acotado a la altura del viewport (`max-height: 100%`) para que el scroll ocurra siempre dentro del contenido, nunca en la página. `contentLoading` es independiente del `loading` de los botones del footer: se puede mostrar el panel con los botones habilitados mientras el contenido todavía carga, o viceversa.
 
@@ -2249,6 +2345,133 @@ import Input from '../Input/index'; // export default, forwardRef, archivo index
 
 ---
 []()
+### ChatComposer
+
+Composer para chats y prompts: una barra superior con botones configurables, un campo de texto que acepta Markdown (con vista previa renderizada por `MarkdownContent`) y pegado de imágenes. Las imágenes pegadas se muestran **arriba** del campo. Por dentro usa `MultilinePlaceholder` para el textarea.
+
+**Import:**
+```jsx
+import { ChatComposer } from 'anteriority-ui';
+```
+
+**Uso básico:**
+```jsx
+const [texto, setTexto] = useState('');
+<ChatComposer
+  value={texto}
+  onChange={setTexto}
+  onSend={(text) => { enviar(text); setTexto(''); }}
+  toolbar={[
+    { type: 'icon', icon: Paperclip, tooltip: 'Adjuntar', onClick: abrirSelector },
+    { type: 'toggle', label: 'Modo rápido', icon: Zap, active: rapido, onClick: () => setRapido(!rapido) },
+    { type: 'button', label: 'Plantilla', onClick: usarPlantilla },
+  ]}
+  onImagePaste={(files) => subir(files)}
+/>
+```
+
+**Props:**
+
+| Prop | Tipo | Default | Descripción |
+|---|---|---|---|
+| `value` / `onChange(text)` | string / function | `''` / — | Texto controlado (`onChange` recibe el string, no el evento). |
+| `onSend(text)` | function | — | Se llama con el atajo de envío (Ctrl+Shift+Enter por defecto) o con el botón de envío. Enter solo inserta un salto de línea. No limpia el texto solo: el consumidor decide. |
+| `placeholder`, `rows`, `maxRows`, `disabled` | — | `'Escribí un mensaje… (Markdown soportado)'`, `3`, `15`, `false` | Campo de texto. Crece con el contenido hasta `maxRows` líneas, sin barra de scroll visible. |
+| `toolbar` | `Array<item>` | `[]` | Botones de la barra superior (ver tipos abajo). |
+| `markdown` | boolean | `true` | Habilita Markdown: el valor se renderiza con `MarkdownContent` cuando está activa la vista previa. |
+| `previewToggle` | boolean | `true` | Agrega al final de la barra el botón de vista previa (solo si `markdown`). |
+| `defaultPreview` | boolean | `false` | Vista previa activa al montar. |
+| `previewLabel`, `emptyPreviewText` | string | `'Vista previa'`, `'Nada para previsualizar'` | Textos del toggle y de la vista previa vacía. |
+| `markdownProps` | object | — | Props extra para el `MarkdownContent` (`components`, `linkColor`, `images`…). |
+| `onImagePaste(files, event)` | function | — | Recibe las imágenes pegadas (array de `File`). Sin este prop el pegado de imágenes está desactivado. |
+| `imagePreviewLabel`, `imageRemoveLabel` | string | `'Imagen'`, `'Quitar imagen'` | Textos de los chips de imagen. |
+| `showSend` | boolean | `true` | Muestra el botón circular de envío (se deshabilita si no hay texto ni imágenes). |
+| `sendShortcut` | `'ctrl+shift+enter'` \| `'enter'` \| `'none'` | `'ctrl+shift+enter'` | Atajo de teclado para enviar. `'enter'` envía con Enter solo; `'none'` desactiva el atajo. |
+| `sendLabel`, `sendIcon`, `sendColor` | — | `'Enviar'`, `Send`, `Button.COLORS.PRIMARY` | Configuración del botón de envío, que va dentro del campo, abajo a la derecha. |
+| `sendMenu` | `Array<{ key?, label, icon?, onClick(texto), disabled? }>` | `[]` | Si tiene elementos, aparece un chevron pegado al botón de enviar que abre un popover con estas acciones. `onClick` recibe el texto actual. |
+| `sendMenuLabel` | string | `'Más opciones de envío'` | `aria-label` del chevron. |
+| `menuBgColor`, `menuTextColor`, `menuBorderColor`, `menuHoverColor` | string | — | Colores del popover de acciones (fondo, texto, borde y fondo al pasar el mouse). |
+| `sendMenuIconColor` | string | `#ffffff` | Color del chevron que abre el menú de envío. |
+| `mutedTextColor` | string | `#94a3b8` | Texto de la vista previa vacía. |
+| `placeholderColor` | string | `rgba(0,0,0,0.42)` | Color del placeholder del campo. |
+| `imagePreviewBorderColor`, `imageThumbBorderColor`, `imageLabelBgColor`, `imageLabelTextColor` | string | — | Colores de los chips de imagen pegada (los mismos que `ImagePastePreview`). |
+| `imagePreviewProps` | object | — | Props extra que se reenvían tal cual a `ImagePastePreview` (ej. `style`, o cualquier prop nueva de ese componente). Tiene prioridad sobre las props `image*` de arriba. |
+| `footerToolbar` | `Array<item>` | `[]` | Botones de la parte inferior del campo, a la izquierda del envío (mismos tipos que `toolbar`). |
+| `bgColor`, `borderColor`, `textColor` | string | — | Fondo, borde y texto del composer (CSS vars `--chat-composer-*`). |
+| `toolbarBgColor`, `toolbarBorderColor` | string | — | Fondo y línea de la barra superior. |
+| `inputBgColor` | string | — | Fondo del campo de texto. |
+| `sendLoading` | boolean | `false` | Muestra el spinner en el botón de enviar (ej. mientras se envía el mensaje). |
+| `sendButtonProps` | object | — | Props extra para el botón de enviar (`size`, `activeColor`, `hoverColor`…). `disabled`, `onClick` y `loading` los controla el composer, así que no se pueden pisar desde acá. |
+| `textareaProps` | object | — | Props extra para el textarea (`variant`, `size`, `id`, `name`, `autoFocus`, `inputProps`…). `value`, `onChange` y `onKeyDown` los controla el composer. |
+| `ref` | ref | — | Apunta al `<textarea>` del campo. Útil para enfocarlo desde afuera (ej. `ref.current.focus()` después de enviar). |
+| `width`, `maxWidth` | string \| number | `100%` (ancho) / — | Ancho del composer. Sin valor ocupa todo el contenedor padre. Ej.: `width={720}` o `maxWidth="60vw"`. |
+| `className`, `style` | — | — | Se aplican al contenedor. |
+
+**Tipos de item de `toolbar`:**
+
+| `type` | Props | Qué renderiza |
+|---|---|---|
+| `button` (default) | `label`, `icon?`, `onClick`, `disabled?`, `tooltip?`, `color?`, `variant?` | Botón con texto. |
+| `icon` | `icon`, `tooltip?`, `onClick`, `color?`, `active?` | Botón circular de solo ícono. |
+| `toggle` | `label`, `icon?`, `active`, `onClick`, `activeColor?`, `color?` | Botón con estado activo (`aria-pressed`). |
+| `custom` | `node` | Cualquier nodo React (selector, badge…). |
+| `separator` / `spacer` | — | Divisor vertical o espacio flexible (empuja lo que sigue a la derecha). |
+
+Los colores por item (`color`, `activeColor`) pasan directo al `Button`. Las stories: `Default`, `ConPegadoDeImagenes`, `SinVistaPreviaNiEnvio` y `TemaOscuro`.
+
+### Resizable
+
+Contenedor con un handle arrastrable para agrandar o achicar un panel, igual que la terminal de VS Code. El handle va en el borde indicado y, al arrastrarlo, cambia el tamaño del área de contenido. Funciona también con teclado y, al hacer doble click, vuelve al tamaño inicial.
+
+**Import:**
+```jsx
+import { Resizable } from 'anteriority-ui';
+```
+
+**Uso básico (panel inferior, como la terminal):**
+```jsx
+<div style={{ height: 400, display: 'flex', flexDirection: 'column' }}>
+  <div style={{ flex: 1 }}>Editor</div>
+  <Resizable handlePosition="start" defaultSize={200} minSize={80} maxSize={480}>
+    <div>Terminal</div>
+  </Resizable>
+</div>
+```
+
+**Props:**
+
+| Prop | Tipo | Default | Descripción |
+|---|---|---|---|
+| `children` | node | — | Contenido del panel (se renderiza dentro de un área con scroll). |
+| `direction` | `'vertical'` \| `'horizontal'` | `'vertical'` | `vertical` cambia el alto; `horizontal` cambia el ancho. |
+| `handlePosition` | `'end'` \| `'start'` | `'end'` | Borde donde va el handle. Con `start` arrastrar hacia el inicio agranda el panel (ej. terminal arriba del borde inferior). |
+| `size` | number | — | Tamaño controlado (px). Si se pasa, el componente no guarda estado propio. |
+| `defaultSize` | number | `240` | Tamaño inicial (no controlado) y tamaño al hacer doble click. |
+| `minSize` / `maxSize` | number | `80` / `Infinity` | Límites del tamaño del contenido. |
+| `step` | number | `1` | Paso en px con las flechas del teclado, para ajuste fino. Shift lo multiplica por 10; `Home`/`End` van a mínimo/máximo. Al pasar el puntero sobre la franja, el handle toma el foco y las flechas la mueven; si otro elemento (ej. un input) tiene el foco, hay que hacer clic en la franja primero. También funciona con Tab. |
+| `onSizeChange` | `function(size)` | — | Se llama en cada cambio durante el arrastre. |
+| `onResizeEnd` | `function(size)` | — | Se llama al soltar el handle (o tras una tecla). Útil para guardar la preferencia sin hacerlo en cada pixel. |
+| `resetOnDoubleClick` | boolean | `true` | Doble click en el handle vuelve a `defaultSize`. |
+| `disabled` | boolean | `false` | Desactiva arrastre y teclado. |
+| `showHandle` | boolean | `true` | Oculta el handle (el tamaño sigue controlándose por `size`). |
+| `handleSize` | number | `8` | Grosor del área de agarre en px (no se ve). Se suma al tamaño total del contenedor. |
+| `handleBgColor` | string | transparente | Fondo del área de agarre. |
+| `lineThickness` | number | `1` | Grosor de la franja visible en px. |
+| `lineColor` / `lineActiveColor` | string | `rgba(148,163,184,0.35)` / `#7c9cff` | Color de la franja en reposo / al pasar el mouse, arrastrar o enfocar. |
+| `showGrip` | boolean | `true` | Muestra el recuadro central con flechas. |
+| `gripIcon` | component \| `null` | `ChevronsUpDown` (alto) / `ChevronsLeftRight` (ancho) | Ícono (lucide u otro) dentro del grip. `null` deja el recuadro vacío. |
+| `gripSize` / `gripIconSize` | number | `20` / `14` | Tamaño del recuadro y del ícono en px. |
+| `gripStrokeWidth` | number | `2` | Grosor del trazo del ícono. |
+| `gripRadius` | number | `6` | Radio de esquina del recuadro en px. |
+| `gripBgColor` / `gripBorderColor` / `gripIconColor` | string | transparente / `rgba(148,163,184,0.6)` / `#94a3b8` | Colores del recuadro y del ícono. |
+| `handleLabel` | string | `'Redimensionar'` | `aria-label` del separador. |
+| `className`, `style` | — | — | Se aplican al contenedor externo. |
+
+**Notas:**
+- `size` es el tamaño del contenido; el contenedor mide `size + handleSize`.
+- Para `direction="horizontal"` el contenedor padre debe tener altura definida (ej. `style={{ height: '100%' }}` en el `Resizable`).
+- Teclado: al pasar el puntero sobre la franja toma el foco y las flechas la mueven; al salir, el foco se suelta. Accesibilidad: el handle es un `role="separator"` con `aria-valuenow`, `aria-valuemin` y `aria-valuemax`, y recibe foco con Tab.
+
 ### KeyboardShortcut
 
 Envoltorio genérico que asigna un atajo de teclado global a **cualquier** `children` (`Button`, `Input`, un `<div>` propio, etc.) sin agregar markup propio al DOM — renderiza exactamente el `children` recibido, así que no altera layouts `flex`/`grid` del padre. Internamente usa el hook compartido `useKeyboardShortcut` (`common/hooks/useKeyboardShortcut.js`), el mismo que usan los atajos Ctrl/Cmd+K de `TopBar` y Ctrl/Cmd+B de `Sidebar`.
@@ -2500,6 +2723,8 @@ Renderiza un archivo (imagen, video, audio, PDF o cualquier otro tipo) a partir 
 
 Cuando el tipo resuelve a video y `controls` es `true` (default), el `<video>` no usa los controles nativos del browser: renderiza un reproductor custom (`components/VideoPlayer`) con la paleta de la librería — play/pause central y en la barra inferior, seek bar con preview de tiempo al hover y buscador de tiempo por texto (`mm:ss` o segundos), control de volumen, velocidad de reproducción (0.5x–2x), fullscreen y Picture-in-Picture (si el browser lo soporta), overlay de buffering (usando el componente `Loading`) y overlay de error con reintento. La barra espaciadora pausa/reanuda mientras el mouse está sobre el player o en fullscreen (vía el componente `KeyboardShortcut`, sin capturar la tecla globalmente en el resto de la página). Pasar `controls={false}` devuelve el `<video>` nativo del browser sin ningún control (útil para videos de fondo/autoplay silencioso).
 
+Cuando el tipo resuelve a Markdown (`.md`/`.markdown`, o `mimeType` `text/markdown`) y `controls` es `true` (default), el componente descarga el texto de la `url` y lo renderiza con [MarkdownContent](#markdowncontent) (`components/MarkdownViewer`), así que soporta todo lo que ese componente (tablas y listas GFM, bloques de código con botón de copiar, mermaid, íconos, etc.). Con `controls={false}` cae en la tarjeta genérica de archivo. Como hace un `fetch` real, necesita que el servidor de la `url` permita CORS.
+
 **Import:**
 ```jsx
 import MediaViewer from 'anteriority-ui/screens/components/MediaViewer'; // export default, archivo index.jsx
@@ -2511,6 +2736,7 @@ import MediaViewer from 'anteriority-ui/screens/components/MediaViewer'; // expo
 <MediaViewer url="https://ejemplo.com/video.mp4" />
 <MediaViewer url="https://ejemplo.com/audio.mp3" name="nota-de-voz.mp3" />
 <MediaViewer url="https://ejemplo.com/contrato.docx" name="contrato.docx" size={512000} />
+<MediaViewer url="https://ejemplo.com/README.md" name="README.md" />
 ```
 
 **Props:**
@@ -2518,7 +2744,7 @@ import MediaViewer from 'anteriority-ui/screens/components/MediaViewer'; // expo
 | Prop | Tipo | Default | Descripción |
 |---|---|---|---|
 | url / src | string | — | URL del archivo a mostrar. Si no se pasa ninguna de las dos, el componente no renderiza nada. `src` es alias de `url`. |
-| type / mimeType | string | — | Fuerza el tipo de media en vez de inferirlo. Acepta un mimeType real (`'image/png'`, `'application/pdf'`, etc.) o directamente uno de los valores de `MediaViewer.KIND` (`'image'`, `'video'`, `'audio'`, `'pdf'`, `'file'`). |
+| type / mimeType | string | — | Fuerza el tipo de media en vez de inferirlo. Acepta un mimeType real (`'image/png'`, `'application/pdf'`, etc.) o directamente uno de los valores de `MediaViewer.KIND` (`'image'`, `'video'`, `'audio'`, `'pdf'`, `'docx'`, `'markdown'`, `'file'`). |
 | name | string | — | Nombre de archivo a mostrar (y a usar para inferir el tipo por extensión si no hay `mimeType`). Si no se pasa, se intenta extraer del final de la `url`. |
 | size | number | — | Tamaño en bytes, mostrado formateado (`KB`/`MB`/`GB`) en la tarjeta genérica de archivo. |
 | alt | string | nombre del archivo | Texto alternativo para imagen/video. |
@@ -2547,6 +2773,14 @@ import MediaViewer from 'anteriority-ui/screens/components/MediaViewer'; // expo
 | videoRetryLabel | string | `'Reintentar'` | Texto del botón de reintento en el overlay de error del reproductor de video custom. |
 | videoLoadingVariant | string | `'bars'` | `variant` pasado al componente `Loading` del overlay de buffering del reproductor de video custom (`'default'`, `'bars'`, `'bounce'`, `'box'`). |
 | videoLoadingSize | string | `'medium'` | `size` pasado al componente `Loading` del overlay de buffering del reproductor de video custom. |
+| senderName | string | — | Solo audio: nombre de quién envió el audio. Si se pasa (o `senderAvatar`), la insignia con ícono de música del reproductor se reemplaza por el componente [Avatar](#avatar) (iniciales con color generado a partir del nombre). Sin ninguno de los dos queda el ícono de música. |
+| senderAvatar | string | — | Solo audio: URL de la foto del remitente, mostrada en el `Avatar` (si no carga, cae a las iniciales de `senderName`). |
+| avatarBgColor | string | color generado del nombre | Solo audio: color de fondo del `Avatar` del remitente (por default se genera a partir de `senderName`; con foto es transparente). |
+| avatarTextColor | string | `'#ffffff'` | Solo audio: color de las iniciales del `Avatar` del remitente. |
+| markdownAccentColor | string | `'#2563eb'` | Color de acento del visor de Markdown: spinner de carga y color de los links del documento. |
+| markdownTextColor | string | `'#334155'` | Color de texto del visor de Markdown (el contenido lo hereda) y del mensaje de error. |
+| markdownBgColor | string | `'#ffffff'` | Color de fondo del área del visor de Markdown. |
+| markdownErrorLabel | string | `'No se pudo cargar el documento Markdown'` | Texto del estado de error del visor de Markdown (el botón de abrir usa `openLabel`). |
 | onError | function | — | Callback del evento `onError` nativo de `<img>`/`<video>`/`<audio>` (ej. para mostrar un fallback si la URL no carga). |
 | className | string | `''` | Clase adicional para el contenedor. |
 | style | object | — | Estilos inline adicionales para el contenedor. |
@@ -2595,7 +2829,7 @@ import { Download } from 'lucide-react';
 />
 ```
 
-**Notas:** No sube ni persiste nada — es puramente presentacional, recibe una URL ya resuelta. El PDF se muestra embebido en un `<iframe>` (sujeto a las políticas de same-origin/CSP del sitio que lo sirve) con un link "Abrir" como fallback — la story `PdfLocal` usa un PDF de prueba real servido desde `fixtures/MediaViewer/documento-de-prueba.pdf` (ver `.storybook/main.js`, `staticDirs: ["../fixtures"]`). `MediaViewer.KIND` expone las constantes de tipo (`MediaViewer.KIND.IMAGE`, etc.) para quien quiera forzar `type` sin hardcodear el string. El ícono cuadrado de la tarjeta genérica de archivo no tiene prop de color propia (su color viene del tipo de archivo detectado); usar `bgColor`/`borderColor`/`textColor`/`accentColor` para el resto del contenedor. El request de detección por `HEAD`/`GET` (ver `detectTypeByHead`) necesita que la `url` sea alcanzable por `fetch` desde el navegador con CORS permitido — si el servidor bloquea el origen, el intento falla silenciosamente y el componente se queda con el fallback por extensión/tarjeta genérica, sin romper el render.
+**Notas:** No sube ni persiste nada — es puramente presentacional, recibe una URL ya resuelta. Una `url` que sea una data-URL (`data:audio/webm;base64,...`) se tipa por su propio mimeType (no por extensión) y no se usa como nombre de archivo. El PDF se muestra embebido en un `<iframe>` (sujeto a las políticas de same-origin/CSP del sitio que lo sirve) con un link "Abrir" como fallback — la story `PdfLocal` usa un PDF de prueba real servido desde `fixtures/MediaViewer/documento-de-prueba.pdf` (ver `.storybook/main.js`, `staticDirs: ["../fixtures"]`). `MediaViewer.KIND` expone las constantes de tipo (`MediaViewer.KIND.IMAGE`, etc.) para quien quiera forzar `type` sin hardcodear el string. El ícono cuadrado de la tarjeta genérica de archivo no tiene prop de color propia (su color viene del tipo de archivo detectado); usar `bgColor`/`borderColor`/`textColor`/`accentColor` para el resto del contenedor. El request de detección por `HEAD`/`GET` (ver `detectTypeByHead`) necesita que la `url` sea alcanzable por `fetch` desde el navegador con CORS permitido — si el servidor bloquea el origen, el intento falla silenciosamente y el componente se queda con el fallback por extensión/tarjeta genérica, sin romper el render.
 
 ---
 
@@ -3488,6 +3722,13 @@ const schema = {
 | `submitText` | string | `'Enviar'` | Texto del botón de submit default |
 | `disabled` | boolean | `false` | Deshabilita todos los campos |
 | `readonly` | boolean | `false` | Vuelve todos los campos de solo lectura |
+| `noHtml5Validate` | boolean | `true` | Desactiva la validación nativa del navegador (el globo "Incluye un signo @…"). La validación la hace el JSON Schema y el error sale inline bajo el campo, con el estilo del `Input`. |
+| `errorMessages` | object | — | Pisa los mensajes por defecto en español. Clave = keyword de ajv (`required`, `minimum`, `minLength`, `pattern`…) o `format:<nombre>` (ej. `format:email`); valor = string o `(params) => string`. |
+| `transformErrors` | function | — | `transformErrors` de rjsf; se aplica después de traducir los mensajes. |
+| `fieldGap` | string | `'1.25rem'` | Espacio vertical entre campos (cualquier valor CSS: `'2rem'`, `'24px'`). En `DrawPanel` se pasa con `schemaFormProps={{ fieldGap: '2rem' }}`. |
+| `showErrorList` | boolean \| `'top'` \| `'bottom'` | `false` | Lista de errores de rjsf arriba/abajo del form. Por defecto se muestran solo inline. |
+
+**Validación numérica:** el widget de `number`/`integer` toma `minimum`, `maximum`, `exclusiveMinimum/Maximum` y `multipleOf` del schema. Siempre bloquea letras al tipear; si `minimum >= 0` también bloquea el signo `-` (ej. `edad: { type: 'integer', minimum: 0, maximum: 120 }`). `integer` no admite decimales.
 | `className` | string | `''` | Clase adicional en el `<form>` |
 | `style` | object | — | Estilos inline en el `<form>` |
 | `children` | node | — | Si se define, reemplaza el botón de submit default (ej. para poner acciones propias, o nada si los botones ya los provee un contenedor externo como `DrawPanel`) |
@@ -3500,7 +3741,7 @@ const schema = {
 | `NumberWidget` | `Input` (`numeric`) | `number` / `integer` (default) |
 | `TextareaWidget` | `FormTextArea` | `string` largo (ej. `'ui:widget': 'TextareaWidget'`) |
 | `CheckboxWidget` | `Swich` | `boolean` (default — ver nota debajo) |
-| `SwitchWidget` | `Swich` | `boolean` como toggle, alias explícito de `CheckboxWidget` |
+| `SwitchWidget` | `Swich` (con `showIcons`: ✓ / ✗ en el thumb) | `boolean` como toggle, alias explícito de `CheckboxWidget` |
 | `ChecksWidget` | `Checks` | `boolean` con el look de checkbox tachable (ej. `'ui:widget': 'ChecksWidget'`) |
 | `CheckboxesWidget` | `Checks` (uno por opción) | `array` de `string` con `enum` + `uniqueItems` (selección múltiple; ej. `'ui:widget': 'CheckboxesWidget'` con `'ui:options': { enumOptions }`) |
 | `SelectWidget` | `Selector` | `string` con `enum` (default cuando hay `enum`; **no soporta selección múltiple**, usar `CheckboxesWidget` para eso) |
@@ -3509,12 +3750,31 @@ const schema = {
 | `ColorWidget` | `ColorPicker` | `string` con `format: 'color'` (convención estándar de rjsf) |
 | `RangeWidget` | `Slider` | `number` / `integer` con `'ui:widget': 'range'`; usa `minimum`/`maximum`/`multipleOf` del schema como `min`/`max`/`step` |
 | `FileWidget` | botón de subida + `ImagePastePreview` | `string` con `format: 'data-url'` (archivo/imagen única), o `array` de esos con `format: 'data-url'` (múltiples, detectado automáticamente por rjsf) — ver nota de archivos debajo |
+| `AudioWidget` | `AudioRecorder` (de `MediaViewer`) + reproductor de audio | `string` con `format: 'data-url'` + `'ui:widget': 'AudioWidget'` (una grabación), o `array` de esos con `'ui:options': { multiple: true }` (varias) — graba desde el micrófono, ver nota de audio debajo |
 | `EmailWidget` / `URLWidget` | `Input` (`type="email"`/`"url"`) | `string` con `format: 'email'` / `format: 'uri'` (rjsf los resuelve por `format` con prioridad sobre `TextWidget`, por eso necesitan su propio mapeo) |
 | `PasswordWidget` | `Input` (`type="password"`) | `string` con `'ui:widget': 'password'` (shorthand de rjsf) |
+
+**Texto junto al switch:** por defecto el switch de un `boolean` va solo. Con `'ui:options': { labelPosition: 'top' | 'right' | 'left' }` muestra el `title` del campo (o `text` si se pasa) arriba, a la derecha o a la izquierda. También acepta `textColor`, `activeColor` e `inactiveColor`.
+
+**Textos y badges entre campos:** `NoteWidget` (usa `Callout`) y `BadgeWidget` (usa `Badge`) son campos decorativos: se declaran en el schema como un `string` más, no guardan valor ni validan, y se dibujan en su posición. `ui:options`: `variant` (`info`/`warning`/`danger`/`success`/`neutral`), `title`, `text`, `badgeLabel`, `icon`, `when` y colores (`bgColor`, `textColor`, `iconColor`, `borderColor`, `labelColor`, `valueColor`). `text`, `title` y `when` aceptan funciones de `formData` para mostrarse según lo ingresado:
+
+```js
+avisoMenor: { type: 'string' }
+// uiSchema
+avisoMenor: { 'ui:widget': 'NoteWidget', 'ui:options': {
+  variant: 'warning',
+  when: (d) => d.edad < 18,
+  text: (d) => `Con ${d.edad} años se requiere un tutor.`,
+} }
+```
+
+Stories: `TextosYBadgesEntreCampos`, `TextosYBadgesEnDrawPanel` y `TextosYBadgesPersonalizados` (todas las variantes, colores propios, íconos de lucide, badges con label + valor y textos dinámicos según `formData`).
 
 **Nota sobre `boolean`:** `Checks` tacha el label al marcarlo (pensado para listas de permisos/to-do), lo cual se ve mal en un campo booleano suelto de formulario. Por eso el widget registrado como `CheckboxWidget` (el que rjsf usa por default para todo `boolean`) es en realidad un `Swich`; para el look de checkbox clásico hay que pedirlo explícito con `'ui:widget': 'ChecksWidget'`.
 
 **Nota sobre archivos (`FileWidget`):** el valor que entrega `onChange` es un data-URL en base64 (string), o un array de data-URLs si el campo es `array`/`'ui:options': { multiple: true }` — no un `File` nativo del browser. Restringir el tipo de archivo con `'ui:options': { accept: 'image/*' }` (mismo formato que el atributo HTML `accept`). El preview reusa `ImagePastePreview` (el mismo chip que usan `PasteImageField`/`MultilinePlaceholder`).
+
+**Nota sobre audio (`AudioWidget`):** graba audio desde el micrófono (necesita permiso del navegador y `localhost`/HTTPS). El flujo es grabar → escuchar → **Guardar audio**: recién al guardar se escribe el valor, que queda como data-URL en base64 (ej. `data:audio/webm;base64,...`), igual que `FileWidget` — no un `File`/`Blob`. Lo ya guardado se muestra con el reproductor de audio y un botón para eliminarlo; con `multiple` se pueden acumular varias grabaciones, y sin `multiple` el grabador desaparece mientras haya una guardada. En modo `disabled`/`readonly` solo se muestra lo guardado. Las opciones del grabador se pasan vía `'ui:options'` con los mismos nombres que las props del `AudioRecorder`: `maxDurationSeconds` (default 300; `0`/`null` = sin límite), `audioBitsPerSecond` (default 32000, voz), `recordLabel`/`stopLabel`/`discardLabel`/`sendLabel` (default `'Guardar audio'`)/`sendingLabel`, más `removeLabel` (`'Eliminar audio'`), los colores `bgColor`/`borderColor`/`textColor`/`accentColor`/`recordingColor`/`errorColor`/`iconBgColor`, y `senderName`/`senderAvatar`/`avatarBgColor`/`avatarTextColor` para identificar quién graba con un `Avatar` en lugar del ícono de música (ver `MediaViewer`). El audio guardado lo muestra [RenderJsonSchema](#renderjsonschema) directamente con el reproductor.
 
 **Nota sobre theming de `ColorWidget`/`RadioWidget`/`RangeWidget`:** estos tres widgets no tienen ninguna prop de color directa en `SchemaForm` — `widgets.jsx` no inyecta un theme global a los widgets internos. Para tematizarlos hay que pasar las props de color del componente subyacente vía `'ui:options'` en el campo correspondiente del `uiSchema`, igual que `accept`/`multiple` en `FileWidget`:
 - `ColorWidget` → `'ui:options': { bgColor, textColor, borderColor, accentColor }` (mismas props que acepta `ColorPicker`, incluido el popover).
@@ -3719,7 +3979,7 @@ const uiSchema = {
 
 ### RenderJsonSchema
 
-Vista de **solo lectura** de datos ya guardados a partir de un JSON Schema: a diferencia de `SchemaForm`, no renderiza un formulario editable ni depende de rjsf — recorre `schema.properties` y muestra cada valor de `formData` como texto (o imagen, para `format: 'data-url'`), resolviendo el `title`, `enum`/`enumNames` (o `anyOf` con `const`/`title`), `boolean` y `format: 'date'`/`'date-time'` del propio schema. Pensado para mostrar el detalle de una respuesta ya enviada (ej. lo que guardó un `<SchemaForm />`) sin tener que escribir a mano el mapeo de cada campo.
+Vista de **solo lectura** de datos ya guardados a partir de un JSON Schema: a diferencia de `SchemaForm`, no renderiza un formulario editable ni depende de rjsf — recorre `schema.properties` y muestra cada valor de `formData` como texto (o imagen/audio/archivo, para `format: 'data-url'`: el tipo se lee del mimeType de la propia data-URL, ej. `data:audio/webm;base64,...` se muestra con el reproductor de audio), resolviendo el `title`, `enum`/`enumNames` (o `anyOf` con `const`/`title`), `boolean` y `format: 'date'`/`'date-time'` del propio schema. Pensado para mostrar el detalle de una respuesta ya enviada (ej. lo que guardó un `<SchemaForm />`) sin tener que escribir a mano el mapeo de cada campo.
 
 Tolera datos guardados por un widget roto o una versión vieja (un valor que no matchea el `type` esperado, como un objeto en vez de un string): en lugar de romper o mostrar `"[object Object]"`, ese campo se muestra vacío (`"Sin datos"` por default).
 
@@ -4108,6 +4368,117 @@ const [value, setValue] = useState(false);
 
 ---
 
+### Table
+
+Tabla unificada que fusiona `TableA` y `TableB`: la prop `variant` elige el look (`'A'` compacta, `'B'` cómoda) y todas las funciones están disponibles en ambas. `TableA` y `TableB` siguen existiendo como wrappers (`<Table variant="A" />` / `<Table variant="B" />`) con su API y su aspecto de siempre, así que no hay que migrar nada.
+
+**Import:**
+```jsx
+import { Table } from 'anteriority-ui'; // o import Table from 'screens/components/Table';
+```
+
+**Uso básico:**
+```jsx
+<Table variant="B" columns={[{ key: 'name', label: 'Nombre' }]} data={rows} />
+```
+
+**Props:** las de [TableA](#tablea) y [TableB](#tableb), más:
+
+| Prop | Tipo | Default | Descripción |
+|---|---|---|---|
+| `variant` | `'A'` \| `'B'` | `'A'` | `'A'` = look de TableA (variables `--tableA-*`), `'B'` = look de TableB (`--tableB-*`). |
+| `columns` | `Array` | `[]` | Acepta `header`/`accessor` (estilo A) o `label`/`key` (estilo B) en cualquier variante, además de `type: 'badge' \| 'actions'`, `render(row, index)`, `filter`, `align`, `width`. |
+| `keyExtractor` / `rowKey` | `function` / `string` | — / `'id'` | Clave de fila: `keyExtractor(row)` si existe, si no `row[rowKey]`, si no el índice. |
+| `expandable` | `{ expandedRowRender, rowExpandable? }` | — | Filas expandibles (también en la variante A). |
+| `onRowClick` | `function(row, index)` | — | Click en fila (también en la variante B; convive con `expandable`). |
+| `badgeColors` | `{ success, warning, danger }` | — | Colores de badges `{ bg, color }` (ambas variantes). |
+
+**Tabla dinámica (tipos de celda y `schema`):** cada columna acepta `type` para renderizar distintos campos. Los de datos leen `row[key]`; todos los handlers reciben la fila para que el consumidor actualice su estado.
+
+| `type` | Props de columna | Qué renderiza |
+|---|---|---|
+| `text` (default) | `render?` | Texto plano |
+| `number` | `numberFormat?`, `locale?` | Número formateado (`toLocaleString`) |
+| `date` | `format?` (`'date'` \| `'datetime'` \| `'time'` \| `fn`), `locale?` | Fecha formateada (`'es-AR'` por default) |
+| `link` | `href?` (string/fn), `text?`, `target?`, `onClick?`, `linkColor?` | `<a>`; sin `href` usa el valor como URL |
+| `button` | `label`/`text`, `onClick(row)`, `icon?`, `disabled?`, `buttonProps?` | `Button` en la celda |
+| `input` | `inputType?` (`'text'` \| `'number'` \| `'email'`…), `onChange(row, next)`, `onCommit(row, next)` (al salir del campo), `placeholder?`, `min?`, `max?`, `disabled?`, `error?`, `bgColor?`, `textColor?` | `Input` editable (`number` entrega un número) |
+| `select` | `options: [{ value, label }]`, `onChange(row, next)`, `placeholder?`, `disableClearable?` | `Selector` desplegable |
+| `switch` | `onChange(row, next)`, `disabled?`, `showIcons?`, `activeColor?`, `inactiveColor?` | `Swich` |
+| `checkbox` | `onChange(row, next)`, `disabled?`, `checkedBgColor?` | `Checks` (solo ícono) |
+| `badge` / `actions` | ver TableB | Badge / botones de acción |
+
+Los controles interactivos no disparan `onRowClick` ni expanden la fila. `linkColor` (prop de `Table`) define el color por defecto de los links.
+
+**Desde un JSON Schema:** `schema` (objeto con `properties`, o array con `items`) y `uiSchema` generan las columnas, igual que `SchemaForm`. El `type` se deduce (`boolean` → `switch`, `format: 'date'` → `date`, `format: 'uri'` → `link`, `number`/`integer` → `number` alineado a la derecha, `enum` → etiqueta con `enumNames`); se fuerza con `'ui:widget'` y se agregan props de columna con `'ui:options'`. `'ui:order'` ordena. Si también pasás `columns`, esas mandan.
+
+**Ejemplo completo (schema + uiSchema + data en JSON):**
+
+```jsx
+const schema = {
+  type: 'array',
+  items: {
+    type: 'object',
+    properties: {
+      nombre:     { type: 'string',  title: 'Nombre' },
+      email:      { type: 'string',  title: 'Email' },
+      edad:       { type: 'integer', title: 'Edad' },
+      web:        { type: 'string',  format: 'uri',  title: 'Sitio' },
+      ingreso:    { type: 'string',  format: 'date', title: 'Ingreso' },
+      puntos:     { type: 'integer', title: 'Puntos' },
+      rol:        { type: 'string',  title: 'Rol', enum: ['admin', 'editor', 'lector'], enumNames: ['Administrador', 'Editor', 'Lector'] },
+      estado:     { type: 'string',  title: 'Estado', enum: ['activo', 'pendiente'], enumNames: ['Activo', 'Pendiente'] },
+      activo:     { type: 'boolean', title: 'Activo' },
+      verificado: { type: 'boolean', title: 'Verificado' },
+      acciones:   { type: 'string',  title: 'Acciones' },
+    },
+  },
+};
+
+const uiSchema = {
+  'ui:order': ['nombre', 'email', 'edad', 'rol', 'estado', 'web', 'ingreso', 'puntos', 'activo', 'verificado', 'acciones'],
+  nombre:     { 'ui:widget': 'input', 'ui:options': { onChange: (row, v) => editar(row.id, 'nombre', v) } },
+  email:      { 'ui:widget': 'input', 'ui:options': { inputType: 'email', onCommit: (row, v) => guardar(row.id, { email: v }) } },
+  edad:       { 'ui:widget': 'input', 'ui:options': { min: 0, max: 120, onChange: (row, v) => editar(row.id, 'edad', v), width: '110px' } },
+  rol:        { 'ui:widget': 'select', 'ui:options': { onChange: (row, v) => editar(row.id, 'rol', v) } },
+  estado:     { 'ui:widget': 'badge', 'ui:options': { badgeType: (row) => (row.estado === 'activo' ? 'success' : 'warning') } },
+  ingreso:    { 'ui:options': { format: 'date' } },
+  activo:     { 'ui:options': { align: 'center', onChange: (row, v) => editar(row.id, 'activo', v) } },
+  verificado: { 'ui:widget': 'checkbox', 'ui:options': { align: 'center', onChange: (row, v) => editar(row.id, 'verificado', v) } },
+  acciones:   { 'ui:widget': 'button', 'ui:options': { label: 'Ver ficha', align: 'right', onClick: (row) => abrirFicha(row.id) } },
+};
+
+// data: llega tal cual de un JSON/API
+const data = [
+  { "id": 1, "nombre": "Ana Gómez",  "email": "ana@correo.com",  "edad": 31, "web": "https://ana.dev",
+    "ingreso": "2024-03-12", "puntos": 1250, "rol": "admin",  "estado": "activo",    "activo": true,  "verificado": true },
+  { "id": 2, "nombre": "Luis Pérez", "email": "luis@correo.com", "edad": 27, "web": "https://luis.io",
+    "ingreso": "2025-11-02", "puntos": 430,  "rol": "editor", "estado": "pendiente", "activo": false, "verificado": false }
+];
+
+<Table variant="B" schema={schema} uiSchema={uiSchema} data={data} keyExtractor={(r) => r.id} />
+```
+
+**Variante B (badges, acciones, filas expandibles):** el schema funciona igual con `variant="B"`. Los extras de B se piden así: `'ui:widget': 'badge'` + `badgeType` (colores con `badgeColors`), `'ui:widget': 'actions'` + `'ui:options': { actions: [{ label, onClick(row), disabled?(row), icon? }] }`, y las filas expandibles con la prop `expandable` de la tabla (no es de una columna, así que no va dentro del schema). Ver el story `VarianteBDesdeSchema`.
+
+`editar(id, campo, valor)` y `guardar(id, cambios)` son funciones del consumidor (típicamente un `setRows` o una llamada a la API): la tabla nunca modifica `data` por sí misma.
+
+```jsx
+<Table
+  variant="B"
+  schema={{ type: 'array', items: { type: 'object', properties: {
+    nombre: { type: 'string', title: 'Nombre' },
+    activo: { type: 'boolean', title: 'Activo' },
+    nacimiento: { type: 'string', format: 'date', title: 'Nacimiento' },
+  } } }}
+  uiSchema={{ activo: { 'ui:options': { onChange: (row, next) => guardar(row.id, next) } } }}
+  data={rows}
+  keyExtractor={(r) => r.id}
+/>
+```
+
+Diferencias que se conservan por variante: el estado de error (A: ícono + mensaje + "Reintentar"; B: `Loading` con frases) y el `emptyMessage` por defecto (A sin punto final, B con punto).
+
 ### TableA
 
 Tabla simple orientada a columnas con `accessor`/`render`, con estados de carga (skeleton), error y vacío incorporados.
@@ -4352,7 +4723,7 @@ const [enabled, setEnabled] = useState(false);
 | `inactiveColor` | `string` | `'#919191'` | Color de fondo del switch cuando está inactivo. |
 | `thumbColor` | `string` | `'#ffffff'` | Color del círculo deslizante (thumb / redondito blanco). |
 | `variant` | `'default'` \| `'icons'` \| `'labels'` \| `'both'` | `'default'` | Variante visual: `'icons'` muestra check/X en el thumb; `'labels'` muestra SI/NO en la parte libre del track; `'both'` activa ambos. |
-| `showIcons` / `icons` | `boolean` | `false` | Muestra un ícono de check cuando está en `true` y una X cuando está en `false` dentro del círculo blanco (thumb). |
+| `showIcons` / `icons` | `boolean` | `true` | Muestra un check cuando está activo y una X cuando está inactivo dentro del círculo blanco (thumb). Es el comportamiento por defecto; para un switch liso usar `showIcons={false}` (con `icons` sin definir). |
 | `showLabels` / `labels` | `boolean` | `false` | Muestra texto descriptivo en la parte que queda libre del track (por defecto "SI" cuando está activo y "NO" cuando está inactivo). |
 | `yesText` | `string` | `'SI'` | Texto para el estado activo cuando `showLabels` está habilitado. |
 | `noText` | `string` | `'NO'` | Texto para el estado inactivo cuando `showLabels` está habilitado. |
@@ -4615,6 +4986,12 @@ import TopBar from '../TopBar/index'; // export default
 | `user` | `{ name?, email?, avatarUrl? }` | — | Si se define, muestra el avatar de usuario (`Profile/Avatar`) con menú desplegable al hacer click. |
 | `userMenuItems` | array de `{ id?, label, icon?, onClick?, variant? }` | `[]` | Items del menú de usuario (variant `'danger'` los resalta en rojo). |
 | `className` | string | `''` | Clase adicional en el `<header>` raíz. |
+| `autoHide` | boolean | `false` | Auto-ocultado: la barra se desliza hacia arriba cuando el puntero no está sobre ella y vuelve a aparecer al acercar el puntero al borde superior, donde estaba. Ver nota de auto-ocultado debajo. |
+| `autoHideDelay` | number | `600` | Milisegundos que espera, tras salir el puntero, antes de ocultar la barra (evita parpadeos si el puntero la roza). Solo con `autoHide`. |
+| `autoHideTriggerHeight` | number | `12` | Alto en px de la franja invisible en el borde superior que vuelve a mostrar la barra al acercar el puntero. Solo con `autoHide`. |
+| `autoHideShowHandle` | boolean | `true` | Muestra una pestaña con una flecha hacia abajo colgando del borde superior mientras la barra está oculta, para que se note que hay una barra. Con `false` solo queda la franja invisible. Solo con `autoHide`. |
+| `autoHideHandlePosition` | `'left'` \| `'center'` \| `'right'` | `'center'` | Posición horizontal de la pestaña. Solo con `autoHide`. |
+| `autoHideHandleLabel` | string | `'Mostrar barra superior'` | `aria-label`/`title` de la pestaña (es un botón: el click o el foco también muestran la barra). Solo con `autoHide`. |
 | `showDivider` | boolean | `true` | Si es `true` y hay tanto `actions` (no vacío) como `user`, muestra una línea divisora vertical entre el grupo de acciones y el avatar. |
 | `bgColor` | string | — | Color de fondo de la barra (`--topbar-bg`). |
 | `textColor` | string | — | Color del texto/título y del crumb activo (`--topbar-text`, también se usa como `currentColor` de `Breadcrumbs` si no se pasa `breadcrumbCurrentColor`). |
@@ -4665,6 +5042,12 @@ import TopBar from '../TopBar/index'; // export default
 **Notas:** El menú de usuario se renderiza vía `createPortal` a `document.body` (mismo patrón que el menú de usuario de `Sidebar`), posicionado contra el botón del avatar. `actions` son completamente genéricas — no asume ningún set fijo de íconos (notificaciones, mensajes, ayuda, etc. quedan a elección del consumidor). El atajo de teclado Ctrl/Cmd+K para abrir el `CommandPalette` (`useCommandPaletteShortcut` en `utils.js`) usa el hook genérico `useKeyboardShortcut` (`common/hooks/useKeyboardShortcut.js`), reutilizable para registrar cualquier otro atajo global (`{ key, ctrlOrMeta, shift, alt, enabled, onTrigger }`) sin reimplementar el listener de teclado a mano en cada componente nuevo.
 
 **Responsive:** `leftSection` (logo + breadcrumb/título) se encoge primero y trunca con ellipsis; `rightSection` (acciones + divisor + avatar + `ctaButton`) nunca se encoge, para que los botones nunca queden apretados ni se superpongan entre sí. Por debajo de 1023px el buscador central se angosta, por debajo de 767px se oculta por completo (el consumidor puede ofrecer una lupa en `actions` para ese breakpoint) y el header pasa a `flex-wrap` como red de seguridad si aun así no entra todo en una fila; por debajo de 479px se reducen aún más los paddings de los botones de acción y el ancho máximo de breadcrumb/título.
+
+**Auto-ocultado (`autoHide`):** con `autoHide`, la barra se desliza hacia arriba y se desvanece `autoHideDelay` ms después de que el puntero sale de ella, y vuelve a aparecer al instante cuando el puntero entra a una franja invisible de `autoHideTriggerHeight` px en el borde superior (el lugar donde estaba) o a la propia barra. Mientras está oculta queda una pestaña con una flecha hacia abajo colgando de ese borde (`autoHideShowHandle`, `autoHideHandlePosition`); usa los mismos colores del `TopBar` (`bgColor`, `borderColor`, `iconColor`, `textColor`, `accentColor`), así que se recolorea con esas props. Cosas a tener en cuenta:
+- **Pasa a overlay:** con `autoHide` activo la barra deja de ocupar lugar en el layout (se dibuja `position: absolute` encima del contenido, con `z-index` 1100, pisable con la variable CSS `--topbar-auto-hide-z-index`). Así el contenido de abajo no salta al ocultarse/mostrarse, pero si necesitás que no quede tapado hay que dejarle ese espacio al contenido (ej. un `padding-top`).
+- **No se oculta** mientras tenga el foco adentro (navegación por teclado: al tabular hacia la barra oculta, vuelve a aparecer), mientras esté abierta la paleta de comandos, el panel de acciones mobile o la búsqueda mobile, ni mientras el puntero esté sobre un menú abierto desde la barra (ej. el de usuario).
+- **Solo con hover:** en dispositivos táctiles (sin `(hover: hover) and (pointer: fine)`) se ignora y la barra queda siempre visible, porque no habría forma de volver a mostrarla.
+- Respeta `prefers-reduced-motion` (sin animación). No afecta al estado `loading` (el skeleton siempre se ve).
 
 ---
 

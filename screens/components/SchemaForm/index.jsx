@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Form from '@rjsf/core';
 import ajv8Validator from '@rjsf/validator-ajv8';
 
@@ -7,6 +7,7 @@ import styles from './index.module.css';
 import { SCHEMA_FORM_WIDGETS } from './widgets';
 import { SCHEMA_FORM_TEMPLATES } from './templates';
 import { DEFAULT_SUBMIT_TEXT } from './constants.js';
+import { buildTransformErrors } from './utils.js';
 
 // Renderiza un formulario completo a partir de un JSON Schema (+ uiSchema opcional),
 // usando los componentes ya existentes de AnteriorityUI (Input, Checks, Swich,
@@ -35,15 +36,28 @@ const SchemaForm = ({
   submitText = DEFAULT_SUBMIT_TEXT,
   disabled = false,
   readonly = false,
+  noHtml5Validate = true,
+  errorMessages,
+  transformErrors,
+  showErrorList = false,
+  fieldGap,
   className = '',
   style,
   children,
 }) => {
+  // Los widgets decorativos (NoteWidget/BadgeWidget) condicionan su texto a los datos,
+  // pero rjsf no le pasa formData a los widgets: se espeja acá y viaja por formContext.
+  const [liveData, setLiveData] = useState(formData);
+  const currentData = formData !== undefined ? formData : liveData;
   return (
     <Form
+      formContext={{ formData: currentData }}
+      noHtml5Validate={noHtml5Validate}
+      showErrorList={showErrorList}
+      transformErrors={buildTransformErrors(errorMessages, transformErrors)}
       id={formId}
       className={`${styles.form} ${className}`.trim()}
-      style={style}
+      style={fieldGap ? { '--schemaform-gap': fieldGap, ...style } : style}
       schema={schema}
       uiSchema={uiSchema}
       formData={formData}
@@ -53,7 +67,7 @@ const SchemaForm = ({
       templates={{ ...SCHEMA_FORM_TEMPLATES, ...templates }}
       disabled={disabled}
       readonly={readonly}
-      onChange={(e) => onChange?.(e.formData, e)}
+      onChange={(e) => { setLiveData(e.formData); onChange?.(e.formData, e); }}
       onSubmit={(e) => onSubmit?.(e.formData, e)}
       onError={onError}
     >

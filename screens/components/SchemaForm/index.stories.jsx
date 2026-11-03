@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Star, ShieldCheck, Clock, Gift } from 'lucide-react';
 import validator from '@rjsf/validator-ajv8';
 import SchemaForm from './index';
 import DrawPanel from '../DrawPanel/index';
@@ -48,7 +49,7 @@ const profileSchema = {
   required: ['nombre'],
   properties: {
     nombre: { type: 'string', title: 'Nombre' },
-    edad: { type: 'number', title: 'Edad' },
+    edad: { type: 'integer', title: 'Edad', minimum: 0, maximum: 120 },
     bio: { type: 'string', title: 'Biografía' },
     pais: {
       type: 'string',
@@ -226,6 +227,56 @@ export const ConArchivos = {
         <SchemaForm
           schema={documentoSchema}
           uiSchema={documentoUiSchema}
+          formData={formData}
+          validator={validator}
+          onChange={setFormData}
+          onSubmit={(data) => alert('Enviado (ver consola para el detalle de los data-URLs)') || console.log(data)}
+        />
+      </div>
+    );
+  },
+};
+
+// Campos de audio: 'ui:widget': 'AudioWidget' sobre un string data-url (una nota de voz) o un
+// array de data-urls con multiple (varias). Al guardar la grabación el valor queda como
+// `data:audio/webm;base64,...`. Las opciones del grabador (límite, bitrate, labels, colores) van
+// en 'ui:options'. Requiere permiso de micrófono (localhost o HTTPS).
+const audioSchema = {
+  type: 'object',
+  properties: {
+    nota: {
+      type: 'string',
+      format: 'data-url',
+      title: 'Nota de voz',
+      description: 'Una sola grabación, de hasta 60 segundos',
+    },
+    notas: {
+      type: 'array',
+      title: 'Notas de voz (varias)',
+      items: { type: 'string', format: 'data-url' },
+    },
+  },
+};
+
+const audioUiSchema = {
+  nota: {
+    'ui:widget': 'AudioWidget',
+    'ui:options': { maxDurationSeconds: 60 },
+  },
+  notas: {
+    'ui:widget': 'AudioWidget',
+    'ui:options': { multiple: true },
+  },
+};
+
+export const ConAudio = {
+  render: () => {
+    const [formData, setFormData] = useState({});
+    return (
+      <div style={{ maxWidth: 420 }}>
+        <SchemaForm
+          schema={audioSchema}
+          uiSchema={audioUiSchema}
           formData={formData}
           validator={validator}
           onChange={setFormData}
@@ -471,6 +522,209 @@ export const ColorWidgetPersonalizado = {
           validator={validator}
           onChange={setFormData}
           showSubmitButton={false}
+        />
+      </div>
+    );
+  },
+};
+
+// Textos y badges entre campos: son campos decorativos (sin valor ni validación) que se
+// declaran en el schema como cualquier otro y se renderizan con BadgeWidget / NoteWidget.
+// `text`, `title` y `when` aceptan funciones de formData para mostrarse según lo ingresado.
+const avisosSchema = {
+  type: 'object',
+  required: ['nombre'],
+  properties: {
+    estado: { type: 'string', title: 'Solicitud en revisión' },
+    nombre: { type: 'string', title: 'Nombre' },
+    edad: { type: 'integer', title: 'Edad', minimum: 0, maximum: 120 },
+    avisoMenor: { type: 'string', title: 'Aviso menor' },
+    pais: { type: 'string', title: 'País', enum: ['ar', 'uy', 'br'], enumNames: ['Argentina', 'Uruguay', 'Brasil'] },
+    separador: { type: 'string', title: 'Datos de contacto' },
+    email: { type: 'string', title: 'Email', format: 'email' },
+    nota: { type: 'string', title: 'Importante' },
+  },
+};
+
+const avisosUiSchema = {
+  estado: {
+    'ui:widget': 'BadgeWidget',
+    'ui:options': { badgeLabel: 'Estado', bgColor: '#fef3c7', borderColor: '#f59e0b', valueColor: '#92400e', labelColor: '#92400e' },
+  },
+  avisoMenor: {
+    'ui:widget': 'NoteWidget',
+    'ui:options': {
+      variant: 'warning',
+      when: (data) => typeof data.edad === 'number' && data.edad < 18,
+      title: 'Menor de edad',
+      text: (data) => `Con ${data.edad} años se requiere autorización de un tutor.`,
+    },
+  },
+  separador: { 'ui:widget': 'BadgeWidget', 'ui:options': { text: 'Datos de contacto' } },
+  nota: {
+    'ui:widget': 'NoteWidget',
+    'ui:options': { variant: 'info', text: 'Revisá los datos antes de enviar: no se pueden editar después.' },
+  },
+};
+
+export const TextosYBadgesEntreCampos = {
+  render: () => {
+    const [formData, setFormData] = useState({});
+    return (
+      <div style={{ maxWidth: 420 }}>
+        <SchemaForm
+          schema={avisosSchema}
+          uiSchema={avisosUiSchema}
+          formData={formData}
+          validator={validator}
+          onChange={setFormData}
+        />
+      </div>
+    );
+  },
+};
+
+export const TextosYBadgesEnDrawPanel = {
+  render: () => {
+    const [isOpen, setIsOpen] = useState(true);
+    return (
+      <>
+        <Button onClick={() => setIsOpen(true)}>Abrir panel</Button>
+        <DrawPanel
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          title="Editar solicitud"
+          width="440px"
+          schema={avisosSchema}
+          uiSchema={avisosUiSchema}
+          confirmText="Guardar"
+          onSubmit={() => setIsOpen(false)}
+        />
+      </>
+    );
+  },
+};
+
+// Personalización completa de NoteWidget / BadgeWidget: todas las variantes de Callout, paleta
+// propia, íconos de lucide, badges con label + valor y textos/condiciones que dependen de formData.
+const personalizadoSchema = {
+  type: 'object',
+  required: ['nombre'],
+  properties: {
+    badgePlan: { type: 'string' },
+    nombre: { type: 'string', title: 'Nombre' },
+    puntos: { type: 'integer', title: 'Puntos acumulados', minimum: 0 },
+    badgeNivel: { type: 'string' },
+    notaInfo: { type: 'string' },
+    notaExito: { type: 'string' },
+    notaAdvertencia: { type: 'string' },
+    notaPeligro: { type: 'string' },
+    notaNeutral: { type: 'string' },
+    plan: { type: 'string', title: 'Plan', enum: ['free', 'pro'], enumNames: ['Gratis', 'Pro'] },
+    notaPersonalizada: { type: 'string' },
+    badgeVerificado: { type: 'string' },
+  },
+};
+
+const nivelDe = (puntos = 0) => (puntos >= 1000 ? 'Oro' : puntos >= 500 ? 'Plata' : 'Bronce');
+
+const personalizadoUiSchema = {
+  badgePlan: {
+    'ui:widget': 'BadgeWidget',
+    'ui:options': {
+      icon: Star,
+      iconColor: '#7c3aed',
+      badgeLabel: 'Plan',
+      text: (d) => (d.plan === 'pro' ? 'Pro' : 'Gratis'),
+      bgColor: '#f5f3ff',
+      borderColor: '#c4b5fd',
+      labelColor: '#6d28d9',
+      valueColor: '#4c1d95',
+    },
+  },
+  badgeNivel: {
+    'ui:widget': 'BadgeWidget',
+    'ui:options': {
+      icon: Gift,
+      badgeLabel: 'Nivel',
+      text: (d) => nivelDe(d.puntos),
+      when: (d) => typeof d.puntos === 'number',
+      bgColor: '#fffbeb',
+      borderColor: '#fcd34d',
+      valueColor: '#92400e',
+    },
+  },
+  notaInfo: {
+    'ui:widget': 'NoteWidget',
+    'ui:options': { variant: 'info', title: 'Información', text: 'Los puntos se acreditan dentro de las 24 hs.' },
+  },
+  notaExito: {
+    'ui:widget': 'NoteWidget',
+    'ui:options': {
+      variant: 'success',
+      when: (d) => d.puntos >= 1000,
+      title: '¡Nivel Oro!',
+      text: (d) => `Con ${d.puntos} puntos accedés a todos los beneficios.`,
+    },
+  },
+  notaAdvertencia: {
+    'ui:widget': 'NoteWidget',
+    'ui:options': {
+      variant: 'warning',
+      when: (d) => d.puntos > 0 && d.puntos < 100,
+      text: 'Te faltan puntos para llegar a Plata.',
+    },
+  },
+  notaPeligro: {
+    'ui:widget': 'NoteWidget',
+    'ui:options': {
+      variant: 'danger',
+      when: (d) => d.nombre && d.nombre.length < 2,
+      title: 'Nombre demasiado corto',
+      text: 'Ingresá al menos 2 caracteres.',
+    },
+  },
+  notaNeutral: {
+    'ui:widget': 'NoteWidget',
+    'ui:options': { variant: 'neutral', text: 'Los campos marcados con ** son obligatorios.' },
+  },
+  notaPersonalizada: {
+    'ui:widget': 'NoteWidget',
+    'ui:options': {
+      when: (d) => d.plan === 'pro',
+      icon: ShieldCheck,
+      title: 'Soporte prioritario activo',
+      text: 'Respondemos en menos de 2 horas hábiles.',
+      bgColor: '#ecfeff',
+      borderColor: '#22d3ee',
+      textColor: '#164e63',
+      iconColor: '#0891b2',
+    },
+  },
+  badgeVerificado: {
+    'ui:widget': 'BadgeWidget',
+    'ui:options': {
+      icon: Clock,
+      iconColor: '#15803d',
+      text: 'Cuenta verificada hoy',
+      bgColor: '#f0fdf4',
+      borderColor: '#86efac',
+      valueColor: '#166534',
+    },
+  },
+};
+
+export const TextosYBadgesPersonalizados = {
+  render: () => {
+    const [formData, setFormData] = useState({ nombre: 'A', puntos: 50, plan: 'pro' });
+    return (
+      <div style={{ maxWidth: 460 }}>
+        <SchemaForm
+          schema={personalizadoSchema}
+          uiSchema={personalizadoUiSchema}
+          formData={formData}
+          validator={validator}
+          onChange={setFormData}
         />
       </div>
     );

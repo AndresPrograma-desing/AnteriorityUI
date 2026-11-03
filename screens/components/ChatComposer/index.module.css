@@ -1,0 +1,138 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: 100%;
+  background: var(--chat-composer-bg, #ffffff);
+  border: 1px solid var(--chat-composer-border, #e2e8f0);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 10px 0;
+}
+
+.previews {
+  padding: 0;
+}
+
+.field textarea {
+  color: var(--chat-composer-text, inherit);
+  /* Sin barra de scroll: el campo crece hasta maxRows (15 líneas) y el texto extra sigue scrolleando con la rueda. */
+  scrollbar-width: none;
+}
+
+.field textarea::-webkit-scrollbar {
+  display: none;
+}
+
+.markdownView {
+  min-height: 3lh;
+  padding: 6px 2px;
+  color: var(--chat-composer-text, #0f172a);
+  word-break: break-word;
+}
+
+.emptyPreview {
+  color: var(--chat-composer-muted, #94a3b8);
+  font-size: 0.85rem;
+}
+
+.field textarea::placeholder {
+  color: var(--chat-composer-placeholder, rgba(0, 0, 0, 0.42));
+  opacity: 1;
+}
+
+.field :global(.MuiOutlinedInput-notchedOutline) {
+  display: none;
+}
+
+.field :global(.MuiOutlinedInput-root) {
+  padding: 4px 2px;
+}
+
+/* Footer dentro del mismo marco: herramientas a la izquierda, envío a la derecha. */
+.footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px 8px;
+}
+
+.footer .footerTools {
+  border: none;
+  padding: 0;
+  background: transparent;
+  min-width: 0;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.sendGroup {
+  display: inline-flex;
+  align-items: stretch;
+}
+
+.sendBtn {
+  height: 32px;
+  min-width: 44px;
+  border-radius: 8px !important;
+}
+
+/* Solo con menú: el botón de enviar se pega al chevron, así que pierde las esquinas derechas. */
+.sendGroupWithMenu .sendBtn {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+.sendMenuBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  border: none;
+  border-radius: 0 8px 8px 0;
+  color: var(--chat-composer-send-icon, #ffffff);
+  cursor: pointer;
+  margin-left: 1px;
+}
+
+.menu {
+  box-sizing: border-box;
+  min-width: 180px;
+  padding: 4px;
+  background: var(--chat-composer-menu-bg, #ffffff);
+  border: 1px solid var(--chat-composer-menu-border, #e2e8f0);
+  border-radius: 10px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--chat-composer-menu-text, #0f172a);
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.menuItem:hover:not(:disabled) {
+  background: var(--chat-composer-menu-hover, rgba(124, 156, 255, 0.12));
+}
+
+.menuItem:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

@@ -1,0 +1,9 @@
+export const DEFAULT_PLACEHOLDER = 'Escribí un mensaje… (Markdown soportado)';
+export const DEFAULT_ROWS = 3;
+export const DEFAULT_MAX_ROWS = 15;
+export const DEFAULT_SEND_LABEL = 'CTRL + SHIFT + ENTER';
+export const DEFAULT_PREVIEW_LABEL = 'Vista previa';
+export const DEFAULT_IMAGE_LABEL = 'Imagen';
+export const DEFAULT_IMAGE_REMOVE_LABEL = 'Quitar imagen';
+export const DEFAULT_EMPTY_PREVIEW_TEXT = 'Nada para previsualizar';
+export const DEFAULT_SEND_MENU_LABEL = 'Más opciones de envío';

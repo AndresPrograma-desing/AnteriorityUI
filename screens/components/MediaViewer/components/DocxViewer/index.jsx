@@ -69,8 +69,11 @@ const DocxViewer = ({
         });
         if (cancelled) return;
         setIsLoading(false);
-      } catch {
+      } catch (err) {
         if (!cancelled) {
+          // Sin este log el motivo real (CORS, 403 por URL firmada vencida, archivo corrupto) queda
+          // oculto detrás del mensaje genérico. No se loguea la url: puede ser una URL firmada.
+          console.error('[DocxViewer] No se pudo cargar el documento:', err);
           setHasError(true);
           setIsLoading(false);
         }

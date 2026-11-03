@@ -125,6 +125,41 @@ El paquete se publica en el registro público de npm como `anteriority-ui`, no v
 - Si se agrega un componente/carpeta nueva bajo `screens/`, `common/`, `features/` o `hooks/`, no hace falta tocar nada del build — `scripts/build.mjs` recorre esos cuatro directorios dinámicamente. Sí hay que agregarlo a mano al barrel `index.js` (ver arriba).
 - `react`, `react-dom`, `@mui/material`, `@emotion/*` ya son `peerDependencies` (no van empaquetados) — eso ya estaba bien resuelto antes de este cambio; lo que faltaba era el build + versionado, no las peer deps.
 
+## Ramas y commits: prefijo de tarea `UI-<n>`
+
+- **Rama nueva:** `<tipo>/UI-<n>-<slug>`, con el slug en minúsculas, ej. `feat/UI-1-consumer-skill`. Tipos permitidos: `feat`, `fix`, `add`, `revert`, `chore`, `docs`, `refactor`, `test`, `style`, `perf`, `build`, `ci` (los mismos que usan las ramas existentes, `feat/...` y `fix/...`). Se crea desde `main` salvo que se indique otra base. El `<n>` es el número de tarea que indica el usuario; no inventarlo.
+- **Commit:** el asunto empieza con `UI-<n>: ` seguido del asunto en inglés, ej. `UI-1: Add consumer skill`. El cuerpo, si lo hay, también en inglés.
+- **Enforcement:** `.claude/hooks/require-task-prefix.mjs` (PreToolUse sobre Bash) bloquea: rama nueva sin prefijo, asunto de commit sin prefijo, y commit desde una rama sin prefijo (`main` excluido). Corre junto a `block-spanish-git.mjs`, que exige inglés.
+- Para que el hook pueda leer el asunto, usar `-m "UI-<n>: ..."` o un heredoc con el asunto en la primera línea. `-F archivo` se bloquea. `git commit --amend` sin `-m` se permite.
+- Las ramas anteriores a esta regla (`feat/...`, `fix/...`) no se renombran.
+- Los hooks y `.claude/settings.json` están versionados (excepciones en `.gitignore`). `.claude/settings.local.json` sigue ignorado porque es local.
+
+## Skill para consumidores (`skill/anteriority-ui/`)
+
+Hay DOS carpetas de skills, no confundirlas:
+- `.claude/skills/` → skills **internas** de este repo, para trabajar en la librería (`design-color-props`, `expose-child-props`, `extract-shared-components`). No se publican.
+- `skill/anteriority-ui/SKILL.md` → skill **para los consumidores**: le enseña a la IA del proyecto que instala la librería a usar sus componentes. Se publica dentro del paquete.
+
+**Cómo llega al consumidor:**
+- `scripts/build.mjs` copia `skill/` a `dist/skill/` y `bin/` a `dist/bin/`, y agrega el campo `bin` al `dist/package.json`.
+- `bin/install-skill.mjs` (comando `anteriority-ui-install-skill`) copia `dist/skill/anteriority-ui/` a `.claude/skills/anteriority-ui/` del proyecto consumidor. Claude Code no lee skills desde `node_modules`, así que este paso es obligatorio.
+- El README y [AnteriorityUI.md](AnteriorityUI.md#skill-para-la-ia-del-proyecto-consumidor) documentan el comando. Si cambia el nombre del comando, la ruta de la skill o el destino, actualizar los tres (README, AnteriorityUI.md y `bin/install-skill.mjs`).
+
+**Qué mantener sincronizado en `SKILL.md`:**
+- **Componente nuevo** → agregarlo al índice de la sección 4 (en el grupo que corresponda) y verificar que su nombre esté en el barrel `index.js`.
+- **Componente renombrado o eliminado** → quitarlo o renombrarlo en el índice y en cualquier ejemplo de la skill. Buscar el nombre viejo con `grep -n` en `skill/` antes de cerrar el cambio.
+- **Cambio de setup** (CSS base, `ThemeProvider`, `configureApiClient`, dependencias opcionales por componente) → actualizar las secciones 1 y 5 de la skill y la sección de setup del README.
+- **Cambio de reglas de color o de convenciones** que la IA del consumidor debe respetar → actualizar la sección 6 (o 7) de la skill.
+- **Cambio de props de un componente** → NO tocar la skill. Solo `AnteriorityUI.md`, que es la fuente de verdad que la skill le indica a la IA que lea.
+- La skill nunca debe duplicar tablas de props: si se copian props ahí, quedan desactualizadas en la siguiente versión.
+
+**Cómo verificar un cambio en la skill:**
+1. `pnpm build` → confirmar que `dist/skill/anteriority-ui/SKILL.md` y `dist/bin/install-skill.mjs` existen y que `dist/package.json` tiene `bin`.
+2. Probar el comando contra una carpeta temporal: `node dist/bin/install-skill.mjs <carpeta-temporal>` y verificar `<carpeta-temporal>/.claude/skills/anteriority-ui/SKILL.md`.
+3. Si el frontmatter de `SKILL.md` cambia, revisar que `name` siga siendo `anteriority-ui` (es el nombre de la carpeta destino) y que `description` siga describiendo cuándo activarla.
+
+**Por qué `skill/` y no `.claude/skills/`:** `.gitignore` ignora `.claude/*` y solo re-incluye `.claude/skills/` (para las internas). Ubicar la skill del consumidor en `skill/` la mantiene separada de las internas y no depende de esa excepción del `.gitignore`. Si alguien la mueve a `.claude/skills/`, no se publicaría (el build no la copia desde ahí).
+
 ## ⚠️ Gotcha de pnpm workspace
 
 `C:\Users\Usuario` (la carpeta home del usuario) es raíz de OTRO proyecto suyo no relacionado (`proyecto-hp-backend`, con su propio `package.json`/`pnpm-workspace.yaml`/`.git`). Como está dos niveles arriba de este repo, pnpm puede tratarlo como raíz del workspace y mezclar instalaciones ahí en vez de aislarlas acá. Por eso este repo tiene su propio `pnpm-workspace.yaml` (con `packages: []`) — **no lo borres** — sirve para que pnpm pare la búsqueda hacia arriba y trate `AnteriorityUI` como su propia raíz. Si algo similar vuelve a romperse (paquetes no encontrados en runtime pese a estar en `package.json`), sospechar primero de esto antes de reinstalar todo.
