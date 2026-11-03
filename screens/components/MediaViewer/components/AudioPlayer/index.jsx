@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Play, Pause, Volume2, VolumeX, Volume1, Music, AlertCircle, RotateCw } from 'lucide-react';
 import Button from '../../../Button/index';
 import Slider from '../../../Slider/index';
+import Avatar from '../../../Avatar/index';
 import { VideoSeekBar, VideoSpeedControl } from '../VideoPlayer/components/index.js';
 import { AudioPlayerSkeleton } from './components/index.js';
 import styles from './index.module.css';
@@ -17,9 +18,17 @@ import {
 // para reemplazar el <audio controls> nativo del browser por una UI consistente con la paleta
 // de la librería. Reusa VideoSeekBar/VideoSpeedControl (agnósticos de video: solo necesitan
 // currentTime/duration/rate) para no duplicar esa lógica.
+//
+// A la izquierda muestra por default una insignia con ícono de música. Si se pasa `senderName`
+// y/o `senderAvatar`, la insignia se reemplaza por el componente Avatar de la librería (foto, o
+// iniciales con color generado a partir del nombre) para identificar quién envió el audio.
 const AudioPlayer = ({
   src,
   fileName,
+  senderName,
+  senderAvatar,
+  avatarBgColor,
+  avatarTextColor,
   loop = false,
   muted: initialMuted = false,
   autoPlay = false,
@@ -155,9 +164,19 @@ const AudioPlayer = ({
         <AudioPlayerSkeleton />
       ) : (
         <>
-          <div className={styles.iconBadge} style={{ backgroundColor: iconBgColor, color: accentColor }}>
-            <Music size={18} />
-          </div>
+          {senderName || senderAvatar ? (
+            <Avatar
+              src={senderAvatar}
+              name={senderName}
+              size={40}
+              bgColor={avatarBgColor}
+              textColor={avatarTextColor}
+            />
+          ) : (
+            <div className={styles.iconBadge} style={{ backgroundColor: iconBgColor, color: accentColor }}>
+              <Music size={18} />
+            </div>
+          )}
 
           <div className={styles.body}>
             {fileName && <div className={styles.fileName} style={{ color: controlsColor }}>{fileName}</div>}

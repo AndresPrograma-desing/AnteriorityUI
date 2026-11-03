@@ -1,0 +1,33 @@
+.markdownViewer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.areaOuter {
+  position: relative;
+  width: 100%;
+}
+
+.area {
+  box-sizing: border-box;
+  min-width: 0;
+  min-height: 160px;
+  padding: 16px;
+  overflow-wrap: anywhere;
+}
+
+.loadingOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+@media (max-width: 480px) {
+  .area {
+    padding: 12px;
+  }
+}

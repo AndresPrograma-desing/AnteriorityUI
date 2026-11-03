@@ -107,6 +107,74 @@ export const ConImagen = {
   ),
 };
 
+// Genera un WAV de un segundo (tono de 440 Hz) como data-URL, para ejemplificar un audio ya
+// guardado sin depender de un archivo externo — es el mismo formato (`data:audio/...;base64,...`)
+// que guarda el AudioWidget de SchemaForm al grabar.
+function createToneDataURL(seconds = 1, frequency = 440, sampleRate = 8000) {
+  const samples = seconds * sampleRate;
+  const buffer = new ArrayBuffer(44 + samples * 2);
+  const view = new DataView(buffer);
+  const writeText = (offset, text) =>
+    [...text].forEach((char, i) => view.setUint8(offset + i, char.charCodeAt(0)));
+
+  writeText(0, 'RIFF');
+  view.setUint32(4, 36 + samples * 2, true);
+  writeText(8, 'WAVE');
+  writeText(12, 'fmt ');
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true);
+  view.setUint16(22, 1, true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate * 2, true);
+  view.setUint16(32, 2, true);
+  view.setUint16(34, 16, true);
+  writeText(36, 'data');
+  view.setUint32(40, samples * 2, true);
+  for (let i = 0; i < samples; i += 1) {
+    view.setInt16(44 + i * 2, Math.sin((2 * Math.PI * frequency * i) / sampleRate) * 0.3 * 32767, true);
+  }
+
+  let binary = '';
+  new Uint8Array(buffer).forEach((byte) => {
+    binary += String.fromCharCode(byte);
+  });
+  return `data:audio/wav;base64,${btoa(binary)}`;
+}
+
+const audioSchema = {
+  type: 'object',
+  properties: {
+    nombre: { type: 'string', title: 'Nombre del registro' },
+    nota: { type: 'string', format: 'data-url', title: 'Nota de voz' },
+  },
+};
+
+export const ConAudio = {
+  render: () => (
+    <div style={{ maxWidth: 420 }}>
+      <RenderJsonSchema
+        schema={audioSchema}
+        formData={{ nombre: 'Registro de ejemplo', nota: createToneDataURL() }}
+      />
+    </div>
+  ),
+};
+
+export const ConAudioTemaOscuro = {
+  render: () => (
+    <div style={{ maxWidth: 420, background: '#0b1120', padding: '1rem' }}>
+      <RenderJsonSchema
+        schema={audioSchema}
+        formData={{ nombre: 'Registro de ejemplo', nota: createToneDataURL() }}
+        bgColor="#111827"
+        textColor="#f1f5f9"
+        labelColor="#94a3b8"
+        borderColor="#1f2937"
+      />
+    </div>
+  ),
+};
+
 // Mismo panel con paleta oscura vía las props de color opcionales (bgColor/
 // textColor/labelColor/borderColor): también oscurece el MediaViewer interno
 // del campo avatar (sus colores se propagan, no se heredan solos por CSS).

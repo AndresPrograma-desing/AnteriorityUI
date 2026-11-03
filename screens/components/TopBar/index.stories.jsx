@@ -106,6 +106,63 @@ export const CustomColors = {
   },
 };
 
+// Con `autoHide` la barra se desliza hacia arriba cuando el puntero no está sobre ella (tras
+// `autoHideDelay` ms) y queda una pestaña con una flecha colgando del borde superior; al acercar
+// el puntero a ese borde (o a la pestaña) la barra vuelve a aparecer.
+// Se dibuja como overlay (no ocupa lugar en el layout), así que el contenido de abajo no salta.
+// En pantallas táctiles (sin hover) se desactiva y la barra queda siempre visible.
+export const AutoOcultar = {
+  render: (args) => (
+    <div style={{ minHeight: 320, background: '#f8fafc' }}>
+      <SearchWithState {...args} />
+      <div style={{ padding: '80px 24px 24px', color: '#475569' }}>
+        Sacá el puntero de la barra: se oculta. Acercalo al borde superior de este recuadro y vuelve a salir.
+      </div>
+    </div>
+  ),
+  args: {
+    logo: <Logo />,
+    breadcrumbItems,
+    actions,
+    user: { name: 'Jane Doe', email: 'jane.doe@example.com' },
+    userMenuItems,
+    autoHide: true,
+  },
+};
+
+// Pestaña a la derecha en vez de al centro, con la paleta oscura: la pestaña usa los mismos
+// colores del TopBar (bgColor/borderColor/iconColor), así que se recolorea con las props de siempre.
+export const AutoOcultarPestanaDerechaTemaOscuro = {
+  render: (args) => (
+    <div style={{ minHeight: 320, background: '#010409' }}>
+      <SearchWithState {...args} />
+    </div>
+  ),
+  args: {
+    ...CustomColors.args,
+    autoHide: true,
+    autoHideHandlePosition: 'right',
+  },
+};
+
+// Sin pestaña visible: solo queda la franja invisible del borde superior para volver a mostrarla.
+export const AutoOcultarSinPestana = {
+  render: AutoOcultar.render,
+  args: {
+    ...AutoOcultar.args,
+    autoHideShowHandle: false,
+  },
+};
+
+export const AutoOcultarRapido = {
+  render: AutoOcultar.render,
+  args: {
+    ...AutoOcultar.args,
+    autoHideDelay: 150,
+    autoHideTriggerHeight: 24,
+  },
+};
+
 export const MinimalActionsOnly = {
   args: {
     logo: <Logo />,

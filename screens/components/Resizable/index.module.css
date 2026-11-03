@@ -1,0 +1,100 @@
+.root {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex-shrink: 0;
+}
+
+.content {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+}
+
+/* Área de agarre: transparente salvo que el consumidor pinte el fondo. */
+.handle {
+  position: relative;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--resizable-handle-bg, transparent);
+  touch-action: none;
+  user-select: none;
+  outline: none;
+}
+
+.handleVertical {
+  width: 100%;
+  cursor: ns-resize;
+}
+
+.handleHorizontal {
+  height: 100%;
+  cursor: ew-resize;
+}
+
+.handle.disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+/* Franja fina que atraviesa el handle de lado a lado. */
+.line {
+  position: absolute;
+  background: var(--resizable-line, rgba(148, 163, 184, 0.35));
+  pointer-events: none;
+  transition: background-color 0.15s ease;
+}
+
+.handleVertical .line {
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.handleHorizontal .line {
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Grip central: recuadro redondeado con las flechas. */
+.grip {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border: 1px solid var(--resizable-grip-border, rgba(148, 163, 184, 0.6));
+  background: var(--resizable-grip-bg, transparent);
+  color: var(--resizable-grip-icon, #94a3b8);
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.handle:hover .line,
+.handle.dragging .line {
+  background: var(--resizable-line-active, #7c9cff);
+}
+
+.handle:hover .grip,
+.handle.dragging .grip {
+  border-color: var(--resizable-line-active, #7c9cff);
+  color: var(--resizable-line-active, #7c9cff);
+}
+
+.handle:focus-visible .grip {
+  outline: 2px solid var(--resizable-line-active, #7c9cff);
+  outline-offset: 2px;
+}
+
+.handle.disabled:hover .line,
+.handle.disabled:hover .grip {
+  background: var(--resizable-line, rgba(148, 163, 184, 0.35));
+  border-color: var(--resizable-grip-border, rgba(148, 163, 184, 0.6));
+  color: var(--resizable-grip-icon, #94a3b8);
+}

@@ -1,7 +1,13 @@
 import React, { useRef } from 'react';
-import { Upload } from 'lucide-react';
+import { Upload, Trash2 } from 'lucide-react';
 import styles from './index.module.css';
+import {
+  DEFAULT_AUDIO_SAVE_LABEL,
+  DEFAULT_AUDIO_REMOVE_LABEL,
+  AUDIO_RECORDER_OPTION_KEYS,
+} from './constants.js';
 
+import { numericPropsFromSchema } from './utils.js';
 import Input from '../Input/index';
 import Checks from '../Checks/index';
 import Swich from '../Swich/index';
@@ -9,10 +15,14 @@ import Selector from '../Material-UI/Components/Selector/index';
 import CalendarPicker from '../CalendarPicker/index';
 import ImagePastePreview from '../ImagePastePreview/index';
 import Button from '../Button/index';
+import Callout from '../Callout/index';
+import Badge from '../Badge/index';
 import { FormTextArea } from '../FormControls/index';
 import { RadioGroup, Radio } from '../Radio/index';
 import ColorPicker from '../ColorPicker/index';
 import Slider from '../Slider/index';
+import MediaViewer from '../MediaViewer/index';
+import AudioRecorder from '../MediaViewer/components/AudioRecorder/index';
 
 // Widgets de rjsf: cada uno traduce la interfaz (value, onChange, label, ...)
 // que rjsf les pasa a la interfaz de los componentes ya existentes de la librería,
@@ -43,11 +53,12 @@ export function PasswordWidget(props) {
   return <TextWidget {...props} options={{ ...props.options, inputType: 'password' }} />;
 }
 
-export function NumberWidget({ id, value, required, disabled, readonly, label, placeholder, rawErrors, onChange }) {
+export function NumberWidget({ id, value, required, disabled, readonly, label, placeholder, rawErrors, onChange, schema }) {
   return (
     <Input
       id={id}
       numeric
+      {...numericPropsFromSchema(schema)}
       label={label}
       value={value ?? ''}
       required={required}
@@ -81,13 +92,36 @@ export function TextareaWidget({ id, value, required, disabled, readonly, label,
 // Por eso el widget registrado como "CheckboxWidget" (el que rjsf usa por default
 // para todo boolean) es en realidad un Swich; quien quiera el look de checkbox
 // tachable lo pide explícito con 'ui:widget': 'ChecksWidget'.
-export function SwitchWidget({ value, disabled, readonly, onChange }) {
-  return (
+export function SwitchWidget({ id, value, disabled, readonly, label, options, onChange }) {
+  const switchEl = (
     <Swich
       value={!!value}
+      showIcons
       disabled={disabled || readonly}
       onChange={(next) => onChange(next)}
+      activeColor={options?.activeColor}
+      inactiveColor={options?.inactiveColor}
     />
+  );
+  // Sin 'ui:options.labelPosition' el switch va solo (look original). Con 'top' | 'right' | 'left'
+  // se muestra el título del campo (o options.text) en esa posición.
+  const position = options?.labelPosition;
+  const text = options?.text ?? label;
+  if (!position || !text) return switchEl;
+  const isColumn = position === 'top';
+  return (
+    <div
+      className={styles.switchRow}
+      style={{
+        flexDirection: isColumn ? 'column' : position === 'left' ? 'row-reverse' : 'row',
+        alignItems: isColumn ? 'flex-start' : 'center',
+        justifyContent: position === 'left' ? 'flex-end' : undefined,
+        ...(options?.textColor ? { '--schemaform-switch-text': options.textColor } : {}),
+      }}
+    >
+      <label htmlFor={id} className={styles.switchLabel}>{text}</label>
+      {switchEl}
+    </div>
   );
 }
 
@@ -220,6 +254,94 @@ export function FileWidget({ id, value, multiple, disabled, readonly, label, onC
   );
 }
 
+function readFileAsDataURL(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+}
+
+// Widget para grabar audio desde el micrófono: se pide con 'ui:widget': 'AudioWidget' sobre un
+// schema { type: 'string', format: 'data-url' } (un audio) o un array de esos (varios, con
+// 'ui:options': { multiple: true }). Igual que FileWidget, el valor guardado es un data-URL en
+// base64 (ej. `data:audio/webm;base64,...`), no un File ni un Blob, así que RenderJsonSchema lo
+// muestra directo con el reproductor de audio. Reusa el AudioRecorder de MediaViewer: graba,
+// permite escuchar antes de confirmar y recién al "Guardar audio" se escribe el valor; lo ya
+// guardado se muestra con el reproductor y un botón para eliminarlo.
+//
+// Las opciones del grabador (límite de duración, bitrate, labels y colores) se pasan vía
+// 'ui:options' con los mismos nombres que sus props (ver AUDIO_RECORDER_OPTION_KEYS).
+export function AudioWidget({ id, value, multiple, disabled, readonly, label, onChange, options }) {
+  const values = Array.isArray(value) ? value : value ? [value] : [];
+  const locked = disabled || readonly;
+  const canRecord = !locked && (multiple || values.length === 0);
+
+  const recorderProps = {};
+  AUDIO_RECORDER_OPTION_KEYS.forEach((key) => {
+    if (options?.[key] !== undefined) recorderProps[key] = options[key];
+  });
+
+  const handleSend = async ({ file }) => {
+    const dataURL = await readFileAsDataURL(file);
+    onChange(multiple ? values.concat(dataURL) : dataURL);
+  };
+
+  const removeAt = (index) => {
+    if (multiple) {
+      onChange(values.filter((_, i) => i !== index));
+    } else {
+      onChange(undefined);
+    }
+  };
+
+  return (
+    <div id={id} className={styles.audioWidget}>
+      {label && <p className={styles.checkboxesLabel}>{label}</p>}
+
+      {values.map((dataURL, index) => (
+        <div key={`${id || 'audio'}-${index}`} className={styles.audioItem}>
+          <MediaViewer
+            url={dataURL}
+            type="audio"
+            className={styles.audioPlayer}
+            bgColor={options?.bgColor}
+            borderColor={options?.borderColor}
+            textColor={options?.textColor}
+            audioAccentColor={options?.accentColor}
+            audioControlsColor={options?.textColor}
+            audioIconBgColor={options?.iconBgColor}
+            senderName={options?.senderName}
+            senderAvatar={options?.senderAvatar}
+            avatarBgColor={options?.avatarBgColor}
+            avatarTextColor={options?.avatarTextColor}
+          />
+          {!locked && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="small"
+              icon={Trash2}
+              onClick={() => removeAt(index)}
+            >
+              {options?.removeLabel || DEFAULT_AUDIO_REMOVE_LABEL}
+            </Button>
+          )}
+        </div>
+      ))}
+
+      {canRecord && (
+        <AudioRecorder
+          sendLabel={DEFAULT_AUDIO_SAVE_LABEL}
+          {...recorderProps}
+          onSend={handleSend}
+        />
+      )}
+    </div>
+  );
+}
+
 export function DateWidget({ label, value, required, disabled, readonly, onChange }) {
   return (
     <CalendarPicker
@@ -302,7 +424,56 @@ export function RangeWidget({ id, value, disabled, readonly, schema, options, on
   );
 }
 
+// Campos decorativos: no guardan valor ni validan, solo muestran un aviso entre campos.
+// `text`/`title` pueden ser string o (formData) => string; `when` (formData) => boolean
+// permite mostrarlo solo si se cumple una condición sobre los datos del formulario.
+// formData llega por registry.formContext (SchemaForm lo mantiene actualizado).
+function resolveNoteOption(option, formData) {
+  return typeof option === 'function' ? option(formData) : option;
+}
+
+export function NoteWidget({ label, options, formContext }) {
+  const formData = formContext?.formData ?? {};
+  if (options?.when && !options.when(formData)) return null;
+  const text = resolveNoteOption(options?.text, formData);
+  const title = resolveNoteOption(options?.title, formData) ?? label;
+  return (
+    <Callout
+      variant={options?.variant}
+      title={title}
+      icon={options?.icon}
+      bgColor={options?.bgColor}
+      textColor={options?.textColor}
+      iconColor={options?.iconColor}
+      borderColor={options?.borderColor}
+    >
+      {text}
+    </Callout>
+  );
+}
+
+export function BadgeWidget({ label, options, formContext }) {
+  const formData = formContext?.formData ?? {};
+  if (options?.when && !options.when(formData)) return null;
+  const text = resolveNoteOption(options?.text, formData) ?? label;
+  return (
+    <Badge
+      icon={options?.icon}
+      label={resolveNoteOption(options?.badgeLabel, formData)}
+      value={text}
+      iconColor={options?.iconColor}
+      bgColor={options?.bgColor}
+      borderColor={options?.borderColor}
+      labelColor={options?.labelColor}
+      valueColor={options?.valueColor}
+      style={{ alignSelf: 'flex-start', width: 'fit-content' }}
+    />
+  );
+}
+
 export const SCHEMA_FORM_WIDGETS = {
+  NoteWidget,
+  BadgeWidget,
   TextWidget,
   NumberWidget,
   TextareaWidget,
@@ -313,6 +484,7 @@ export const SCHEMA_FORM_WIDGETS = {
   SwitchWidget,
   CheckboxesWidget,
   FileWidget,
+  AudioWidget,
   RadioWidget,
   ColorWidget,
   RangeWidget,

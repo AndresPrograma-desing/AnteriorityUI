@@ -10,12 +10,21 @@ export function mimeToKind(mime) {
   if (mime.startsWith('audio/')) return MEDIA_KIND.AUDIO;
   if (mime === 'application/pdf') return MEDIA_KIND.PDF;
   if (mime === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') return MEDIA_KIND.DOCX;
+  if (mime === 'text/markdown' || mime === 'text/x-markdown') return MEDIA_KIND.MARKDOWN;
   if (Object.values(MEDIA_KIND).includes(mime)) return mime;
   return null;
 }
 
+// mimeType de una data-URL (`data:audio/webm;base64,...` -> `audio/webm`), o null si no lo es.
+// Una data-URL no tiene extensión, así que sin esto el tipo nunca se infiere por la url (y la
+// detección en cascada tomaría un audio webm como video, porque un <video> también lo carga).
+export function getDataUrlMime(url) {
+  if (typeof url !== 'string' || !url.startsWith('data:')) return null;
+  return url.slice(5).split(/[;,]/)[0] || null;
+}
+
 export function resolveMediaKind({ type, mimeType, url, name }) {
-  const fromMime = mimeToKind(mimeType || type);
+  const fromMime = mimeToKind(mimeType || type || getDataUrlMime(url));
   if (fromMime) return fromMime;
 
   const extension = getExtension(name || url);
@@ -25,6 +34,8 @@ export function resolveMediaKind({ type, mimeType, url, name }) {
 export function getFileName(url, name) {
   if (name) return name;
   if (!url) return '';
+  // Una data-URL es el contenido en base64, no un nombre: partirla por "/" daría basura.
+  if (url.startsWith('data:')) return '';
   const clean = url.split('?')[0].split('#')[0];
   const segments = clean.split('/');
   return segments[segments.length - 1] || '';

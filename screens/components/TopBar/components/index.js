@@ -4,3 +4,4 @@ export { default as NavLinks } from './NavLinks/index';
 export { default as TopBarActions } from './TopBarActions/index';
 export { default as UserMenu } from './UserMenu/index';
 export { default as MobileActionsPanel } from './MobileActionsPanel/index';
+export { default as AutoHideShell } from './AutoHideShell/index';

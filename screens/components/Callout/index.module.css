@@ -7,6 +7,8 @@
   border: 1px solid transparent;
   border-radius: 8px;
   box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
   animation: calloutSlideIn 0.2s ease-out;
   text-decoration: none;
 }
@@ -41,16 +43,20 @@
   font-weight: 700;
   line-height: 1.4;
   margin-bottom: 4px;
+  /* Un título largo sin espacios (ej. un email) no debe desbordar la tarjeta. */
+  overflow-wrap: anywhere;
 }
 
 .markdownBody {
   font-size: 0.85rem;
+  overflow-wrap: anywhere;
 }
 
 .timestamp {
   font-size: 0.72rem;
   opacity: 0.7;
   margin-top: 4px;
+  overflow-wrap: anywhere;
 }
 
 .actions {

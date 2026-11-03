@@ -1,0 +1,20 @@
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 8px;
+  background: var(--chat-composer-toolbar-bg, transparent);
+  border-bottom: 1px solid var(--chat-composer-toolbar-border, #e2e8f0);
+}
+
+.separator {
+  width: 1px;
+  height: 18px;
+  margin: 0 4px;
+  background: var(--chat-composer-toolbar-border, #e2e8f0);
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
