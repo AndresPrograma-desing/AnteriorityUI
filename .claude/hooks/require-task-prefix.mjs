@@ -3,7 +3,8 @@
 // mensajes de commit de este repo.
 //
 //   - Rama nueva (`git checkout -b`, `git switch -c|-C`, `git checkout -B`, `git branch <nombre>`):
-//     el nombre debe ser `UI-<n>-<slug>` en minúsculas para el slug, ej. `UI-1-consumer-skill`.
+//     el nombre debe ser `<tipo>/UI-<n>-<slug>` (slug en minúsculas), ej. `feat/UI-1-consumer-skill`.
+//     Tipos: feat, fix, add, revert, chore, docs, refactor, test, style, perf, build, ci.
 //   - Commit (`git commit`): el asunto debe ser `UI-<n>: <asunto en inglés>`, ej. `UI-1: Add consumer skill`.
 //     Se lee del primer `-m "..."` o del primer renglón de un heredoc. Si no se puede leer el
 //     asunto (ej. `-F archivo` o abrir el editor), se bloquea para pedir `-m "UI-<n>: ..."`.
@@ -14,7 +15,9 @@
 
 import { execSync } from 'node:child_process';
 
-const TASK_BRANCH = /^UI-\d+-[a-z0-9][a-z0-9._-]*$/;
+// Tipo de cambio (como en las ramas existentes del repo: feat/..., fix/...) + prefijo de tarea.
+const BRANCH_TYPES = ['feat', 'fix', 'add', 'revert', 'chore', 'docs', 'refactor', 'test', 'style', 'perf', 'build', 'ci'];
+const TASK_BRANCH = new RegExp(`^(${BRANCH_TYPES.join('|')})\\/UI-\\d+-[a-z0-9][a-z0-9._-]*$`);
 const TASK_SUBJECT = /^UI-\d+: \S.*$/;
 const PROTECTED_BRANCHES = new Set(['main']);
 
@@ -91,7 +94,7 @@ process.stdin.on('end', () => {
 
   for (const name of branchNamesToCreate(segments)) {
     if (!TASK_BRANCH.test(name)) {
-      problems.push(`nombre de rama "${name}": debe ser UI-<n>-<slug>, ej. UI-1-consumer-skill`);
+      problems.push(`nombre de rama "${name}": debe ser <tipo>/UI-<n>-<slug>, ej. feat/UI-1-consumer-skill (tipos: ${BRANCH_TYPES.join(', ')})`);
     }
   }
 
