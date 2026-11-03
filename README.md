@@ -93,6 +93,19 @@ import { Home, Bell, Search } from 'anteriority-ui/lucide';
 
 Para íconos de marcas/tecnologías/UI (react-icons empaquetado, sin instalar nada extra), ver la sección "Icons (react-icons)" en [AnteriorityUI.md](AnteriorityUI.md). Para buscar/listar esos íconos programáticamente sin conocer de antemano en qué pack vive cada uno, `anteriority-ui/common/icons` expone `findIcons`, `ICON_PACKS` y `ICON_PACK_NAMES` (ver [findIcons](AnteriorityUI.md#findicons)).
 
+## Skill para tu asistente de IA (Claude Code)
+
+La librería trae una skill (`skill/anteriority-ui/SKILL.md` en el repo, `skill/` dentro del paquete publicado) que le enseña a la IA de tu proyecto cómo usar los componentes: setup, índice de qué componente usar para cada caso, dónde leer las props exactas y las reglas de color/API. Así la IA deja de inventar props o de reimplementar componentes que ya existen.
+
+Claude Code no lee skills desde `node_modules`, así que hay que copiarla a `.claude/skills/` de tu proyecto. La librería trae un comando para eso, desde la raíz del proyecto consumidor:
+
+```bash
+pnpm anteriority-ui-install-skill
+# o: npx anteriority-ui-install-skill
+```
+
+Después de actualizar la librería (`pnpm update anteriority-ui`), volvé a ejecutarlo para tomar los cambios: reemplaza la copia anterior. Para instalar en otra carpeta, pasala como argumento: `pnpm anteriority-ui-install-skill ../otro-proyecto`. La skill apunta a `node_modules/anteriority-ui/AnteriorityUI.md` como fuente de verdad, así que la documentación de props siempre corresponde a la versión instalada.
+
 ## Estructura del proyecto
 
 ```
@@ -199,6 +212,7 @@ Documentación completa de props y ejemplos de uso de los ~50 componentes en **[
 | [SubSidebarLayout](AnteriorityUI.md#subsidebarlayout) | Layout de sub-sidebar con menú |
 | [SummaryCard](AnteriorityUI.md#summarycard) | Tarjeta de resumen con degradado |
 | [Swich](AnteriorityUI.md#swich) | Interruptor (switch) on/off |
+| [Table](AnteriorityUI.md#table) | Tabla unificada (`variant="A"` \| `"B"`); TableA y TableB son wrappers de ella |
 | [TableA](AnteriorityUI.md#tablea) | Tabla simple con columnas configurables |
 | [TableB](AnteriorityUI.md#tableb) | Tabla con filas expandibles y badges |
 | [ToggleCard](AnteriorityUI.md#togglecard) | Tarjeta colapsable con acción |
