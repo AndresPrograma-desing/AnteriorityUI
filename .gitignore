@@ -23,6 +23,8 @@ pnpm-debug.log*
 # Editor / tool local state
 .claude/*
 !.claude/skills/
+!.claude/hooks/
+!.claude/settings.json
 .vscode/
 
 # OS

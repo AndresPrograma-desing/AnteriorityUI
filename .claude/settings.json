@@ -1,0 +1,33 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/block-spanish-git.mjs\"",
+            "statusMessage": "Verificando que el commit/rama esté en inglés..."
+          },
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/require-task-prefix.mjs\"",
+            "statusMessage": "Verificando prefijo UI-<n> en rama y commit..."
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/remind-color-props.mjs\"",
+            "statusMessage": "Verificando convención de props de color..."
+          }
+        ]
+      }
+    ]
+  }
+}
