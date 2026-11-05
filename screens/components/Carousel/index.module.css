@@ -1,0 +1,46 @@
+.root {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  border-radius: var(--carousel-radius, 12px);
+  overflow: hidden;
+  background: var(--carousel-slide-bg, #0f172a);
+  /* Fondo default oscuro: el texto default también es claro, para no heredar el color oscuro de la página. */
+  color: var(--carousel-text, #e2e8f0);
+  box-sizing: border-box;
+}
+
+.root:focus-visible {
+  outline: 2px solid var(--carousel-focus, var(--carousel-dot-active, #38bdf8));
+  outline-offset: 2px;
+}
+
+.viewport {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  min-height: 120px;
+}
+
+/* Cada slide ocupa todo el viewport; la posición (transform / opacity) la define el estilo inline
+   según la transición. La duración la pone el root en --carousel-duration. */
+.slideWrap {
+  position: absolute;
+  inset: 0;
+  will-change: transform, opacity;
+  transition:
+    transform var(--carousel-duration, 450ms) cubic-bezier(0.22, 0.61, 0.36, 1),
+    opacity var(--carousel-duration, 450ms) ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slideWrap {
+    transition: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .viewport {
+    min-height: 160px;
+  }
+}

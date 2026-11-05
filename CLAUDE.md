@@ -131,6 +131,7 @@ El paquete se publica en el registro público de npm como `anteriority-ui`, no v
 - **Commit:** el asunto empieza con `UI-<n>: ` seguido del asunto en inglés, ej. `UI-1: Add consumer skill`. El cuerpo, si lo hay, también en inglés.
 - **Enforcement:** `.claude/hooks/require-task-prefix.mjs` (PreToolUse sobre Bash) bloquea: rama nueva sin prefijo, asunto de commit sin prefijo, y commit desde una rama sin prefijo (`main` excluido). Corre junto a `block-spanish-git.mjs`, que exige inglés.
 - Para que el hook pueda leer el asunto, usar `-m "UI-<n>: ..."` o un heredoc con el asunto en la primera línea. `-F archivo` se bloquea. `git commit --amend` sin `-m` se permite.
+- **Numeración automática:** el `<n>` de una tarea nueva es el número más alto ya usado en las ramas (locales y remotas) y en los commits con prefijo `UI-<n>`, más 1. Si el último es `UI-2`, la siguiente es `UI-3`. Antes de crear la rama, revisar `git branch -a` y `git log --all` para calcularlo; no hace falta preguntarlo al usuario salvo que la rama o el commit estén ambiguos.
 - Las ramas anteriores a esta regla (`feat/...`, `fix/...`) no se renombran.
 - Los hooks y `.claude/settings.json` están versionados (excepciones en `.gitignore`). `.claude/settings.local.json` sigue ignorado porque es local.
 

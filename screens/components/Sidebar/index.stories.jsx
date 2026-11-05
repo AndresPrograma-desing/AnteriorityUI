@@ -121,6 +121,41 @@ export const WithItemActions = {
   },
 };
 
+// Handlers asíncronos: al confirmar "Eliminar" o al elegir "Editar", la opción muestra un
+// spinner durante 1.5s antes de cerrar el menú. Los ítems compartidos sin ser dueño muestran
+// "Salir" con su propio popover de confirmación.
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const groupsForAsyncActions = [
+  {
+    title: 'Proyectos',
+    items: [
+      { id: 'gub', label: 'Gubernamentales-API', icon: FileText, isOwner: true, isShared: true },
+      { id: 'portal', label: 'Portal Matriculados', icon: FileText, isOwner: false, isShared: true },
+      { id: 'anterior', label: 'AnteriorityUI', icon: FileText, isOwner: true, pinned: true },
+    ],
+  },
+];
+
+export const WithAsyncItemActions = {
+  render: (args) => <SidebarWithState {...args} />,
+  args: {
+    groups: groupsForAsyncActions,
+    user: { email: 'jane.doe@example.com' },
+    userMenuItems,
+    onItemEdit: async (item) => {
+      console.log('edit (async)', item);
+      await wait(1500);
+    },
+    onItemDelete: async (item) => {
+      console.log('delete (async)', item);
+      await wait(1500);
+    },
+    onItemPin: (item) => console.log('pin', item),
+    onItemCollaborators: (item) => console.log('collaborators', item),
+  },
+};
+
 export const Loading = {
   render: (args) => <SidebarWithState {...args} />,
   args: {

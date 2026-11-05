@@ -5,6 +5,11 @@ import ModalTooltip from '../../../ModalTooltip/ModalTooltip';
 import styles from './index.module.css';
 import { getInitial } from '../../utils.js';
 
+// Duración de la animación de salida (debe coincidir con userMenuOut en index.module.css).
+const CLOSE_ANIMATION_MS = 160;
+const USER_MENU_WIDTH = 240;
+const USER_MENU_GAP = 10;
+
 function UserFooter({
   user,
   userMenuItems = [],
@@ -13,17 +18,32 @@ function UserFooter({
   effectiveCollapsed,
 }) {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
   const [userMenuPosition, setUserMenuPosition] = useState(null);
   const userFooterButtonRef = useRef(null);
   const userMenuRef = useRef(null);
+  const closeTimerRef = useRef(null);
 
+  const closeUserMenu = () => {
+    if (!isUserMenuOpen || isClosing) return;
+    setIsClosing(true);
+    closeTimerRef.current = setTimeout(() => {
+      setIsUserMenuOpen(false);
+      setIsClosing(false);
+      closeTimerRef.current = null;
+    }, CLOSE_ANIMATION_MS);
+  };
+
+  useEffect(() => () => clearTimeout(closeTimerRef.current), []);
+
+  // El menú sale al costado de la sidebar (no encima del botón), alineado con la base del botón.
   useLayoutEffect(() => {
     if (!isUserMenuOpen || !userFooterButtonRef.current) return;
-    const rect = userFooterButtonRef.current.getBoundingClientRect();
+    const buttonRect = userFooterButtonRef.current.getBoundingClientRect();
+    const sidebarRect = userFooterButtonRef.current.closest('aside')?.getBoundingClientRect() ?? buttonRect;
     setUserMenuPosition({
-      bottom: window.innerHeight - rect.top + 8,
-      left: rect.left,
-      width: effectiveCollapsed ? 220 : rect.width,
+      bottom: window.innerHeight - buttonRect.bottom,
+      left: sidebarRect.right + USER_MENU_GAP,
     });
   }, [isUserMenuOpen, effectiveCollapsed]);
 
@@ -33,13 +53,21 @@ function UserFooter({
       const target = event.target;
       if (userMenuRef.current?.contains(target)) return;
       if (userFooterButtonRef.current?.contains(target)) return;
-      setIsUserMenuOpen(false);
+      closeUserMenu();
     };
     document.addEventListener('mousedown', handlePointerDown);
     return () => document.removeEventListener('mousedown', handlePointerDown);
-  }, [isUserMenuOpen]);
+  });
 
   if (!user?.email) return null;
+
+  const toggleUserMenu = () => {
+    if (isUserMenuOpen) {
+      closeUserMenu();
+    } else {
+      setIsUserMenuOpen(true);
+    }
+  };
 
   return (
     <div className={styles.userFooter}>
@@ -47,7 +75,9 @@ function UserFooter({
         type="button"
         ref={userFooterButtonRef}
         className={styles.userFooterButton}
-        onClick={() => setIsUserMenuOpen((prev) => !prev)}
+        aria-haspopup="menu"
+        aria-expanded={isUserMenuOpen}
+        onClick={toggleUserMenu}
       >
         <span className={styles.avatar}>{getInitial(user.email)}</span>
         {!effectiveCollapsed && <span className={styles.userEmail}>{user.email}</span>}
@@ -78,8 +108,9 @@ function UserFooter({
       {isUserMenuOpen && userMenuPosition && createPortal(
         <div
           ref={userMenuRef}
-          className={styles.userMenu}
-          style={{ bottom: userMenuPosition.bottom, left: userMenuPosition.left, width: userMenuPosition.width }}
+          role="menu"
+          className={`${styles.userMenu} ${isClosing ? styles.userMenuClosing : ''}`}
+          style={{ bottom: userMenuPosition.bottom, left: userMenuPosition.left, width: USER_MENU_WIDTH }}
         >
           <div className={styles.userMenuEmail}>{user.email}</div>
           {userMenuItems.map((menuItem) => {
@@ -88,9 +119,10 @@ function UserFooter({
               <button
                 key={menuItem.id ?? menuItem.label}
                 type="button"
+                role="menuitem"
                 className={`${styles.userMenuItem} ${menuItem.variant === 'danger' ? styles.userMenuItemDanger : ''}`}
                 onClick={() => {
-                  setIsUserMenuOpen(false);
+                  closeUserMenu();
                   menuItem.onClick && menuItem.onClick();
                 }}
               >
@@ -110,7 +142,7 @@ function UserFooter({
                   rel="noopener noreferrer"
                   className={styles.userMenuLinkItem}
                   onClick={() => {
-                    setIsUserMenuOpen(false);
+                    closeUserMenu();
                     link.onClick && link.onClick();
                   }}
                 >

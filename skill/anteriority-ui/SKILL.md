@@ -137,7 +137,9 @@ Nombres exactos del barrel.
 - `Callout` — aviso por `variant` (`info`, `warning`, `danger`, `success`, `neutral`), con título y cuerpo en Markdown.
 - `ErrorMessage` (banner en línea con icono y título). `ErrorState` también existe en el barrel, pero no tiene sección propia en `AnteriorityUI.md`: leé su `index.jsx` antes de usarlo.
 - `Loading` (varias variantes), `Skeleton` (placeholder shimmer).
-- `AlertModal` — modal de alerta/confirmación con input opcional; parsea errores de API.
+- `AlertModal` — modal de alerta/confirmación con input opcional; parsea errores de API.
+- `Carousel` — carrusel de imágenes, videos, texto, markdown y render propio; transiciones slide/fade/zoom, autoplay, flechas, puntos, swipe y teclado.
+- `ConfirmPopover` — popover flotante de confirmación (Cancelar / Confirmar) anclado en una posición; título y mensaje en markdown; spinner si `onConfirm` devuelve una promesa. Para acciones destructivas junto a un menú.
 - `DrawPanel` — drawer deslizante con header, footer de acciones y protección contra cierre con cambios sin guardar.
 - `Frame` — tarjeta con título, ícono, estado de error/carga; inline o como modal.
 - `NotificationsPanel` — lista de notificaciones con scroll, descarte y estado vacío.

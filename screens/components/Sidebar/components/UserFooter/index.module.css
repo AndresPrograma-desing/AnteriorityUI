@@ -67,6 +67,44 @@
   gap: 4px;
   z-index: 2000;
   min-width: 210px;
+  transform-origin: left bottom;
+  animation: userMenuIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Sale hacia el costado de la sidebar: entra desde la sidebar con fade + leve escala,
+   y se va con el recorrido inverso (duración en CLOSE_ANIMATION_MS del .jsx). */
+.userMenuClosing {
+  animation: userMenuOut 0.16s cubic-bezier(0.4, 0, 1, 1) both;
+  pointer-events: none;
+}
+
+@keyframes userMenuIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes userMenuOut {
+  from {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-8px) scale(0.97);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .userMenu,
+  .userMenuClosing {
+    animation-duration: 0.01ms;
+  }
 }
 
 .userMenuEmail {

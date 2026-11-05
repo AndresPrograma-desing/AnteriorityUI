@@ -12,6 +12,46 @@ const options = [
   { value: 'ave', label: 'Ave' },
 ];
 
+export const Flat = {
+  render: (args) => <ControlledTemplate {...args} />,
+  args: {
+    label: undefined,
+    options,
+    variant: 'flat',
+    value: 'gato',
+    placeholder: 'Selecciona una especie',
+  },
+};
+
+// Badge estilo "pill" con relleno de color (ej. estado "En Curso").
+export const FlatBadge = {
+  render: (args) => <ControlledTemplate {...args} />,
+  args: {
+    options: [
+      { value: 'texto largo largo', label: 'texto largo largo' },
+      { value: 'pausa', label: 'En Pausa' },
+    ],
+    variant: 'flat',
+    value: 'curso',
+    bgColor: '#1d4ed8',
+    borderColor: '#60a5fa',
+    textColor: '#ffffff',
+    iconColor: '#ffffff',
+  },
+};
+
+export const FlatCustomColors = {
+  render: (args) => <ControlledTemplate {...args} />,
+  args: {
+    options,
+    variant: 'flat',
+    value: 'ave',
+    textColor: '#f97316',
+    iconColor: '#f97316',
+    placeholder: 'Selecciona una especie',
+  },
+};
+
 const ControlledTemplate = (args) => {
   const [value, setValue] = useState(args.value || '');
   return (
@@ -96,6 +136,25 @@ export const MultiSelectCustomChips = {
     chipTextColor: '#ffffff',
     chipIconColor: '#e0f2fe',
     placeholder: 'Selecciona especies',
+  },
+};
+
+// multiSelect con más de 3 seleccionados: los chips quedan en una sola línea y, con
+// showSelectedTooltip, al pasar el mouse aparece el listado completo.
+export const MultiSelectSelectedTooltip = {
+  render: (args) => <MultiSelectTemplate {...args} />,
+  args: {
+    label: 'Estado',
+    options: [
+      { value: 'enviados', label: 'Enviados' },
+      { value: 'pendientes', label: 'Pendientes de revisión' },
+      { value: 'fallidos', label: 'Fallidos' },
+      { value: 'archivados', label: 'Archivados' },
+    ],
+    multiSelect: true,
+    value: ['enviados', 'pendientes', 'fallidos', 'archivados'],
+    showSelectedTooltip: true,
+    placeholder: 'Selecciona estados',
   },
 };
 
