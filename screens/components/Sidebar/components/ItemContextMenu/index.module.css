@@ -37,3 +37,29 @@
 .contextMenuItemDanger:hover {
   background-color: #fef2f2;
 }
+
+.contextMenuItem:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.contextMenuItemActive {
+  background-color: #fef2f2;
+}
+
+.spin {
+  animation: spinIcon 0.8s linear infinite;
+}
+
+@keyframes spinIcon {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spin {
+    animation-duration: 0.01ms;
+    animation-iteration-count: 1;
+  }
+}

@@ -44,6 +44,130 @@ Cuando se agrega, renombra o elimina un componente, se actualiza `skill/anterior
 
 ---
 
+### Carousel
+
+Carrusel de slides que puede mezclar **imágenes, videos, texto, markdown** y render propio (`render`). Transiciones `slide` (default), `fade` y `zoom` en CSS, con duración configurable. Navegación con flechas (`Button` de la librería), puntos, teclado (`←` `→`) y swipe. Autoplay opcional, pausado con el mouse encima. Responsive: ocupa el ancho del contenedor y la altura se controla con `height`.
+
+**Import:**
+```jsx
+import { Carousel } from 'anteriority-ui';
+```
+
+**Uso básico:**
+```jsx
+<Carousel
+  height={320}
+  slides={[
+    { src: '/banner-1.jpg', alt: 'Promo', caption: 'Descuento de verano' },
+    { src: '/clip.mp4', poster: '/clip.jpg' },
+    { title: 'Aviso', content: 'Texto plano' },
+    { content: '**Markdown** con [links](https://example.com)' },
+    { render: ({ active }) => <MiWidget activo={active} /> },
+  ]}
+/>
+```
+
+**Tipo de cada slide** (campo `type` opcional):
+- `image`: `src`, `alt`, `caption`. Sin `type`, un `src` que no termina en extensión de video se trata como imagen.
+- `video`: `src` (`.mp4`, `.webm`, `.ogg`, `.mov` se detectan solos), `poster`, `muted` (default `true`), `caption`. Se pausa cuando el slide deja de estar activo.
+- `text`: `title?`, `content` (texto plano).
+- `markdown`: `title?`, `content` (markdown, vía `MarkdownContent`). Sin `type`, un slide con `content` se trata como markdown.
+- `custom`: `render({ active, index })`, devuelve cualquier nodo de React. Sin `type`, un slide con `render` se trata como custom.
+
+| Prop | Tipo | Default | Descripción |
+|---|---|---|---|
+| slides | array | `[]` | Lista de slides (ver tipos arriba). `id` opcional como key. |
+| initialIndex | number | `0` | Slide inicial. |
+| onChange | `(index, slide) => void` | — | Se llama cada vez que cambia el slide activo (no al montar). |
+| autoPlay | boolean | `false` | Avanza solo cada `interval` ms. |
+| interval | number | `5000` | Tiempo entre slides en autoplay (ms). |
+| loop | boolean | `true` | Al llegar al último continúa con el primero, que entra desde el costado en la misma dirección (no retrocede por todos los slides). Con `false` las flechas se deshabilitan en los extremos. |
+| pauseOnHover | boolean | `true` | Pausa el autoplay mientras el mouse está encima. |
+| transition | `'slide'` \| `'fade'` \| `'zoom'` | `'slide'` | Tipo de transición entre slides. |
+| transitionDuration | number | `450` | Duración de la transición (ms). Con `prefers-reduced-motion` se desactiva. |
+| height | number \| string | `320` | Alto del carrusel. Número = px; string = cualquier valor CSS (ej. `'clamp(200px, 40vh, 480px)'`). |
+| showArrows | boolean | `true` | Muestra las flechas prev/next (solo si hay más de un slide). |
+| showDots | boolean | `true` | Muestra los puntos de posición (solo si hay más de un slide). |
+| keyboard | boolean | `true` | Navegación con `←` / `→` cuando el carrusel tiene el foco. |
+| swipe | boolean | `true` | Swipe horizontal (mouse o touch) para cambiar de slide. |
+| arrowLabels | `{ prev?, next? }` | `{ prev: 'Anterior', next: 'Siguiente' }` | Textos (aria-label / tooltip) de las flechas. |
+| dotLabel | string | `'Ir al slide'` | Prefijo del aria-label de cada punto. |
+| ariaLabel | string | `'Carrusel'` | Nombre accesible de la región. |
+| bgColor | string | — | Fondo del carrusel y de los slides. |
+| textColor | string | — | Color del texto de los slides de texto y markdown. |
+| captionBgColor | string | — | Degradado de fondo detrás del `caption`. |
+| captionTextColor | string | — | Color del texto del `caption`. |
+| arrowColor | string | — | Color del ícono de las flechas. |
+| arrowSize | number | `40` | Alto y ancho (px) de cada flecha. |
+| arrowIconSize | number | `20` | Tamaño (px) del ícono de cada flecha. |
+| arrowBgColor | string | — | Fondo circular de las flechas. |
+| arrowBorderColor | string | — | Borde de las flechas. |
+| arrowHoverBgColor | string | — | Fondo de las flechas al pasar el mouse. |
+| dotColor | string | — | Color de los puntos inactivos. |
+| dotActiveColor | string | — | Color del punto activo (y del foco de teclado). |
+| imageProps | object | — | Props extra para cada `<img>` (ej. `{ loading: 'eager', className }`). |
+| videoProps | object | — | Props extra para cada `<video>` (ej. `{ controls: false, loop: true }`). |
+| markdownProps | object | — | Props extra para el `MarkdownContent` de los slides markdown (ej. `{ linkColor, openLinksInNewTab: false }`). |
+| prevArrowProps / nextArrowProps | object | — | Props extra para cada `Button` de flecha (ej. `{ ToolTip: true }`). `disabled` se combina con el estado de `loop`. |
+| className | string | `''` | Clase CSS adicional del contenedor. |
+| style | object | — | Estilos inline del contenedor. |
+
+**Notas:** Todos los slides se renderizan a la vez y se posicionan con `transform` / `opacity`; el video del slide inactivo queda cargado pero pausado. El swipe usa `pointer` events y se activa a partir de 50px. Los colores se pasan como variables CSS (`--carousel-*`) al contenedor; los `bgColor` / `textColor` de cada slide individual se hacen con `render` o `content` propio.
+
+---
+
+### ConfirmPopover
+
+Popover flotante de confirmación (Cancelar / Confirmar) anclado en una posición fija del viewport, pensado para acciones destructivas junto a un menú o botón (ej. eliminar desde un menú contextual). A diferencia de `AlertModal` (modal centrado), no bloquea la pantalla. El título y el mensaje aceptan **markdown** (vía `MarkdownContent`).
+
+**Import:**
+```jsx
+import { ConfirmPopover } from 'anteriority-ui';
+```
+
+**Uso básico:**
+```jsx
+<ConfirmPopover
+  open={open}
+  position={{ top: 120, left: 240 }}
+  danger
+  title="¿Eliminar este elemento?"
+  message="Se eliminará junto con su contenido. Esta acción **no se puede deshacer**."
+  confirmText="Eliminar"
+  onCancel={() => setOpen(false)}
+  onConfirm={async () => { await deleteItem(id); setOpen(false); }}
+/>
+```
+
+| Prop | Tipo | Default | Descripción |
+|---|---|---|---|
+| open | boolean | `true` | Si es `false`, no renderiza nada. |
+| position | `{ top, left }` | `{ top: 0, left: 0 }` | Posición fija en el viewport (px). |
+| title | string (markdown) | — | Título del popover. |
+| message | string (markdown) | — | Cuerpo del popover. |
+| confirmText | string | `'Confirmar'` | Texto del botón de confirmar. |
+| cancelText | string | `'Cancelar'` | Texto del botón de cancelar. |
+| danger | boolean | `false` | Variante peligrosa: el botón de confirmar usa `Button` `variant="danger"` (rojo por default). |
+| confirmIcon | component (lucide) | — | Ícono del botón de confirmar (`Button` `icon`). |
+| cancelIcon | component (lucide) | — | Ícono del botón de cancelar (`Button` `icon`). |
+| buttonSize | `'small'` \| `'medium'` \| `'large'` | `'small'` | Tamaño de ambos botones (`Button` `size`). |
+| confirmButtonProps | object | — | Props extra para el `Button` de confirmar (ej. `{ fullWidth: true, ToolTip: 'Borra el item' }`). Se aplican antes que las del popover: `onClick`, `loading` y `disabled` (cuando hay una confirmación en curso) siguen controlados por el popover. |
+| cancelButtonProps | object | — | Props extra para el `Button` de cancelar. Mismo criterio que `confirmButtonProps`. |
+| onConfirm | function | — | Se llama al confirmar. Si devuelve una promesa, el botón de confirmar entra en `loading` (spinner de `Button`) hasta que termine. Si falla, el popover queda abierto y el error se loguea. |
+| onCancel | function | — | Se llama al cancelar, con el botón o con `Escape` (no con `Escape` mientras una confirmación está en curso). |
+| bgColor | string | — | Fondo del popover. Sin prop: blanco. |
+| borderColor | string | — | Borde del popover y del botón cancelar. |
+| titleColor | string | — | Color del título. |
+| textColor | string | — | Color del mensaje. |
+| confirmBgColor | string | — | Fondo del botón de confirmar (pisa el rojo de `danger`). |
+| confirmTextColor | string | — | Texto del botón de confirmar. |
+| className | string | `''` | Clase CSS adicional. |
+| style | object | — | Estilos inline adicionales. |
+
+**Notas:** Se renderiza con `createPortal` en `document.body`. Acepta `ref` (apunta al contenedor del popover) para que el padre detecte clicks fuera. El cierre por click fuera no lo maneja el componente: lo decide el padre.
+
+---
+
 ### AlertModal
 
 Modal de alerta/confirmación genérico que se renderiza vía portal sobre `document.body`. Traduce y formatea automáticamente mensajes de error (string, array u objeto con `errors`/`details`) al español, y puede incluir un input de texto o select embebido.
@@ -1020,6 +1144,12 @@ Basado en [@nivo/calendar](https://nivo.rocks/calendar/) — calendario de activ
 | `yearSpacing` | number | `40` | Espacio (px) entre filas de años, si el rango cruza más de un año. |
 | `margin` | object | `{ top: 40, right: 40, bottom: 40, left: 40 }` | Márgenes del gráfico. |
 | `showLegend` | bool | `true` | Muestra la leyenda de intensidad (abajo a la derecha). |
+| `showTooltip` | bool | `true` | Muestra el tooltip al pasar sobre un día (fecha: valor). Con `false`, no aparece. |
+| `tooltipBgColor` | string | — | Fondo del tooltip (vía `theme.tooltip.container` de Nivo). Sin prop: blanco. |
+| `tooltipTextColor` | string | — | Texto del tooltip. Sin prop: color de Nivo por default. |
+| `tooltipBorderColor` | string | — | Borde del tooltip. Sin prop: sin borde. |
+| `tooltipComponent` | component | — | Componente propio del tooltip (recibe `{ value, day, color }`, reemplaza el de Nivo). Tiene prioridad sobre los colores. |
+| `valueFormat` | string \| function | — | Formato del valor mostrado en el tooltip y la leyenda (pasa a Nivo `valueFormat`). |
 | `onDayClick` | `function(day, event)` | — | Si se define, cada celda se vuelve clickeable (cursor pointer); `day` trae `day`/`value`/`date`/`color` del día (o solo `day`/`date` si no tiene dato). |
 | `height` | number | `300` | Alto en px del gráfico. |
 
@@ -2608,6 +2738,7 @@ import { MarkdownContent } from '../MarkdownContent/index'; // named export (tam
 | style | object | — | Estilos inline adicionales. |
 | components | object | — | Mapa de renderers personalizados de `react-markdown`. Un renderer propio para `code`/`pre`/`h1`-`h6` reemplaza por completo el renderer con botón de copiar de ese tag. |
 | linkColor | string | — | Color de los enlaces (`--markdown-link`). |
+| openLinksInNewTab | boolean | `true` | Los enlaces externos (no `#anclas`, y que no traigan `target` propio) abren en una pestaña nueva (`target="_blank"` + `rel="noopener noreferrer"`). Pasar `false` para que abran en la misma pestaña. |
 | copyCodeLabel | string | `'Copiar código'` | Tooltip/aria-label del botón de copiar sobre bloques de código. |
 | copiedCodeLabel | string | `'Código copiado'` | Tooltip/aria-label del botón tras copiar un bloque de código. |
 | copyTitleLabel | string | `'Copiar título'` | Tooltip/aria-label del botón de copiar sobre encabezados (`h1`-`h6`). |
@@ -3090,6 +3221,14 @@ import Search from '../Material-UI/Components/Search/index'; // export default, 
 | bgColor | string | — | Fondo del input. |
 | textColor | string | — | Color del texto del input. |
 | borderColor | string | — | Color del borde (variant outlined). |
+| showSelectedTooltip | boolean | `false` | Solo `multiSelect`. Si es `true` y hay más de 3 seleccionados, al pasar el mouse sobre el campo aparece un tooltip con todas las selecciones (`ModalTooltip`). En multiSelect los chips ya no hacen salto de línea: el campo mantiene su altura y los que no entran se recortan. |
+| selectedTooltipThreshold | number | `3` | Solo `multiSelect` con `showSelectedTooltip`. Cantidad de seleccionados a partir de la cual (superada) aparece el tooltip. |
+| selectedTooltipPosition | `'top'` \| `'bottom'` | `'top'` | Posición del tooltip de selecciones (pasa a `ModalTooltip` `position`). |
+| selectedTooltipDelay | number | `150` (default de `ModalTooltip`) | Retardo en ms antes de mostrar el tooltip de selecciones. |
+| selectedTooltipBgColor | string | — | Fondo del tooltip de selecciones (pasa a `ModalTooltip` `bgColor`). |
+| selectedTooltipTextColor | string | — | Texto del tooltip de selecciones (pasa a `ModalTooltip` `textColor`). |
+| selectedTooltipProps | object | — | Props extra para el `ModalTooltip` de selecciones. Van antes que las del Selector: `text`, `children` y el ancho del wrapper siguen controlados por el Selector. |
+| wrapOptions | boolean | `false` | Si es `false`, las opciones del listado no hacen salto de línea (el listado toma el ancho de su contenido). Con `true`, el texto de cada opción puede partirse en varias líneas. |
 | iconColor | string | `rgba(0, 0, 0, 0.54)` | Color del ícono de limpiar (mismo gris que usa MUI por default para íconos de acción). |
 | ...props | any | — | Cualquier otra prop de `Autocomplete` de Material-UI. |
 
@@ -3164,6 +3303,11 @@ import Selector from '../Material-UI/Components/Selector/index'; // export defau
 | chipBgColor | string | — | Fondo de los chips de selección (modo `multiSelect`). |
 | chipTextColor | string | — | Color de texto de los chips. |
 | chipIconColor | string | — | Color del ícono "X" de cada chip. |
+| variant | `'outlined'` \| `'flat'` | `'outlined'` | `'outlined'`: caja con borde (comportamiento de siempre). `'flat'`: sin caja, borde ni subrayado; el texto se muestra completo (ancho según contenido, sin `…`) y el listado sigue abriéndose al clickear. Con `flat`, `fullWidth` default pasa a `false`. |
+| textColor | string | — | Color del texto del valor seleccionado. Sin prop, usa el color del tema de MUI. |
+| bgColor | string | — | Solo `variant="flat"`. Fondo del badge. Sin prop, usa un tinte del color del texto (12%). |
+| borderColor | string | — | Solo `variant="flat"`. Borde del badge. Sin prop, sin borde visible. |
+| iconColor | string | — | Color de la flecha del listado. Sin prop, usa el color del tema de MUI. |
 | popperZIndex | number | `100000` | `z-index` del `Popper` del listado desplegable (se renderiza en un portal al final de `<body>`, fuera del árbol del componente). Ajustar si un overlay/modal propio del proyecto consumidor tiene un `z-index` mayor y tapa los clics del listado. |
 
 **Ejemplos:**
@@ -4051,7 +4195,7 @@ const schema = {
 
 ### Sidebar
 
-Barra lateral de navegación colapsable con grupos de items, subitems anidados y colapsables (ej. "Vacunas" → Ver/Crear/Pendientes/Lotes), badges por método HTTP, menú de usuario, menú contextual por item (editar/eliminar/fijar/colaboradores) y reordenamiento por drag & drop.
+Barra lateral de navegación colapsable con grupos de items, subitems anidados y colapsables (ej. "Vacunas" → Ver/Crear/Pendientes/Lotes), badges por método HTTP, menú de usuario (sale al costado de la sidebar, con animación de entrada y salida; se desactiva con `prefers-reduced-motion`), menú contextual por item (editar/eliminar/fijar/colaboradores; eliminar y salir piden confirmación en un popover al costado de la opción; si el handler devuelve una promesa, la opción muestra un spinner hasta que termine) y reordenamiento por drag & drop.
 
 **Import:**
 ```jsx

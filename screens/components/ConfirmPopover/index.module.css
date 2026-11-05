@@ -1,0 +1,53 @@
+.popover {
+  position: fixed;
+  width: 260px;
+  padding: 14px;
+  background: var(--confirm-bg, #ffffff);
+  border: 1px solid var(--confirm-border, var(--sidebar-border, #e2e8f0));
+  border-radius: var(--sidebar-radius, 10px);
+  box-shadow: var(--sidebar-shadow, 0 8px 24px rgba(15, 23, 42, 0.12));
+  z-index: 2001;
+  transform-origin: left center;
+  animation: confirmIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--confirm-title, var(--sidebar-text, #0f172a));
+}
+
+.title p,
+.message p {
+  margin: 0;
+}
+
+.message {
+  margin: 6px 0 12px;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--confirm-text, var(--sidebar-text-muted, #64748b));
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+@keyframes confirmIn {
+  from {
+    opacity: 0;
+    transform: translateX(-8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .popover {
+    animation-duration: 0.01ms;
+  }
+}

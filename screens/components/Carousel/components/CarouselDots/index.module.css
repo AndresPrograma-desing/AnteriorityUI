@@ -1,0 +1,30 @@
+.dots {
+  position: absolute;
+  left: 50%;
+  bottom: 10px;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 3;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: var(--carousel-dot, rgba(255, 255, 255, 0.45));
+  cursor: pointer;
+  transition: width var(--carousel-duration, 450ms) ease, background-color 0.2s ease;
+}
+
+.dot:focus-visible {
+  outline: 2px solid var(--carousel-dot-active, #ffffff);
+  outline-offset: 2px;
+}
+
+.dotActive {
+  width: 22px;
+  background: var(--carousel-dot-active, #ffffff);
+}

@@ -38,6 +38,8 @@ export { default as GreenHighlight } from './screens/components/GreenHighlight/i
 export { default as HoursPicker } from './screens/components/HoursPicker/index.js';
 export { default as IconCatalog } from './screens/components/IconCatalog/index.js';
 export { default as ImagePastePreview } from './screens/components/ImagePastePreview/index.js';
+export { default as Carousel } from './screens/components/Carousel/index.js';
+export { default as ConfirmPopover } from './screens/components/ConfirmPopover/index.js';
 export { default as InfoTooltip } from './screens/components/InfoTooltip/index.js';
 export { default as Input } from './screens/components/Input/index.js';
 export { default as KeyboardShortcut } from './screens/components/KeyboardShortcut/index.js';

@@ -236,7 +236,7 @@ const createImageRenderer = (UserImage) =>
     return <img src={src} alt={alt} onError={() => setFailed(true)} {...rest} />;
   };
 
-const createLinkRenderer = (UserLink, copyTextLabel, copiedTextLabel) =>
+const createLinkRenderer = (UserLink, copyTextLabel, copiedTextLabel, openLinksInNewTab) =>
   function LinkRenderer(props) {
     const { href, children, ...rest } = props;
 
@@ -264,11 +264,16 @@ const createLinkRenderer = (UserLink, copyTextLabel, copiedTextLabel) =>
       );
     }
 
+    // Por default los enlaces externos abren en una pestaña nueva. Anchors internos (#...)
+    // y los links que ya traen target propio se respetan tal cual.
+    const shouldOpenNewTab = openLinksInNewTab && typeof href === 'string' && !href.startsWith('#') && rest.target == null;
+    const linkProps = shouldOpenNewTab ? { target: '_blank', rel: 'noopener noreferrer', ...rest } : rest;
+
     if (UserLink) {
-      return <UserLink href={href} {...rest}>{children}</UserLink>;
+      return <UserLink href={href} {...linkProps}>{children}</UserLink>;
     }
 
-    return <a href={href} {...rest}>{children}</a>;
+    return <a href={href} {...linkProps}>{children}</a>;
   };
 
 export const MarkdownContent = ({
@@ -277,6 +282,7 @@ export const MarkdownContent = ({
   style,
   components,
   linkColor,
+  openLinksInNewTab = true,
   images,
   copyCodeLabel = 'Copiar código',
   copiedCodeLabel = 'Código copiado',
@@ -291,7 +297,7 @@ export const MarkdownContent = ({
     ...components,
     code: createCodeRenderer(components?.code),
     pre: createPreRenderer(components?.pre, copyCodeLabel, copiedCodeLabel),
-    a: createLinkRenderer(components?.a, copyTextLabel, copiedTextLabel),
+    a: createLinkRenderer(components?.a, copyTextLabel, copiedTextLabel, openLinksInNewTab),
     img: createImageRenderer(components?.img),
     div: (props) =>
       props['data-copy-block']

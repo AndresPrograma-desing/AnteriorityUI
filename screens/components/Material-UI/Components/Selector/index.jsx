@@ -1,10 +1,10 @@
 import * as React from 'react';
-import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
-import Checks from '../../../Checks/index';
 import styles from './index.module.css';
-import { DEFAULT_POPPER_Z_INDEX } from './constants.js';
+import { DEFAULT_POPPER_Z_INDEX, DEFAULT_SELECTED_TOOLTIP_THRESHOLD } from './constants.js';
+import ModalTooltip from '../../../ModalTooltip/ModalTooltip';
+import { normalizeVal, createFindOption, measureTextPx } from './utils.js';
+import { SelectorOption, SelectorInput } from './components/index';
 
 export default function Selector({
     label,
@@ -14,7 +14,13 @@ export default function Selector({
     id = "custom-autocomplete",
     style = {},
     className = "",
-    fullWidth = true,
+    fullWidth,
+    variant = 'outlined',
+    textColor,
+    iconColor,
+    bgColor,
+    borderColor,
+    wrapOptions = false,
     placeholder,
     required,
     requiredColor = "red",
@@ -27,23 +33,31 @@ export default function Selector({
     chipBgColor,
     chipTextColor,
     chipIconColor,
-    popperZIndex = DEFAULT_POPPER_Z_INDEX
+    popperZIndex = DEFAULT_POPPER_Z_INDEX,
+    showSelectedTooltip = true,
+    selectedTooltipThreshold = DEFAULT_SELECTED_TOOLTIP_THRESHOLD,
+    selectedTooltipPosition = 'top',
+    selectedTooltipDelay,
+    selectedTooltipBgColor,
+    selectedTooltipTextColor,
+    selectedTooltipProps,
 }) {
-    const normalizeVal = (val) => String(val || '').toLowerCase().replace(/[_\s\/-]+/g, '');
-
-    const findOption = (val) =>
-        (val !== "" && val !== undefined && val !== null)
-            ? options.find(opt =>
-                String(opt.value) === String(val) ||
-                normalizeVal(opt.value) === normalizeVal(val) ||
-                normalizeVal(opt.label) === normalizeVal(val)
-              ) || null
-            : null;
+    const findOption = createFindOption(options);
 
     const selectedOption = multiSelect ? undefined : findOption(value);
     const selectedOptions = multiSelect
         ? (Array.isArray(value) ? value : []).map(findOption).filter(Boolean)
         : undefined;
+
+    // variant="flat": sin caja ni borde ni subrayado; el texto se muestra completo
+    // (ancho según contenido, sin ellipsis). fullWidth por default es true solo en "outlined".
+    const isFlat = variant === 'flat';
+    const resolvedFullWidth = fullWidth ?? !isFlat;
+
+    // En flat el input se dimensiona en ch según el texto visible (label seleccionado o
+    // placeholder), así el valor se ve completo y no queda cortado.
+    const flatText = multiSelect ? (placeholder || '') : (selectedOption?.label || placeholder || '');
+    const flatInputWidth = `${Math.ceil(measureTextPx(flatText) + 2)}px`;
 
     const displayLabel = label ? (
         <span>
@@ -52,16 +66,54 @@ export default function Selector({
         </span>
     ) : undefined;
 
-    return (
+    // Tooltip con todas las selecciones (solo multiSelect, opt-in por prop) cuando superan el umbral.
+    const showTooltipNow = showSelectedTooltip && multiSelect && (selectedOptions?.length ?? 0) > selectedTooltipThreshold;
+    const selectedLabelsText = (selectedOptions ?? []).map((opt) => opt.label).join(', ');
+
+    const autocomplete = (
         <Autocomplete
             id={id}
-            sx={{ width: fullWidth ? '100%' : 300, m: 0 }}
+            sx={isFlat
+                ? {
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    width: resolvedFullWidth ? '100%' : 'auto',
+                    m: 0,
+                    px: '12px',
+                    py: '4px',
+                    borderRadius: '15px', // badge: pastilla redondeada
+                    background: bgColor ?? 'color-mix(in srgb, currentColor 12%, transparent)',
+                    border: `1px solid ${borderColor ?? 'transparent'}`,
+                    cursor: 'pointer',
+                    // "&&" sube la especificidad para ganarle al width/min-width que MUI
+                    // le pone al input de Autocomplete.
+                    '&& .MuiAutocomplete-input': {
+                        ...(textColor ? { color: textColor } : {}),
+                        flexGrow: 0,
+                        width: flatInputWidth,
+                        minWidth: 0,
+                        padding: 0,
+                        cursor: 'pointer',
+                        textOverflow: 'clip',
+                        overflow: 'visible',
+                    }
+                }
+                : {
+                    width: resolvedFullWidth ? '100%' : 300,
+                    m: 0,
+                    // multiSelect: los chips no hacen salto de línea (el campo no crece en alto),
+                    // los que no entran se recortan y el tooltip lista todos.
+                    ...(multiSelect ? {
+                        '& .MuiAutocomplete-inputRoot': { flexWrap: 'nowrap', overflow: 'hidden', minWidth: 0 },
+                        '& .MuiChip-root': { maxWidth: '100%', minWidth: 0 },
+                    } : {}),
+                }}
             style={style}
             className={className}
             options={options}
             autoHighlight
             openOnFocus
-            disableClearable={disableClearable}
+            disableClearable={disableClearable || isFlat}
             multiple={multiSelect}
             disableCloseOnSelect={multiSelect}
             getOptionLabel={(option) => option.label || ""}
@@ -82,6 +134,12 @@ export default function Selector({
                 popper: {
                     sx: { zIndex: popperZIndex }
                 },
+                // Sin wrapOptions el listado toma el ancho de su contenido (no el del input) y
+                // las opciones no hacen salto de línea.
+                paper: wrapOptions ? undefined : {
+                    sx: { width: 'max-content', maxWidth: 'min(90vw, 480px)' }
+                },
+                popupIndicator: iconColor ? { sx: { color: iconColor } } : undefined,
                 chip: (chipBgColor || chipTextColor || chipIconColor) ? {
                     sx: {
                         ...(chipBgColor ? { backgroundColor: chipBgColor } : {}),
@@ -105,52 +163,43 @@ export default function Selector({
                         style: scrollbarColor ? { '--selector-scrollbar-thumb': scrollbarColor } : undefined
                     }
             }}
-            renderOption={(props, option, { selected }) => {
-                const { key, ...optionProps } = props;
-                return (
-                    <Box
-                        key={key}
-                        component="li"
-                        sx={{ display: 'flex', alignItems: 'center', gap: '8px', ...optionProps.sx }}
-                        {...optionProps}
-                    >
-                        {multiSelect && (
-                            <Checks
-                                checked={selected}
-                                iconOnly
-                                checkedBgColor={checkedBgColor}
-                                checkedLabelColor={checkedLabelColor}
-                                style={{ pointerEvents: 'none' }}
-                            />
-                        )}
-                        {option.icon && <img src={option.icon} alt="" style={{ width: 24, height: 24, objectFit: 'contain' }} />}
-                        {option.label}
-                    </Box>
-                );
-            }}
+            renderOption={(props, option, { selected }) => (
+                <SelectorOption
+                    key={props.key}
+                    props={props}
+                    option={option}
+                    selected={selected}
+                    multiSelect={multiSelect}
+                    wrapOptions={wrapOptions}
+                    checkedBgColor={checkedBgColor}
+                    checkedLabelColor={checkedLabelColor}
+                />
+            )}
             renderInput={(params) => (
-                <TextField
-                    {...params}
+                <SelectorInput
+                    params={params}
                     label={displayLabel}
                     placeholder={placeholder}
-                    size="small"
-                    inputProps={{
-                        ...params.inputProps,
-                        autoComplete: 'off',
-                        form: {
-                            autocomplete: 'off',
-                        },
-                    }}
-                    slotProps={{
-                        ...params.slotProps,
-                        htmlInput: {
-                            ...params.slotProps?.htmlInput,
-                            autoComplete: 'off',
-                            name: 'no-autofill-' + Math.random(),
-                        },
-                    }}
+                    isFlat={isFlat}
                 />
             )}
         />
+    );
+
+    if (!showTooltipNow) return autocomplete;
+
+    return (
+        // selectedTooltipProps va primero: text, children y el ancho del wrapper son del Selector.
+        <ModalTooltip
+            {...selectedTooltipProps}
+            text={selectedLabelsText}
+            position={selectedTooltipPosition}
+            delay={selectedTooltipDelay}
+            bgColor={selectedTooltipBgColor}
+            textColor={selectedTooltipTextColor}
+            style={{ display: 'block', width: '100%', ...selectedTooltipProps?.style }}
+        >
+            {autocomplete}
+        </ModalTooltip>
     );
 }
