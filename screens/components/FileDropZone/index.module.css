@@ -1,0 +1,67 @@
+.wrapper {
+  position: relative;
+}
+
+.input {
+  display: none;
+}
+
+.zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 160px;
+  padding: 24px 16px;
+  box-sizing: border-box;
+  text-align: center;
+  border: 2px dashed var(--fdz-border, #cbd5e1);
+  border-radius: 12px;
+  background: var(--fdz-bg, #f8fafc);
+  color: var(--fdz-text, #475569);
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+}
+
+.zone:hover,
+.zone:focus-visible {
+  border-color: var(--fdz-accent, #2563eb);
+  color: var(--fdz-accent, #2563eb);
+}
+
+.zoneActive {
+  border-color: var(--fdz-accent, #2563eb);
+  background: color-mix(in srgb, var(--fdz-accent, #2563eb) 10%, var(--fdz-bg, #f8fafc));
+  color: var(--fdz-accent, #2563eb);
+}
+
+.zoneDisabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  max-width: 320px;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 2px dashed var(--fdz-accent, #2563eb);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--fdz-bg, #f8fafc) 88%, transparent);
+  color: var(--fdz-accent, #2563eb);
+  font-size: 0.85rem;
+  font-weight: 600;
+  pointer-events: none;
+}

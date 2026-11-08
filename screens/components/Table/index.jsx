@@ -9,7 +9,7 @@ import Skeleton from '../Skeleton/index';
 import ScrollBar from '../ScrollBar';
 import TableScrollFooter from '../../../common/table/TableScrollFooter';
 import { getNextFilterValue, getFilterOptionLabel, columnsFromSchema } from './utils';
-import { LinkCell, ButtonCell, SwitchCell, CheckCell, DateCell, NumberCell, InputCell, SelectCell } from './cells';
+import { LinkCell, ButtonCell, SwitchCell, CheckCell, DateCell, NumberCell, InputCell, SelectCell, DatePickerCell } from './cells';
 import {
   DEFAULT_VARIANT,
   DEFAULT_FILTER_ACTIVE_COLOR,
@@ -134,7 +134,7 @@ const Table = ({
             <Button
               key={actIdx}
               variant={Button.VARIANTS.PRIMARY}
-              size={Button.SIZES.LARGE}
+              size={act.size || Button.SIZES.SMALL}
               color={Button.COLORS.GREEN}
               onClick={(e) => { e.stopPropagation(); act.onClick(row); }}
               disabled={act.disabled ? act.disabled(row) : false}
@@ -163,6 +163,7 @@ const Table = ({
       case 'checkbox': return <CheckCell col={col} row={row} value={value} />;
       case 'input': return <InputCell col={col} row={row} value={value} />;
       case 'select': return <SelectCell col={col} row={row} value={value} />;
+      case 'datepicker': return <DatePickerCell col={col} row={row} value={value} />;
       case 'date': return <DateCell col={col} value={value} />;
       case 'number': return <NumberCell col={col} value={value} />;
       default: return value;

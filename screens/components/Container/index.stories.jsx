@@ -55,3 +55,19 @@ export const WithBlurredBackground = {
   },
 };
 
+
+export const WithStickyHeader = {
+  render: () => (
+    <div style={{ height: 320, overflowY: 'auto', background: '#f8fafc', padding: 16 }}>
+      <Container
+        wattermark={false}
+        header={<strong>Topbar del Container</strong>}
+        style={{ minHeight: 0 }}
+      >
+        {Array.from({ length: 30 }, (_, i) => (
+          <p key={i}>Fila {i + 1}: al scrollear, el topbar queda fijo arriba.</p>
+        ))}
+      </Container>
+    </div>
+  ),
+};

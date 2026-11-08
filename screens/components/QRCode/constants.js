@@ -1,0 +1,17 @@
+export const DEFAULT_SIZE = 200;
+export const DEFAULT_MARGIN = 2; // módulos de quiet zone alrededor del QR
+export const DEFAULT_LEVEL = 'M';
+export const LOGO_LEVEL = 'H'; // con logo central se necesita máxima corrección de errores
+export const LEVELS = ['L', 'M', 'Q', 'H'];
+export const MODULE_STYLES = ['square', 'rounded', 'dots'];
+export const DEFAULT_MODULE_STYLE = 'square';
+export const DEFAULT_LOGO_RATIO = 0.22; // fracción del lado ocupada por el logo
+export const DEFAULT_FG = '#000000';
+export const DEFAULT_BG = '#ffffff';
+export const DEFAULT_BORDER = 'transparent';
+export const DEFAULT_FILE_NAME = 'qr';
+export const DOWNLOAD_SCALE = 4; // multiplicador de resolución del PNG exportado
+export const ANIMATIONS = ['scale', 'fade', 'slide', 'none'];
+export const DEFAULT_ANIMATION = 'scale';
+export const DEFAULT_ANIMATION_DURATION = 300; // ms (entrada y salida)
+export const DEFAULT_BLUR = 8; // px

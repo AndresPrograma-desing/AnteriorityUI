@@ -25,6 +25,11 @@
             "type": "command",
             "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/remind-color-props.mjs\"",
             "statusMessage": "Verificando convención de props de color..."
+          },
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/remind-native-scroll.mjs\"",
+            "statusMessage": "Verificando scroll nativo..."
           }
         ]
       }

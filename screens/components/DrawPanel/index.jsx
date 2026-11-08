@@ -260,6 +260,13 @@ const DrawPanel = ({
                   loadingColor={mutedTextColor}
                 />
               )}
+              {descriptionPosition === 'body' && (markdown ? (
+                <MarkdownContent className={styles.markdownBody} style={{ color: textColor }} {...markdownProps}>
+                  {markdown}
+                </MarkdownContent>
+              ) : description && (
+                <p className={styles.description} style={{ color: mutedTextColor }}>{description}</p>
+              ))}
               {children}
               {markdown && descriptionPosition === 'bottom' && (
                 <div className={styles.descriptionBottom} style={{ borderTopColor: borderColor }}>

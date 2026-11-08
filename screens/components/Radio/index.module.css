@@ -45,3 +45,32 @@
 .muiRadioCustom:hover {
   background-color: color-mix(in srgb, currentColor 8%, transparent);
 }
+/* Colores libres por prop (accentColor / textColor): solo se activan cuando el consumidor los pasa. */
+.hasAccent:global(.Mui-checked) {
+  color: var(--radio-accent);
+}
+
+.hasText :global(.MuiFormControlLabel-label) {
+  color: var(--radio-text);
+}
+
+/* variant="card": cada opción es una tarjeta con borde y fondo; la marcada resalta con el acento.
+   Props de color/forma: radius, bgColor, borderColor (y accentColor para la opción marcada). */
+.card {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 2px 12px 2px 4px;
+  border: 1px solid var(--radio-border, #e2e8f0);
+  border-radius: var(--radio-radius, 8px);
+  background: var(--radio-bg, transparent);
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.card:hover {
+  border-color: var(--radio-accent, #2563eb);
+}
+
+.card:has(:global(.Mui-checked)) {
+  border-color: var(--radio-accent, #2563eb);
+  background: color-mix(in srgb, var(--radio-accent, #2563eb) 8%, var(--radio-bg, transparent));
+}

@@ -4,11 +4,17 @@ export const MEDIA_KIND = {
   AUDIO: 'audio',
   PDF: 'pdf',
   DOCX: 'docx',
+  XLSX: 'xlsx',
   MARKDOWN: 'markdown',
   FILE: 'file',
 };
 
 export const DEFAULT_DOWNLOAD_LABEL = 'Descargar';
+
+// Modo `droppable`: el usuario carga el archivo arrastrándolo, pegándolo (Ctrl/Cmd+V) o eligiéndolo.
+export const DEFAULT_DROP_LABEL = 'Arrastrá un archivo, pegalo (Ctrl+V) o hacé click para elegirlo';
+export const DEFAULT_DROP_ACTIVE_LABEL = 'Soltá el archivo para verlo';
+export const DEFAULT_CLEAR_LABEL = 'Quitar archivo';
 export const DEFAULT_OPEN_LABEL = 'Abrir';
 
 // Paleta por default del reproductor de video custom (fondo oscuro tipo "theater"),
@@ -120,6 +126,155 @@ export const DOCX_ZOOM_STEP = 0.25;
 // documento completo (más alto que esto) scrollea adentro.
 export const DOCX_VIEWPORT_HEIGHT = 480;
 
+// Visor de hojas de cálculo (xlsx / xls / csv, leídos con SheetJS): grilla de solo lectura con filas
+// virtualizadas (solo se pintan las visibles, para soportar decenas de miles de filas), selección de
+// celda/rango/fila/columna y copia al portapapeles. Colores pisables vía props
+// xlsxAccentColor/xlsxTextColor/xlsxBgColor/xlsxHeaderBgColor/xlsxBorderColor.
+export const DEFAULT_XLSX_ACCENT = '#2563eb';
+export const DEFAULT_XLSX_TEXT_COLOR = '#334155';
+export const DEFAULT_XLSX_BG_COLOR = '#ffffff';
+export const DEFAULT_XLSX_HEADER_BG_COLOR = '#f1f5f9';
+export const DEFAULT_XLSX_BORDER_COLOR = '#e2e8f0';
+export const DEFAULT_XLSX_ERROR_COLOR = '#dc2626'; // aviso de dato no válido (validación de datos)
+export const DEFAULT_XLSX_ERROR_LABEL = 'No se pudo cargar la hoja de cálculo';
+export const DEFAULT_XLSX_COPY_LABEL = 'Copiar';
+export const DEFAULT_XLSX_COPIED_LABEL = 'Copiado';
+export const DEFAULT_XLSX_EMPTY_LABEL = 'Hoja vacía';
+
+export const DEFAULT_XLSX_MENU_LABELS = {
+  copy: 'Copiar',
+  cut: 'Cortar',
+  edit: 'Editar celda',
+  validate: 'Validar datos…',
+  editDate: 'Editar fecha…',
+  pickDate: 'Elegir fecha…',
+  insertToday: 'Insertar fecha de hoy',
+  insertNow: 'Insertar fecha y hora actual',
+  clear: 'Borrar contenido',
+  autosum: 'Autosuma (=SUM)',
+  addRows: 'Agregar 100 filas',
+  copyWithHeaders: 'Copiar con encabezados',
+  copyCsv: 'Copiar como CSV',
+  copyJson: 'Copiar como JSON',
+  selectRow: 'Seleccionar fila',
+  selectColumn: 'Seleccionar columna',
+  selectAll: 'Seleccionar todo',
+};
+
+// Validación de datos por rango (menú contextual «Validar datos…» o prop `validations`): qué se acepta escribir.
+export const XLSX_VALIDATION_TYPES = ['any', 'letters', 'alphanumeric', 'number', 'integer', 'date', 'custom'];
+export const DEFAULT_XLSX_VALIDATION_LABELS = {
+  title: 'Validación de datos',
+  range: 'Rango',
+  type: 'Permitir',
+  pattern: 'Patrón (expresión regular)',
+  patternPlaceholder: 'Ej.: ^[A-Z]{3}-\d+$',
+  message: 'Mensaje de error (opcional)',
+  apply: 'Aplicar',
+  clear: 'Quitar validación',
+  cancel: 'Cancelar',
+  invalid: 'Valor no válido en',
+  // Mensaje de error por defecto de cada tipo, cuando la regla no define el suyo.
+  messages: {
+    letters: 'Solo se permiten letras',
+    alphanumeric: 'Solo se permiten letras y números',
+    number: 'Solo se permiten números',
+    integer: 'Solo se permiten números enteros',
+    date: 'Ingresá una fecha válida (dd/mm/aaaa)',
+    custom: 'El valor no cumple el formato requerido',
+    boolean: 'Solo verdadero o falso (true/false)',
+    required: 'Este campo es obligatorio',
+    enum: 'Valores permitidos: {values}',
+    min: 'Debe ser mayor o igual a {n}',
+    max: 'Debe ser menor o igual a {n}',
+    minLength: 'Mínimo {n} caracteres',
+    maxLength: 'Máximo {n} caracteres',
+    fallback: 'Valor no válido',
+  },
+  types: {
+    any: 'Cualquier valor',
+    letters: 'Solo letras',
+    alphanumeric: 'Letras y números',
+    number: 'Solo números',
+    integer: 'Números enteros',
+    date: 'Solo fechas',
+    custom: 'Patrón personalizado',
+    boolean: 'Verdadero / falso',
+  },
+};
+export const XLSX_VALIDATION_NOTICE_MS = 3500;
+
+// Paso de las flechas de scroll: filas que baja/sube un click (vertical) y px que mueve a los lados.
+export const XLSX_SCROLL_STEP_ROWS = 5;
+export const XLSX_SCROLL_STEP_X = 240;
+export const XLSX_TABS_SCROLL_STEP = 160;
+export const XLSX_ARROW_REPEAT_DELAY_MS = 380;
+export const XLSX_ARROW_REPEAT_MS = 60;
+
+// Calculadora flotante de la selección (panel arrastrable y redimensionable)
+export const DEFAULT_XLSX_STATS_LABELS = {
+  title: 'Calculadora',
+  sum: 'Suma',
+  avg: 'Promedio',
+  count: 'Cuenta',
+  min: 'Mínimo',
+  max: 'Máximo',
+  empty: 'Seleccioná celdas con números',
+  copy: 'Copiar valor',
+  insert: 'Insertar en la hoja',
+  destination: 'Insertar',
+  below: 'Debajo (por columna)',
+  right: 'A la derecha (por fila)',
+  single: 'Una celda debajo (todo el rango)',
+  pin: 'Volver a anclar a la selección',
+  close: 'Cerrar',
+  button: 'Calculadora',
+  inserted: 'Insertado en',
+};
+export const XLSX_STATS_PANEL_WIDTH = 280;
+export const XLSX_STATS_PANEL_HEIGHT = 300; // alto estimado para ubicarlo (el real depende del contenido)
+export const XLSX_STATS_PANEL_MARGIN = 8;
+export const XLSX_STATS_NOTICE_MS = 2500;
+
+// Planilla nueva (prop `xlsxNew`): libro en blanco con una hoja de NEW_ROWS x NEW_COLS celdas.
+export const DEFAULT_XLSX_NEW_FILE_NAME = 'planilla.xlsx';
+export const DEFAULT_XLSX_JSON_SHEET_NAME = 'Datos';
+export const DEFAULT_XLSX_JSON_FILE_NAME = 'datos.xlsx';
+export const DEFAULT_XLSX_NEW_ROWS = 100;
+export const DEFAULT_XLSX_NEW_COLS = 20;
+export const XLSX_NEW_SHEET_PREFIX = 'Hoja';
+export const XLSX_ADD_ROWS_STEP = 100;
+export const XLSX_SHEET_NAME_MAX = 31; // límite de Excel
+export const DEFAULT_XLSX_ADD_SHEET_LABEL = 'Agregar hoja';
+export const DEFAULT_XLSX_CREATE_LABEL = 'Crear planilla en blanco';
+export const DEFAULT_XLSX_NEW_BAR_LABEL = 'Planilla nueva';
+
+// Edición (prop `editable`)
+export const DEFAULT_XLSX_SAVE_LABEL = 'Guardar';
+export const DEFAULT_XLSX_UNDO_LABEL = 'Deshacer';
+export const DEFAULT_XLSX_REDO_LABEL = 'Rehacer';
+export const XLSX_HISTORY_LIMIT = 200;
+export const XLSX_DEFAULT_DATE_FORMAT = 'dd/mm/yyyy';
+export const XLSX_COLUMN_KIND_SAMPLE = 40; // filas que se miran para saber si una columna es de fechas
+export const XLSX_STATS_CELL_CAP = 200000; // máx. de celdas para calcular suma/promedio en cada selección
+export const XLSX_BULK_EDIT_CAP = 200000; // máx. de celdas por borrado/pegado masivo
+
+export const XLSX_ROW_HEIGHT = 28;
+// Redimensionado de columnas y filas (arrastrando el borde del encabezado, con el componente Resizable).
+export const XLSX_RESIZE_HANDLE = 6; // grosor del área de agarre, en px
+export const XLSX_COL_MIN_WIDTH = 40;
+export const XLSX_COL_MAX_WIDTH = 800;
+export const XLSX_ROW_MIN_HEIGHT = 22;
+export const XLSX_ROW_MAX_HEIGHT = 400;
+export const XLSX_VIEWPORT_HEIGHT = 480;
+export const XLSX_OVERSCAN_ROWS = 12;
+export const XLSX_ROWNUM_WIDTH = 56;
+export const XLSX_MIN_COL_WIDTH = 56;
+export const XLSX_MAX_COL_WIDTH = 320;
+export const XLSX_CHAR_PX = 7.5;
+export const XLSX_COL_SAMPLE_ROWS = 200;
+export const XLSX_COPIED_FEEDBACK_MS = 1500;
+
 // Paleta por default del visor de Markdown custom (renderiza con MarkdownContent), pisable vía
 // props markdownAccentColor/markdownTextColor/markdownBgColor. El acento se usa para el loading y
 // para el color de los links del markdown.
@@ -154,6 +309,9 @@ export const EXTENSION_KIND_MAP = {
   flac: MEDIA_KIND.AUDIO,
   pdf: MEDIA_KIND.PDF,
   docx: MEDIA_KIND.DOCX,
+  xlsx: MEDIA_KIND.XLSX,
+  xls: MEDIA_KIND.XLSX,
+  csv: MEDIA_KIND.XLSX,
   md: MEDIA_KIND.MARKDOWN,
   markdown: MEDIA_KIND.MARKDOWN,
 };

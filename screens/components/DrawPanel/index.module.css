@@ -291,3 +291,14 @@
   font-size: 0.85rem;
   line-height: 1.4;
 }
+
+/* Markdown en el cuerpo (descriptionPosition="body"): las tablas ocupan todo el ancho del panel
+   en vez de ajustarse al contenido, y el scroll horizontal pasa al contenedor. */
+.markdownBody {
+  overflow-x: auto;
+}
+
+.markdownBody table {
+  display: table;
+  width: 100%;
+}

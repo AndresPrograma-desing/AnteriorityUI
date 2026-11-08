@@ -1,20 +1,17 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Sparkles, Copy, Check } from 'lucide-react';
 import styles from './index.module.css';
 import Button from '../Button/index';
+import useCopyToClipboard from '../../../common/hooks/useCopyToClipboard';
 
 const SummaryCard = ({ title, text, enableCopy = false, gradientStart, gradientEnd, headerColor, className = '', style }) => {
-  const [copied, setCopied] = useState(false);
+  const { copied, copy } = useCopyToClipboard({
+    resetMs: 2000,
+    onError: () => console.error('Failed to copy text'),
+  });
 
-  const handleCopy = async () => {
-    if (!text) return;
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error('Failed to copy text: ', err);
-    }
+  const handleCopy = () => {
+    if (text) copy(text);
   };
 
   return (

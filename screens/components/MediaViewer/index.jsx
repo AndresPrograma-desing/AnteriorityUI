@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Download } from 'lucide-react';
+import { Download, X, FilePlus } from 'lucide-react';
+import Button from '../Button/index';
 import styles from './index.module.css';
 import {
   MEDIA_KIND,
   DEFAULT_DOWNLOAD_LABEL,
   DEFAULT_OPEN_LABEL,
+  DEFAULT_DROP_LABEL,
+  DEFAULT_DROP_ACTIVE_LABEL,
+  DEFAULT_CLEAR_LABEL,
+  DEFAULT_XLSX_CREATE_LABEL,
+  DEFAULT_XLSX_NEW_BAR_LABEL,
   DEFAULT_VIDEO_BG,
   DEFAULT_VIDEO_ACCENT,
   DEFAULT_VIDEO_CONTROLS_COLOR,
@@ -28,10 +34,20 @@ import {
   DEFAULT_MARKDOWN_TEXT_COLOR,
   DEFAULT_MARKDOWN_BG_COLOR,
   DEFAULT_MARKDOWN_ERROR_LABEL,
+  DEFAULT_XLSX_ACCENT,
+  DEFAULT_XLSX_TEXT_COLOR,
+  DEFAULT_XLSX_BG_COLOR,
+  DEFAULT_XLSX_HEADER_BG_COLOR,
+  DEFAULT_XLSX_BORDER_COLOR,
+  DEFAULT_XLSX_ERROR_LABEL,
+  DEFAULT_XLSX_COPY_LABEL,
+  DEFAULT_XLSX_COPIED_LABEL,
+  DEFAULT_XLSX_EMPTY_LABEL,
 } from './constants.js';
 import { resolveMediaKind, getFileName, formatFileSize } from './utils.js';
 import { getFileTypeInfo } from '../../../common/icons/fileType.js';
-import { VideoPlayer, AudioPlayer, PdfViewer, DocxViewer, MarkdownViewer } from './components/index.js';
+import { VideoPlayer, AudioPlayer, PdfViewer, DocxViewer, MarkdownViewer, XlsxViewer } from './components/index.js';
+import FileDropZone from '../FileDropZone/index';
 
 // Prueba si `url` carga como <img>/<video>/<audio> real, sin tocar el DOM visible.
 // A diferencia de fetch(), cargar un <img>/<video>/<audio> NO está sujeto a CORS para
@@ -99,7 +115,7 @@ function useDetectedKind(resolvedUrl, baseKind, enabled) {
 // Renderiza un archivo (imagen, video, audio, PDF o cualquier otro tipo) a partir
 // de una url/src. El tipo se puede forzar con `type`/`mimeType`; si no se pasa,
 // se infiere del mimeType o de la extensión del nombre/url.
-const MediaViewer = ({
+const MediaViewerBase = ({
   url,
   src,
   type,
@@ -152,6 +168,30 @@ const MediaViewer = ({
   markdownTextColor = DEFAULT_MARKDOWN_TEXT_COLOR,
   markdownBgColor = DEFAULT_MARKDOWN_BG_COLOR,
   markdownErrorLabel = DEFAULT_MARKDOWN_ERROR_LABEL,
+  xlsxAccentColor = DEFAULT_XLSX_ACCENT,
+  xlsxTextColor = DEFAULT_XLSX_TEXT_COLOR,
+  xlsxBgColor = DEFAULT_XLSX_BG_COLOR,
+  xlsxHeaderBgColor = DEFAULT_XLSX_HEADER_BG_COLOR,
+  xlsxBorderColor = DEFAULT_XLSX_BORDER_COLOR,
+  xlsxErrorLabel = DEFAULT_XLSX_ERROR_LABEL,
+  xlsxCopyLabel = DEFAULT_XLSX_COPY_LABEL,
+  xlsxCopiedLabel = DEFAULT_XLSX_COPIED_LABEL,
+  xlsxEmptyLabel = DEFAULT_XLSX_EMPTY_LABEL,
+  xlsxMenuLabels,
+  xlsxStatsLabels,
+  xlsxData,
+  xlsxSchema,
+  xlsxSheetName,
+  xlsxValidations,
+  xlsxValidationLabels,
+  xlsxErrorColor,
+  xlsxEditable = false,
+  xlsxSaveLabel,
+  xlsxNew = false,
+  xlsxNewRows,
+  xlsxNewCols,
+  onXlsxChange,
+  onXlsxSave,
   onError,
   className = '',
   style,
@@ -163,9 +203,10 @@ const MediaViewer = ({
   const hasExplicitType = Boolean(type || mimeType);
   const detectedKind = useDetectedKind(resolvedUrl, baseKind, autoDetectType && !hasExplicitType);
 
-  if (!resolvedUrl) return null;
+  const hasXlsxData = Array.isArray(xlsxData);
+  if (!resolvedUrl && !xlsxNew && !hasXlsxData) return null;
 
-  const kind = detectedKind || baseKind;
+  const kind = (xlsxNew || hasXlsxData) && !resolvedUrl ? MEDIA_KIND.XLSX : detectedKind || baseKind;
   const fileName = getFileName(resolvedUrl, name);
   const sizeLabel = formatFileSize(size);
 
@@ -347,6 +388,43 @@ const MediaViewer = ({
     );
   }
 
+  if (kind === MEDIA_KIND.XLSX && controls) {
+    return (
+      <div className={`${styles.wrapper} ${styles.pdfWrapper} ${className}`} style={wrapperStyle}>
+        <XlsxViewer
+          url={resolvedUrl}
+          fileName={fileName}
+          openLabel={openLabel}
+          downloadLabel={downloadLabel}
+          errorLabel={xlsxErrorLabel}
+          copyLabel={xlsxCopyLabel}
+          copiedLabel={xlsxCopiedLabel}
+          emptyLabel={xlsxEmptyLabel}
+          menuLabels={xlsxMenuLabels}
+          statsLabels={xlsxStatsLabels}
+          data={hasXlsxData && !resolvedUrl ? xlsxData : undefined}
+          schema={xlsxSchema}
+          sheetName={xlsxSheetName}
+          validations={xlsxValidations}
+          validationLabels={xlsxValidationLabels}
+          errorColor={xlsxErrorColor}
+          editable={xlsxEditable}
+          createNew={xlsxNew && !resolvedUrl}
+          newRows={xlsxNewRows}
+          newCols={xlsxNewCols}
+          saveLabel={xlsxSaveLabel}
+          onChange={onXlsxChange}
+          onSave={onXlsxSave}
+          accentColor={xlsxAccentColor}
+          textColor={xlsxTextColor}
+          bgColor={xlsxBgColor}
+          headerBgColor={xlsxHeaderBgColor}
+          borderColor={xlsxBorderColor}
+        />
+      </div>
+    );
+  }
+
   if (kind === MEDIA_KIND.MARKDOWN && controls) {
     return (
       <div className={`${styles.wrapper} ${styles.pdfWrapper} ${className}`} style={wrapperStyle}>
@@ -392,6 +470,111 @@ const MediaViewer = ({
     </div>
   );
 };
+
+// Con `droppable`, el archivo lo aporta el usuario: arrastrándolo, pegándolo o eligiéndolo. Se muestra
+// con el mismo visor que una url (el File se expone como blob: URL, revocada al cambiar/desmontar).
+// Si además se pasa `url`/`src`, se muestra ese archivo hasta que el usuario cargue uno propio.
+const DroppableMediaViewer = ({
+  accept,
+  onFileSelect,
+  onFileReject,
+  onClear,
+  dropLabel = DEFAULT_DROP_LABEL,
+  dropActiveLabel = DEFAULT_DROP_ACTIVE_LABEL,
+  clearLabel = DEFAULT_CLEAR_LABEL,
+  creatable = false,
+  createLabel = DEFAULT_XLSX_CREATE_LABEL,
+  newBarLabel = DEFAULT_XLSX_NEW_BAR_LABEL,
+  dropBgColor,
+  dropBorderColor,
+  dropTextColor,
+  dropAccentColor,
+  pasteEnabled = true,
+  ...props
+}) => {
+  const [file, setFile] = useState(null);
+  const [objectUrl, setObjectUrl] = useState(null);
+  const [creating, setCreating] = useState(false); // planilla nueva en blanco (xlsxNew)
+
+  useEffect(() => {
+    if (!file) {
+      setObjectUrl(null);
+      return undefined;
+    }
+    const created = URL.createObjectURL(file);
+    setObjectUrl(created);
+    return () => URL.revokeObjectURL(created);
+  }, [file]);
+
+  const handleFile = (next) => {
+    setCreating(false);
+    setFile(next);
+    onFileSelect?.(next);
+  };
+
+  const handleClear = () => {
+    setFile(null);
+    setCreating(false);
+    onClear?.();
+  };
+
+  const hasContent = Boolean(file ? objectUrl : props.url || props.src) || creating;
+
+  return (
+    <FileDropZone
+      onFile={handleFile}
+      onReject={onFileReject}
+      accept={accept}
+      pasteEnabled={pasteEnabled}
+      label={dropLabel}
+      activeLabel={dropActiveLabel}
+      extra={
+        creatable && (
+          <Button size="small" variant="outline" icon={FilePlus} onClick={() => setCreating(true)}>
+            {createLabel}
+          </Button>
+        )
+      }
+      bgColor={dropBgColor}
+      borderColor={dropBorderColor}
+      textColor={dropTextColor}
+      accentColor={dropAccentColor}
+      className={props.className}
+    >
+      {hasContent && (
+        <>
+          {(file || creating) && (
+            <div className={styles.localFileBar}>
+              <span className={styles.localFileName}>{file ? file.name : newBarLabel}</span>
+              <Button size="small" variant="ghost" color="transparent" icon={X} onClick={handleClear}>
+                {clearLabel}
+              </Button>
+            </div>
+          )}
+          {file ? (
+            <MediaViewerBase
+              {...props}
+              className=""
+              url={objectUrl}
+              src={undefined}
+              name={file.name}
+              size={file.size}
+              mimeType={file.type || undefined}
+              type={undefined}
+            />
+          ) : creating ? (
+            <MediaViewerBase {...props} className="" url={undefined} src={undefined} xlsxNew />
+          ) : (
+            <MediaViewerBase {...props} className="" />
+          )}
+        </>
+      )}
+    </FileDropZone>
+  );
+};
+
+const MediaViewer = ({ droppable = false, ...props }) =>
+  droppable ? <DroppableMediaViewer {...props} /> : <MediaViewerBase {...props} />;
 
 MediaViewer.KIND = MEDIA_KIND;
 

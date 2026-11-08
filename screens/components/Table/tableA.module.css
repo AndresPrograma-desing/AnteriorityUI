@@ -2,7 +2,7 @@
   width: 100%;
   overflow: hidden;
   background: var(--tableA-surface, white);
-  border-radius: 12px;
+  border-radius: 6px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
   border: 1px solid var(--tableA-border, #e2e8f0);
 }

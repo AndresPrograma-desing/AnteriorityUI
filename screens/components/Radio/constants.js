@@ -18,6 +18,13 @@ export const COLORS = {
   warning: 'warning',
 };
 
+export const VARIANTS = {
+  default: 'default',
+  card: 'card',
+};
+
+export const DEFAULT_VARIANT = VARIANTS.default;
+export const DEFAULT_CARD_RADIUS = '8px';
 export const DEFAULT_SIZE = SIZES.md;
 export const DEFAULT_DIRECTION = DIRECTIONS.column;
 export const DEFAULT_COLOR = COLORS.primary;

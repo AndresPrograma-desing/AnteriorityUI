@@ -428,3 +428,22 @@ export const ConMarkdownAbajo = {
     );
   },
 };
+
+// Markdown como contenido del cuerpo (no pegado al título del encabezado).
+export const MarkdownEnElCuerpo = {
+  args: {
+    isOpen: true,
+    onClose: () => console.log('closed'),
+    title: 'Detalle de la tarea',
+    descriptionPosition: 'body',
+    showActions: false,
+    markdown: [
+      '**Estado:** En curso',
+      '',
+      '| Campo | Valor |',
+      '|---|---|',
+      '| Prioridad | **Alta** |',
+      '| Responsable | Ana Gómez |',
+    ].join(String.fromCharCode(10)),
+  },
+};

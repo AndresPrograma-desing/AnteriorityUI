@@ -1,0 +1,48 @@
+.arrow {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  padding: 0 !important;
+  opacity: 1 !important;
+  color: var(--xlsx-accent, #2563eb) !important;
+  background: var(--xlsx-bg, #ffffff) !important;
+  border: 1.5px solid color-mix(in srgb, var(--xlsx-accent, #2563eb) 45%, var(--xlsx-border, #e2e8f0)) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
+  transition: background-color 0.15s ease;
+}
+
+.arrow:hover {
+  background: color-mix(in srgb, var(--xlsx-accent, #2563eb) 14%, var(--xlsx-bg, #ffffff)) !important;
+}
+
+.floating {
+  position: absolute !important;
+  z-index: 6;
+}
+
+.inline {
+  flex-shrink: 0;
+}
+
+/* Posiciones: debajo del encabezado de columnas / a la derecha del número de fila / lejos de las barras */
+.up {
+  top: 40px;
+  right: 18px;
+}
+
+.down {
+  bottom: 18px;
+  right: 18px;
+}
+
+.left {
+  left: 64px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.right {
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+}

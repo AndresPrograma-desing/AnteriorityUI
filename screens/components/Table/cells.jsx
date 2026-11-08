@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
+import { CalendarDays } from 'lucide-react';
 import Button from '../Button';
 import Swich from '../Swich/index';
 import Checks from '../Checks/index';
 import Input from '../Input/index';
 import Selector from '../Material-UI/Components/Selector/index';
+import AnchoredCalendar from '../CalendarPicker/components/AnchoredCalendar/index';
 import { formatDateValue } from './utils';
 
 // Las celdas interactivas viven dentro de una fila que puede ser clicable/expandible: el click
@@ -119,7 +121,8 @@ export function InputCell({ col, row, value }) {
   );
 }
 
-// Selector desplegable en la celda. `options`: [{ value, label }].
+// Selector desplegable en la celda. `options`: [{ value, label }]. `selectorProps` (objeto o fn(row))
+// se reenvía al Selector: ej. { variant: 'flat', textColor, bgColor } para verlo como badge.
 export function SelectCell({ col, row, value }) {
   return (
     <span onClick={stop} style={{ display: 'block', minWidth: col.minInputWidth ?? 140 }}>
@@ -129,8 +132,45 @@ export function SelectCell({ col, row, value }) {
         value={value}
         placeholder={col.placeholder}
         disableClearable={col.disableClearable ?? true}
+        {...resolve(col.selectorProps, row)}
         onChange={(e) => col.onChange?.(row, e.target.value)}
       />
+    </span>
+  );
+}
+
+// Fecha editable con el CalendarPicker de la librería. La celda muestra la fecha formateada y, al hacer
+// click, abre el calendario en un portal anclado a la celda (así no lo recorta el overflow de la tabla).
+// `onChange(row, 'YYYY-MM-DD')` ('' si se usa "Borrar"). Props: format, locale, placeholder, disabled, accentColor.
+export function DatePickerCell({ col, row, value }) {
+  const [rect, setRect] = useState(null);
+  const disabled = resolve(col.disabled, row) ?? false;
+  const text = formatDateValue(value, col.format, col.locale);
+
+  return (
+    <span onClick={stop} style={{ display: 'block', minWidth: col.minInputWidth ?? 120 }}>
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={(e) => setRect(e.currentTarget.getBoundingClientRect())}
+        style={{
+          display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 10px', font: 'inherit',
+          color: 'inherit', background: 'transparent', border: '1px solid #cbd5e1', borderRadius: 6,
+          cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.6 : 1,
+        }}
+      >
+        <span style={{ opacity: text ? 1 : 0.5 }}>{text || col.placeholder || 'Elegir fecha'}</span>
+        <CalendarDays size={16} style={{ color: '#64748b' }} />
+      </button>
+      {rect && (
+        <AnchoredCalendar
+          rect={rect}
+          value={value || undefined}
+          accentColor={col.accentColor}
+          onPick={(next) => { setRect(null); col.onChange?.(row, next); }}
+          onClose={() => setRect(null)}
+        />
+      )}
     </span>
   );
 }

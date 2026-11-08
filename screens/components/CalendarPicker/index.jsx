@@ -32,6 +32,8 @@ const CalendarPicker = ({
   selectorsPopperZIndex,
   variant = 'popover',
   showFooter = true,
+  defaultOpen = false,
+  onClose,
   renderDay,
   country,
   showHolidays,
@@ -43,7 +45,8 @@ const CalendarPicker = ({
   const isInline = variant === 'inline';
 
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+  const wasOpenRef = useRef(defaultOpen);
   const [showSelectors, setShowSelectors] = useState(false);
   const [hoveredDay, setHoveredDay] = useState(null);
   const [dragStartDay, setDragStartDay] = useState(null);
@@ -137,6 +140,12 @@ const CalendarPicker = ({
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isInline, isOpen]);
+
+  // Avisa cuando el popover se cierra (seleccionar un día, Escape o click afuera).
+  useEffect(() => {
+    if (wasOpenRef.current && !isOpen) onClose?.();
+    wasOpenRef.current = isOpen;
+  }, [isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleNextMonth = () => setCurrentDate(addMonths(currentDate, 1));
   const handlePrevMonth = () => setCurrentDate(subMonths(currentDate, 1));
