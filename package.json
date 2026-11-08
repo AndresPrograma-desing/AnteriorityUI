@@ -1,6 +1,6 @@
 {
   "name": "anteriority-ui",
-  "version": "1.17.0",
+  "version": "1.18.0",
   "description": "Librería interna de componentes React (UI) construida sobre MUI, lucide-react y CSS Modules.",
   "packageManager": "pnpm@11.1.2",
   "main": "index.js",
@@ -76,11 +76,11 @@
     "@emotion/styled": "^11.0.0",
     "@mui/material": "^5.0.0 || ^6.0.0 || ^9.0.0",
     "@rjsf/core": "^5.0.0",
+    "fast-formula-parser": "^1.0.19",
     "pdfjs-dist": "^6.0.0",
     "react": "^18.0.0 || ^19.0.0",
     "react-dom": "^18.0.0 || ^19.0.0",
-    "xlsx": "^0.20.3",
-    "fast-formula-parser": "^1.0.19"
+    "xlsx": "^0.20.3"
   },
   "peerDependenciesMeta": {
     "@rjsf/core": {
