@@ -6,6 +6,8 @@ Al hacer un cambio visible para quien consume la librería, se agrega una línea
 
 ## [Sin publicar]
 
+## [1.18.0] - 2026-11-08
+
 ### Agregado
 
 - **`Footer`**: barra inferior reutilizable con zonas izquierda/centro/derecha, botones de acción (`actions`, con el `Button` de la librería), `sticky`, colores y alto configurables. Los strings se muestran con `Text`; `textProps` y `actionProps` reenvían props a los hijos.
@@ -32,6 +34,7 @@ Al hacer un cambio visible para quien consume la librería, se agrega una línea
 
 - `Table`: los botones de las columnas `actions` ahora son `small` por default (cada acción puede pedir otro `size`) y el borde de la tabla pasa de 12 a 6 px de radio.
 - `MediaViewer`: las stories se separaron por tipo de media dentro de `screens/components/MediaViewer/stories/`.
+- Stories y playground: datos de ejemplo reemplazados por datos ficticios, archivos de stories de `MediaViewer` renombrados al inglés y textos del playground movidos a `playground/constants.js`. El playground suma una pestaña de introducción, la vista «Ver JSON» y un enlace a las Stories.
 - El menú contextual del visor de planillas usa el `ScrollBar` de la librería en vez de la barra nativa.
 
 ### Corregido
