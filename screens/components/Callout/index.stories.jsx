@@ -100,8 +100,8 @@ export const ConTimestamp = {
 export const TextoLargoSinEspacios = {
   args: {
     variant: 'info',
-    title: 'fordeveloper167@gmail.com',
-    children: '@ignacioangel671@gmail.com',
+    title: 'dev.demo@example.com',
+    children: '@maria.demo@example.com',
     timestamp: '15:36',
   },
   decorators: [

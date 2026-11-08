@@ -130,8 +130,8 @@ const groupsForAsyncActions = [
   {
     title: 'Proyectos',
     items: [
-      { id: 'gub', label: 'Gubernamentales-API', icon: FileText, isOwner: true, isShared: true },
-      { id: 'portal', label: 'Portal Matriculados', icon: FileText, isOwner: false, isShared: true },
+      { id: 'gub', label: 'Proyecto-API', icon: FileText, isOwner: true, isShared: true },
+      { id: 'portal', label: 'Portal Demo', icon: FileText, isOwner: false, isShared: true },
       { id: 'anterior', label: 'AnteriorityUI', icon: FileText, isOwner: true, pinned: true },
     ],
   },

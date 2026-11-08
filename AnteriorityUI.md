@@ -1758,10 +1758,10 @@ import FileListItem from 'anteriority-ui/screens/components/FileListItem'; // ex
 
 **Uso básico:**
 ```jsx
-<FileListItem name="Product Backlog - Happy Pets v2.pdf" size="114.7 KB" date="16/10/2026" />
+<FileListItem name="Product Backlog - Proyecto Demo v2.pdf" size="114.7 KB" date="16/10/2026" />
 
 <FileListItem
-  name="Historias Usuario.docx"
+  name="Historias de Usuario.docx"
   size="30.8 KB"
   date="15/10/2026"
   selectable
@@ -4543,7 +4543,7 @@ const schema = {
   },
 };
 
-<RenderJsonSchema schema={schema} formData={{ nombre: 'Ignacio', pais: 'ar', nacimiento: '1996-05-10' }} />
+<RenderJsonSchema schema={schema} formData={{ nombre: 'Jane', pais: 'ar', nacimiento: '1996-05-10' }} />
 ```
 
 **Props:**

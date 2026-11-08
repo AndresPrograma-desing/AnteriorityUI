@@ -26,7 +26,7 @@ export const AudioConRemitente = {
   args: {
     url: 'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3',
     name: 'Kalimba.mp3',
-    senderName: 'Ignacio Angel',
+    senderName: 'Jane Doe',
   },
 };
 
@@ -35,7 +35,7 @@ export const AudioConRemitenteYFoto = {
   args: {
     url: 'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3',
     name: 'Kalimba.mp3',
-    senderName: 'Ignacio Angel',
+    senderName: 'Jane Doe',
     senderAvatar: 'https://picsum.photos/seed/remitente/80/80',
   },
 };

@@ -44,7 +44,7 @@ export const Default = {
       <RenderJsonSchema
         schema={profileSchema}
         formData={{
-          nombre: 'Ignacio Angel',
+          nombre: 'Jane Doe',
           edad: 29,
           pais: 'ar',
           nacimiento: '1996-05-10',
@@ -184,7 +184,7 @@ export const TemaOscuro = {
       <RenderJsonSchema
         schema={profileSchema}
         formData={{
-          nombre: 'Ignacio Angel',
+          nombre: 'Jane Doe',
           edad: 29,
           pais: 'ar',
           nacimiento: '1996-05-10',

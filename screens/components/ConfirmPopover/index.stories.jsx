@@ -50,7 +50,7 @@ export const Danger = {
 export const MarkdownMessage = {
   render: (args) => <DangerTemplate {...args} />,
   args: {
-    title: '**Salir** de *Gubernamentales-API*',
+    title: '**Salir** de *Proyecto-API*',
     message: [
       'Vas a perder acceso a:',
       '',
