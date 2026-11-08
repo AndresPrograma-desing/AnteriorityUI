@@ -40,6 +40,7 @@ Dependencias opcionales según el componente:
 |---|---|
 | `SchemaForm` | `@rjsf/core` y `@rjsf/validator-ajv8` |
 | `MediaViewer` (PDFs) | `pdfjs-dist` |
+| `MediaViewer` (planillas `.xlsx`/`.xls`/`.csv`) | `xlsx` desde `https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz` (no la de npm); con `xlsxEditable` y fórmulas, también `fast-formula-parser` |
 | `PasswordResetPanel`, `UserEditPopover` | configurar el cliente HTTP (ver §5) |
 
 Todo lo demás (Chart, Recharts, Nivo, lucide, react-icons, markdown, mermaid)
@@ -50,7 +51,7 @@ viene empaquetado con la librería; no instales nada extra.
 Importá por nombre desde el barrel. Es la forma por defecto:
 
 ```jsx
-import { Button, Input, TableB, Toast } from 'anteriority-ui';
+import { Button, Input, Table, Toast } from 'anteriority-ui';
 ```
 
 Subpath directo solo cuando necesitás exports nombrados que no pasan por el barrel:
@@ -137,7 +138,8 @@ Nombres exactos del barrel.
 - `Callout` — aviso por `variant` (`info`, `warning`, `danger`, `success`, `neutral`), con título y cuerpo en Markdown.
 - `ErrorMessage` (banner en línea con icono y título). `ErrorState` también existe en el barrel, pero no tiene sección propia en `AnteriorityUI.md`: leé su `index.jsx` antes de usarlo.
 - `Loading` (varias variantes), `Skeleton` (placeholder shimmer).
-- `AlertModal` — modal de alerta/confirmación con input opcional; parsea errores de API.
+- `AlertModal` — modal de alerta/confirmación con input opcional; parsea errores de API.
+
 - `Carousel` — carrusel de imágenes, videos, texto, markdown y render propio; transiciones slide/fade/zoom, autoplay, flechas, puntos, swipe y teclado.
 - `ConfirmPopover` — popover flotante de confirmación (Cancelar / Confirmar) anclado en una posición; título y mensaje en markdown; spinner si `onConfirm` devuelve una promesa. Para acciones destructivas junto a un menú.
 - `DrawPanel` — drawer deslizante con header, footer de acciones y protección contra cierre con cambios sin guardar.
@@ -167,6 +169,10 @@ Nombres exactos del barrel.
 
 **Otros**
 - `DesplegablePanel` — fila expandible tipo acordeón. `ScrollBar` — scroll personalizado que se oculta solo.
+- `QRCode` — genera un código QR (SVG) desde un texto/URL; logo, estilos y descarga.
+- `Footer` — barra inferior con zonas izquierda/centro/derecha y botones de acción (`actions`), opcionalmente sticky.
+- `FileDropZone` — zona para recibir un archivo por arrastre, pegado o click (filtro `accept`).
+- `FloatingPanel` — ventana flotante con contenido libre: se mueve, redimensiona y se ancla a un elemento.
 - `Slider` — slider con color de acento y tooltip. `CommandPalette` — paleta de comandos.
 - `Text`, `ToggleCard`, `Callout` — para bloques de texto y avisos dentro de layouts.
 

@@ -1,8 +1,16 @@
 <p align="center">
-  <img src="assets/favicon/anteriorityUI.ico" alt="anteriority-ui" width="480" />
+  <img src="assets/anteriorityUI/anteriority-logo.svg" alt="anteriority-ui" width="160" />
 </p>
 
 # anteriority-ui
+
+<p align="center">
+  <a href="https://andresprograma-desing.github.io/AnteriorityUI/">
+    <img src="assets/anteriorityUI/examples/example.ui.png" alt="AnteriorityUI Playground: tablero de tareas dentro del layout real" />
+  </a>
+  <br />
+  <strong><a href="https://andresprograma-desing.github.io/AnteriorityUI/">Probá la UI en vivo →</a></strong>
+</p>
 
 Librería interna de componentes React (UI) para reutilizar entre proyectos. Construida sobre [MUI](https://mui.com/), [lucide-react](https://lucide.dev/) y CSS Modules, con [Storybook](https://storybook.js.org/) para navegar y probar cada componente de forma aislada. El componente `Chart` se apoya en [Recharts](https://recharts.org/) y en los paquetes de [Nivo](https://nivo.rocks/) (`@nivo/pie`, `@nivo/calendar`) para sus distintos tipos de gráfico — ambos vienen empaquetados como `dependencies`, sin que el proyecto consumidor tenga que instalarlos aparte.
 
@@ -71,12 +79,19 @@ pnpm add react react-dom @mui/material @emotion/react @emotion/styled
    pnpm add pdfjs-dist
    ```
 
+6. (Opcional) Si vas a mostrar planillas (`.xlsx`, `.xls`, `.csv`) con `MediaViewer`, agregá `xlsx`. Instalá la versión oficial desde el CDN de SheetJS: la de npm (0.18.x) está desactualizada y tiene vulnerabilidades conocidas. Para poder **editarlas** con fórmulas (`xlsxEditable`), sumá también `fast-formula-parser`:
+
+   ```bash
+   pnpm add https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz
+   pnpm add fast-formula-parser   # solo si usás xlsxEditable
+   ```
+
 ## Importar componentes
 
 Todos los componentes están indexados en el entry point principal — no hace falta conocer el subpath de cada uno:
 
 ```jsx
-import { Button, Sidebar, TableB } from 'anteriority-ui';
+import { Button, Sidebar, Table } from 'anteriority-ui';
 ```
 
 Alternativa, importando el subpath directo de cada componente (útil para acceder a exports nombrados extra que no pasan por el barrel, ej. `Button.VARIANTS`):
@@ -143,11 +158,16 @@ Los proyectos consumidores controlan cuándo actualizar corriendo `pnpm update a
 
 ## Ver los componentes en Storybook
 
+Sin instalar nada: **[andresprograma-desing.github.io/AnteriorityUI](https://andresprograma-desing.github.io/AnteriorityUI/)** (se publica en cada push a `main`, ver `.github/workflows/storybook.yml`). Incluye los ~50 componentes y el **Playground**, donde se ve cada componente dentro del layout real (sidebar + topbar) y se prueban planillas desde JSON con esquema.
+
+Para correrlo localmente:
+
 ```bash
+pnpm install
 pnpm storybook
 ```
 
-Abre `http://localhost:6006` con los ~50 componentes navegables, cada uno con varias variantes de ejemplo.
+Abre `http://localhost:6006` con los mismos componentes navegables, cada uno con varias variantes de ejemplo.
 
 ## Convención de colores
 
@@ -181,8 +201,11 @@ Documentación completa de props y ejemplos de uso de los ~50 componentes en **[
 | [DateTag](AnteriorityUI.md#datetag) | Etiqueta de fecha formateada |
 | [DesplegablePanel](AnteriorityUI.md#desplegablepanel) | Panel colapsable con ícono temático |
 | [DrawPanel](AnteriorityUI.md#drawpanel) | Panel lateral deslizable (drawer) |
+| [Footer](AnteriorityUI.md#footer) | Barra inferior reutilizable con zonas izquierda/centro/derecha y botones de acción |
+| [FileDropZone](AnteriorityUI.md#filedropzone) | Zona para cargar un archivo por arrastre, pegado o click |
 | [Filter](AnteriorityUI.md#filter) | Panel de filtros con contador de activos |
 | [FormControls](AnteriorityUI.md#formcontrols) | Controles de formulario (Card, Input, TextArea) |
+| [FloatingPanel](AnteriorityUI.md#floatingpanel) | Ventana flotante genérica: contenido libre, movible, redimensionable y anclable a un elemento |
 | [Frame](AnteriorityUI.md#frame) | Marco/tarjeta base reutilizable, soporta modal |
 | [GreenHighlight](AnteriorityUI.md#greenhighlight) | Resaltado de texto/valor destacado |
 | [HoursPicker](AnteriorityUI.md#hourspicker) | Selector de horario |
@@ -204,6 +227,7 @@ Documentación completa de props y ejemplos de uso de los ~50 componentes en **[
 | [PlaceholderButton](AnteriorityUI.md#placeholderbutton) | Botón que se convierte en input al hacer click |
 | [Profile](AnteriorityUI.md#profile) | Header de perfil de usuario |
 | [Profile/Avatar](AnteriorityUI.md#avatar-profileavatar) | Avatar con estado (online/offline) |
+| [QRCode](AnteriorityUI.md#qrcode) | Generador de códigos QR (SVG, logo, descarga PNG/SVG) |
 | [SchemaForm](AnteriorityUI.md#schemaform) | Formulario generado desde un JSON Schema (wrapper de rjsf) |
 | [ScrollBar](AnteriorityUI.md#scrollbar) | Contenedor con scrollbar estilizada |
 | [Sidebar](AnteriorityUI.md#sidebar) | Barra lateral de navegación completa |
@@ -213,8 +237,8 @@ Documentación completa de props y ejemplos de uso de los ~50 componentes en **[
 | [SummaryCard](AnteriorityUI.md#summarycard) | Tarjeta de resumen con degradado |
 | [Swich](AnteriorityUI.md#swich) | Interruptor (switch) on/off |
 | [Table](AnteriorityUI.md#table) | Tabla unificada (`variant="A"` \| `"B"`); TableA y TableB son wrappers de ella |
-| [TableA](AnteriorityUI.md#tablea) | Tabla simple con columnas configurables |
-| [TableB](AnteriorityUI.md#tableb) | Tabla con filas expandibles y badges |
+| [TableA](AnteriorityUI.md#tablea) | **Legacy** — usar `Table variant="A"`. Tabla simple con columnas configurables |
+| [TableB](AnteriorityUI.md#tableb) | **Legacy** — usar `Table variant="B"`. Tabla con filas expandibles y badges |
 | [ToggleCard](AnteriorityUI.md#togglecard) | Tarjeta colapsable con acción |
 | [UserEditPopover](AnteriorityUI.md#usereditpopover) | Popover de edición de nombre de usuario (usa `features/user-profile`) |
 
@@ -249,5 +273,6 @@ Documentación completa de props y ejemplos de uso de los ~50 componentes en **[
 | [**date-fns**](https://date-fns.org/) | Manejo de fechas en `CalendarPicker`/`CalendarComponent`. |
 | [**date-holidays**](https://github.com/commenthol/date-holidays) | Feriados reales por país en `CalendarPicker`. |
 | [**pdfjs-dist**](https://mozilla.github.io/pdf.js/) | Render de PDFs en `MediaViewer` (peer dependency opcional). |
+| [**SheetJS**](https://sheetjs.com/) (`xlsx`) y [**fast-formula-parser**](https://github.com/LesterLyu/fast-formula-parser) | Lectura de planillas y motor de fórmulas del visor/editor de Excel de `MediaViewer` (peer dependencies opcionales). |
 | [**docx-preview**](https://github.com/VolodymyrBaydalka/docxjs) | Preview de documentos `.docx` en `MediaViewer`. |
 | [**@rjsf/core**](https://rjsf-team.github.io/react-jsonschema-form/) | Motor de `SchemaForm` (formularios desde JSON Schema). |

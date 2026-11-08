@@ -1,0 +1,39 @@
+.xlsxViewer {
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.gridArea {
+  position: relative;
+  width: 100%;
+}
+
+.loadingOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 4;
+}
+
+/* Aviso de dato no válido (validación de datos): flota sobre la parte baja de la grilla y se oculta solo. */
+.validationNotice {
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  transform: translateX(-50%);
+  z-index: 30;
+  max-width: calc(100% - 24px);
+  padding: 8px 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #ffffff;
+  background: var(--xlsx-error, #dc2626);
+  border-radius: 8px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+  pointer-events: none;
+}

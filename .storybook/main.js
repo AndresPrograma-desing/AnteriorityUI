@@ -4,7 +4,8 @@
 const config = {
   "stories": [
     "../screens/components/**/*.mdx",
-    "../screens/components/**/*.stories.@(js|jsx|mjs|ts|tsx)"
+    "../screens/components/**/*.stories.@(js|jsx|mjs|ts|tsx)",
+    "../playground/**/*.stories.@(js|jsx|mjs|ts|tsx)"
   ],
   "addons": [
     "@storybook/addon-a11y",

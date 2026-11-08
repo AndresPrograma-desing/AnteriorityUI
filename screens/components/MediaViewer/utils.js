@@ -10,6 +10,11 @@ export function mimeToKind(mime) {
   if (mime.startsWith('audio/')) return MEDIA_KIND.AUDIO;
   if (mime === 'application/pdf') return MEDIA_KIND.PDF;
   if (mime === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') return MEDIA_KIND.DOCX;
+  if (
+    mime === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+    mime === 'application/vnd.ms-excel' ||
+    mime === 'text/csv'
+  ) return MEDIA_KIND.XLSX;
   if (mime === 'text/markdown' || mime === 'text/x-markdown') return MEDIA_KIND.MARKDOWN;
   if (Object.values(MEDIA_KIND).includes(mime)) return mime;
   return null;

@@ -5,7 +5,7 @@ import MuiRadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import MuiRadio from '@mui/material/Radio';
 import styles from './index.module.css';
-import { DEFAULT_SIZE, DEFAULT_COLOR, DEFAULT_DIRECTION, DIRECTIONS, SIZES } from './constants.js';
+import { DEFAULT_SIZE, DEFAULT_COLOR, DEFAULT_DIRECTION, DEFAULT_VARIANT, DIRECTIONS, VARIANTS, SIZES } from './constants.js';
 
 /**
  * Componente de Radio individual
@@ -18,10 +18,24 @@ export function Radio({
   disabled = false,
   size = DEFAULT_SIZE,
   color = DEFAULT_COLOR,
+  accentColor,
+  textColor,
+  variant = DEFAULT_VARIANT,
+  radius,
+  bgColor,
+  borderColor,
   className = '',
   style,
   ...props
 }) {
+  // accentColor / textColor: colores libres (hex, rgb…) para el radio marcado y la etiqueta; sin ellos rige `color` (paleta MUI).
+  const colorVars = {
+    ...(accentColor ? { '--radio-accent': accentColor } : {}),
+    ...(textColor ? { '--radio-text': textColor } : {}),
+    ...(radius !== undefined ? { '--radio-radius': typeof radius === 'number' ? `${radius}px` : radius } : {}),
+    ...(bgColor ? { '--radio-bg': bgColor } : {}),
+    ...(borderColor ? { '--radio-border': borderColor } : {}),
+  };
   return (
     <FormControlLabel
       value={value}
@@ -30,14 +44,14 @@ export function Radio({
         <MuiRadio
           size={size}
           color={color}
-          className={`${styles.muiRadioCustom} ${className}`.trim()}
+          className={`${styles.muiRadioCustom} ${accentColor ? styles.hasAccent : ''} ${className}`.trim()}
         />
       }
       label={label}
       checked={checked}
       onChange={onChange}
-      style={style}
-      className={styles.radioWrapper}
+      style={{ ...colorVars, ...style }}
+      className={`${styles.radioWrapper} ${variant === VARIANTS.card ? styles.card : ''} ${textColor ? styles.hasText : ''}`.trim()}
       {...props}
     />
   );
@@ -55,6 +69,12 @@ export function RadioGroup({
   direction = DEFAULT_DIRECTION,
   size = DEFAULT_SIZE,
   color = DEFAULT_COLOR,
+  accentColor,
+  textColor,
+  variant = DEFAULT_VARIANT,
+  radius,
+  bgColor,
+  borderColor,
   disabled = false,
   children,
   className = '',
@@ -73,6 +93,12 @@ export function RadioGroup({
     return cloneElement(child, {
       size: child.props.size || size,
       color: child.props.color || color,
+      accentColor: child.props.accentColor || accentColor,
+      textColor: child.props.textColor || textColor,
+      variant: child.props.variant || variant,
+      radius: child.props.radius !== undefined ? child.props.radius : radius,
+      bgColor: child.props.bgColor || bgColor,
+      borderColor: child.props.borderColor || borderColor,
       disabled: disabled || child.props.disabled,
     });
   });

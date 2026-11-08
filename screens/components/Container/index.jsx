@@ -16,6 +16,11 @@ export default function Container({
   pageSize = 10,
   pageSizeOptions = [5, 10, 20, 50],
   onPageSizeChange,
+  header,
+  stickyHeader = true,
+  headerBgColor,
+  headerTextColor,
+  headerBorderColor,
   bgImage,
   blurBackground = false,
   style,
@@ -23,6 +28,9 @@ export default function Container({
 }) {
   const containerStyle = {
     ...(borderColor ? { '--container-border': borderColor } : {}),
+    ...(headerBgColor ? { '--container-header-bg': headerBgColor } : {}),
+    ...(headerTextColor ? { '--container-header-text': headerTextColor } : {}),
+    ...(headerBorderColor ? { '--container-header-border': headerBorderColor } : {}),
     ...(bgImage ? { '--container-bg-image': `url(${bgImage})` } : {}),
     ...(bgImage && blurBackground ? { '--container-bg-blur': 'blur(12px)' } : {}),
     ...style,
@@ -35,6 +43,11 @@ export default function Container({
       {...props}
     >
 
+      {header && (
+        <div className={`${styles.header} ${stickyHeader ? styles.headerSticky : ''}`}>
+          {header}
+        </div>
+      )}
       {wattermark &&
       <Barnner 
       bgColor="#e1ddecff"

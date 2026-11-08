@@ -1,22 +1,20 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Copy, Check } from 'lucide-react';
 import ModalTooltip from '../ModalTooltip/ModalTooltip';
+import useCopyToClipboard from '../../../common/hooks/useCopyToClipboard';
 import styles from './index.module.css'; 
 
 export default function CopyableText({ text, bgColor, borderColor, textColor, className = '', style }) {
 
-  const [copied, setCopied] = useState(false);
+  const { copied, copy } = useCopyToClipboard({
+    resetMs: 2000,
+    onError: () => console.error('Error al copiar el texto'),
+  });
 
-  const handleCopy = async (e) => {
+  const handleCopy = (e) => {
     e.preventDefault();
-    e.stopPropagation();  
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error('Error al copiar el texto: ', err);
-    }
+    e.stopPropagation();
+    copy(text);
   };
 
   return (

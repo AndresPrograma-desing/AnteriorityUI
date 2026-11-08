@@ -18,6 +18,8 @@ common/
   theme/muiTheme.js   → theme de MUI compartido (fontFamily: var(--font-sans))
   api/client.js       → cliente HTTP genérico (fetch wrapper), sin lógica de negocio ni endpoints hardcodeados
   storage/LocalStorage.js → utilidades de sessionStorage/localStorage (getUserId/setUserId)
+  hooks/              → lógica no-visual compartida entre componentes: useCopyToClipboard (copiar + feedback "Copiado"), useKeyboardShortcut, usePasteImage, useSwipeToDismiss
+  utils/              → utilidades puras compartidas: copyToClipboard (con fallback a execCommand), downloadBlob
 features/
   password-reset/api.js  → funciones de API específicas del flujo de reseteo de contraseña
   user-profile/api.js    → función de API para actualizar nombre de usuario
@@ -47,6 +49,13 @@ La mayoría de los componentes con color propio (fondo, texto, ícono, borde) ex
 - **Componentes que renderizan otro componente interno con sus propias props de color** (ej. `RenderJsonSchema` usando `MediaViewer` para previews de archivo) no pueden asumir que las CSS custom properties del padre llegan solas — si el hijo lee sus propios tokens (`--media-viewer-*` en vez de los del padre), hay que propagar explícitamente las props de color recibidas hacia ese hijo. Cubrir el contenedor principal y olvidarse de los sub-componentes internos dejaría una paleta a medio personalizar.
 
 **Verificación obligatoria al crear un componente nuevo:** todo componente visual nuevo debe poder recolorearse completamente por props antes de darse por terminado — no es opcional ni queda para "después". Usar la skill `design-color-props` (`.claude/skills/design-color-props/`) para auditar el componente (incluyendo sub-componentes internos, ver convención de descomposición más abajo) y aplicar las props de color que falten. Esto no depende de que se recuerde invocarla a mano: hay un hook `PostToolUse` sobre `Write|Edit` (`.claude/settings.json` → `.claude/hooks/remind-color-props.mjs`) que, cada vez que se escribe o edita un `index.jsx` bajo `screens/components/**/`, inyecta un recordatorio obligatorio en el contexto para correr la skill antes de cerrar la tarea.
+
+## Convención: scroll siempre con el `ScrollBar` de la librería
+
+Ninguna superficie con scroll visible al usuario (listas, menús, diálogos, paneles, popovers) usa la barra nativa del navegador: se usa `screens/components/ScrollBar`. Es una falla recurrente (menú contextual y diálogo del visor de planillas, `AppShell`), por eso hay tres piezas:
+- `pnpm check-scroll [ruta]` (`scripts/check-native-scroll.mjs`): audita `overflow: auto|scroll` y superficies de MUI sin `ScrollBar`. Informa y sale en 0; con `--strict` falla. El baseline actual tiene hallazgos viejos: no ampliarlo. Una excepción legítima se marca con un comentario `native-scroll-ok: <motivo>` en el archivo.
+- Skill interna `native-scroll-audit` (`.claude/skills/native-scroll-audit/`): proceso, recetas para `Menu`/`Dialog`/`Popover`/`Select`/`Autocomplete` de MUI y verificación en el navegador.
+- Hook `PostToolUse` (`.claude/hooks/remind-native-scroll.mjs`): al escribir un `.css`/`.jsx` de `screens/components` con scroll nativo, inyecta un aviso para correr la skill.
 
 ## Convención: descomponer componentes grandes en subcomponentes
 
@@ -167,11 +176,19 @@ Hay DOS carpetas de skills, no confundirlas:
 
 ## Storybook
 
-Cada componente en `screens/components/` tiene un `.stories.jsx` (formato CSF3) al lado de su implementación. Al agregar un componente nuevo, agregarle también su story con variantes reales (no placeholders) — son la referencia que se usa para escribir/actualizar la sección correspondiente en AnteriorityUI.md.
+Cada componente en `screens/components/` tiene un `.stories.jsx` (formato CSF3) al lado de su implementación.
+
+**Componentes con muchas variantes:** cuando un componente cubre varios tipos o casos bien distintos (ej. `MediaViewer`: imagen, video, audio, PDF, planillas…), no se deja un único `index.stories.jsx` de decenas de stories mezcladas. Se parte en un archivo por tipo dentro de la misma carpeta (`Imagen.stories.jsx`, `Pdf.stories.jsx`, …), cada uno con `title: 'Components/<Componente>/<Grupo>'`, así la barra lateral los muestra como subgrupos. Los helpers que usa un solo grupo (ej. `buildSampleSheetUrl` de las planillas) viven en el archivo de ese grupo. Ver `screens/components/MediaViewer/`. Al agregar un componente nuevo, agregarle también su story con variantes reales (no placeholders) — son la referencia que se usa para escribir/actualizar la sección correspondiente en AnteriorityUI.md.
+
+**Playground (`playground/`):** story `Playground/AppShell` que renderiza cualquier componente dentro del `AppShell` real (sidebar + topbar) para verlo en contexto. Vive fuera de `screens/` porque no es un componente de la librería (no se compila ni se publica). Para ver otro componente, agregar una entrada a `DEMOS` en `playground/demos.jsx`. Requiere reiniciar Storybook si se cambia `.storybook/main.js`.
 
 ## Regla: documentar cada modificación de componente
 
 Toda vez que se agregue, cambie o elimine una prop (o cualquier comportamiento visible) de un componente en `screens/components/`, hay que actualizar en el mismo cambio la sección correspondiente en [AnteriorityUI.md](AnteriorityUI.md) (tabla de props, ejemplos de uso, notas) — no dejarlo para después. Si la sección del componente todavía no existe, crearla siguiendo el formato de las demás (Import / Uso básico / Props / Ejemplos / Notas). Si el cambio agrega o modifica variantes visuales relevantes, reflejarlo también en el `.stories.jsx` del componente (ver [Storybook](#storybook)).
+
+## Regla: anotar en el CHANGELOG
+
+Todo cambio visible para quien consume la librería (componente o prop nueva, cambio de comportamiento, fix, obsolescencia) se anota en la sección **Sin publicar** de [CHANGELOG.md](CHANGELOG.md), en el mismo cambio, bajo Agregado / Cambiado / Corregido / Obsoleto / Eliminado. Una línea por cambio, en español, escrita desde el punto de vista del consumidor (qué puede hacer ahora, qué se comporta distinto). Al publicar una versión (`pnpm version ...`), esa sección pasa a llevar el número y la fecha.
 
 ## Dos componentes de avatar distintos
 

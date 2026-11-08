@@ -34,6 +34,9 @@ export { default as FileListItem } from './screens/components/FileListItem/index
 export { default as Filter } from './screens/components/Filter/index.js';
 export { FormCard, FormInput, FormTextArea } from './screens/components/FormControls/index.js';
 export { default as Frame } from './screens/components/Frame/index.js';
+export { default as FileDropZone } from './screens/components/FileDropZone/index.js';
+export { default as FloatingPanel } from './screens/components/FloatingPanel/index.js';
+export { default as Footer } from './screens/components/Footer/index.js';
 export { default as GreenHighlight } from './screens/components/GreenHighlight/index.js';
 export { default as HoursPicker } from './screens/components/HoursPicker/index.js';
 export { default as IconCatalog } from './screens/components/IconCatalog/index.js';
@@ -65,6 +68,7 @@ export { default as PlaceholderButton } from './screens/components/PlaceholderBu
 export { default as Profile } from './screens/components/Profile/index.js';
 export { default as ProfileAvatar } from './screens/components/Profile/Avatar/index.js';
 export { default as Radio } from './screens/components/Radio/index.js';
+export { default as QRCode } from './screens/components/QRCode/index.js';
 export { default as RenderJsonSchema } from './screens/components/RenderJsonSchema/index.js';
 export { default as SchemaForm } from './screens/components/SchemaForm/index.js';
 export { default as ScrollBar } from './screens/components/ScrollBar/index.js';

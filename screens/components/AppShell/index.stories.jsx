@@ -5,6 +5,8 @@ import AppShell from './index';
 export default {
   title: 'Components/AppShell',
   component: AppShell,
+  // AppShell ocupa 100vh: con el padding por defecto de Storybook la página desborda y aparece un segundo scroll.
+  parameters: { layout: 'fullscreen' },
 };
 
 // `logo`/`headerContent` aceptan cualquier node: un ícono de una librería

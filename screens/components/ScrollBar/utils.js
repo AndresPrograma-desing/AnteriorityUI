@@ -2,6 +2,10 @@ import { useRef, useState, useCallback, useEffect } from 'react';
 
 const HIDE_DELAY = 800;
 const MIN_THUMB_SIZE = 24;
+// El track está inset 4px por lado (ver index.module.css): su largo real es clientSize - 8.
+// Si el thumb se calcula contra clientSize, en el final del scroll sobresale del contenedor
+// y puede generar un scroll extra en la página.
+const TRACK_INSET = 8;
 
 const EMPTY_THUMB = { v: { size: 0, offset: 0 }, h: { size: 0, offset: 0 } };
 
@@ -19,17 +23,19 @@ export function useScrollbar({ vertical = true, horizontal = true, autoHide = tr
     const next = { v: { size: 0, offset: 0 }, h: { size: 0, offset: 0 } };
 
     if (vertical && el.scrollHeight > el.clientHeight) {
+      const track = Math.max(el.clientHeight - TRACK_INSET, 0);
       const ratio = el.clientHeight / el.scrollHeight;
-      const size = Math.max(ratio * el.clientHeight, MIN_THUMB_SIZE);
-      const travel = el.clientHeight - size;
+      const size = Math.min(Math.max(ratio * track, MIN_THUMB_SIZE), track);
+      const travel = track - size;
       const scrollRange = el.scrollHeight - el.clientHeight;
       next.v = { size, offset: scrollRange > 0 ? (el.scrollTop / scrollRange) * travel : 0 };
     }
 
     if (horizontal && el.scrollWidth > el.clientWidth) {
+      const track = Math.max(el.clientWidth - TRACK_INSET, 0);
       const ratio = el.clientWidth / el.scrollWidth;
-      const size = Math.max(ratio * el.clientWidth, MIN_THUMB_SIZE);
-      const travel = el.clientWidth - size;
+      const size = Math.min(Math.max(ratio * track, MIN_THUMB_SIZE), track);
+      const travel = track - size;
       const scrollRange = el.scrollWidth - el.clientWidth;
       next.h = { size, offset: scrollRange > 0 ? (el.scrollLeft / scrollRange) * travel : 0 };
     }
@@ -81,7 +87,7 @@ export function useScrollbar({ vertical = true, horizontal = true, autoHide = tr
     event.stopPropagation();
 
     const size = axis === 'v' ? thumbRef.current.v.size : thumbRef.current.h.size;
-    const travel = axis === 'v' ? el.clientHeight - size : el.clientWidth - size;
+    const travel = (axis === 'v' ? el.clientHeight : el.clientWidth) - TRACK_INSET - size;
     const scrollRange = axis === 'v' ? el.scrollHeight - el.clientHeight : el.scrollWidth - el.clientWidth;
     const factor = travel > 0 ? scrollRange / travel : 0;
 

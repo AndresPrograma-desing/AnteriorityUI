@@ -5,7 +5,8 @@
   background: var(--letter-white, #ffffff);
   backdrop-filter: var(--blur, blur(10px));
   -webkit-backdrop-filter: var(--blur, blur(10px));
-  padding: 35px;
+  --container-pad: 35px;
+  padding: var(--container-pad);
   border-radius: 12px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   border: 1px solid var(--container-border, rgba(0, 0, 0, 0.08));
@@ -32,10 +33,28 @@
   z-index: 1;
 }
 
+/* Topbar propio del Container: ocupa todo el ancho de la tarjeta (anula el padding) y, con
+   `stickyHeader`, queda fijo arriba del área con scroll mientras el contenido sube por debajo. */
+.containerCard > .header {
+  box-sizing: border-box;
+  margin: calc(var(--container-pad) * -1) calc(var(--container-pad) * -1) var(--container-pad);
+  padding: 12px var(--container-pad);
+  background: var(--container-header-bg, var(--letter-white, #ffffff));
+  color: var(--container-header-text, inherit);
+  border-bottom: 1px solid var(--container-header-border, rgba(0, 0, 0, 0.08));
+  border-radius: 12px 12px 0 0;
+}
+
+.containerCard > .headerSticky {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
 @media (max-width: 768px) {
   .containerCard {
     max-width: 100%;
-    padding: 1.5rem;
+    --container-pad: 1.5rem;
     min-height: auto; /* Permite que sea fluido en móviles */
   }
 }

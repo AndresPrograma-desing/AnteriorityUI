@@ -1,25 +1,15 @@
-import { useEffect, useRef, useState } from 'react';
 import { Copy, Check } from 'lucide-react';
 import Button from '../Button/index';
+import useCopyToClipboard from '../../../common/hooks/useCopyToClipboard';
 
 export const CopyButton = ({ text, className = '', label = 'Copiar', copiedLabel = 'Copiado' }) => {
-  const [copied, setCopied] = useState(false);
-  const timeoutRef = useRef(null);
+  // Si el portapapeles no está disponible (permisos, contexto inseguro) simplemente no hay feedback.
+  const { copied, copy } = useCopyToClipboard({ resetMs: 1600 });
 
-  useEffect(() => () => clearTimeout(timeoutRef.current), []);
-
-  const handleCopy = async (event) => {
+  const handleCopy = (event) => {
     event.preventDefault();
     event.stopPropagation();
-
-    try {
-      await navigator.clipboard.writeText(text ?? '');
-      setCopied(true);
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = setTimeout(() => setCopied(false), 1600);
-    } catch {
-      // clipboard no disponible (contexto inseguro, permisos, etc.) - no-op
-    }
+    copy(text ?? '');
   };
 
   return (

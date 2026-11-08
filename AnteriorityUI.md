@@ -770,6 +770,8 @@ import CalendarPicker from '../CalendarPicker/index'; // export default
 | `required` | boolean | `false` | Marca el campo como requerido (solo `variant="popover"`) |
 | `disabled` | boolean | `false` | Deshabilita la apertura del calendario (solo `variant="popover"`) |
 | `showFooter` | boolean | `false` | Solo `variant="popover"`. Muestra el footer con los botones "Borrar" (limpia el valor) y "Hoy" (selecciona la fecha actual) debajo del grid de días. Es opt-in: si no se pasa, el popover solo muestra el calendario, sin esos controles. |
+| `defaultOpen` | boolean | `false` | Solo `variant="popover"`. El calendario nace abierto (útil cuando el picker se monta justo para elegir una fecha, ej. al editar una celda). |
+| `onClose` | function | — | Solo `variant="popover"`. Se llama cuando el calendario se cierra (al elegir un día, con Escape o al hacer click afuera). |
 | `range` | boolean | `false` | Activa selección de rango. `value`/`onChange` pasan a usar `{ start, end }` (strings `YYYY-MM-DD`) en vez de una fecha suelta. Funciona igual en ambas variantes. |
 | `inputSx` | object | — | `sx` custom pasado al `TextField` interno (solo `variant="popover"`) |
 | `renderDay` | `function(date: Date) => ReactNode` | — | Solo `variant="inline"`. Contenido custom por celda (ej. eventos/citas de ese día + acciones). Si no se pasa, la celda entera es un único `Button` de la librería (click selecciona el día); si se pasa, la celda es un contenedor y solo el número de día es un `Button` circular aparte (un `<button>` no puede contener otro `<button>`, así que el contenido de `renderDay` puede incluir sus propios `Button`s — ver ejemplo). |
@@ -1350,6 +1352,9 @@ import Container from '../Container'; // export default (index.jsx)
 | `pageSize` | number | `10` | Tamaño de página actual |
 | `pageSizeOptions` | array | `[5, 10, 20, 50]` | Opciones de tamaño de página |
 | `onPageSizeChange` | function | — | Handler de cambio de tamaño de página |
+| `header` | node | — | Topbar propio del Container (títulos, filtros, acciones). Ocupa todo el ancho de la tarjeta, sobre el contenido. |
+| `stickyHeader` | boolean | `true` | Con `header`: lo deja fijo arriba (`position: sticky`) del área con scroll, así el contenido que sube pasa por debajo en vez de quedar cortado. Requiere que el scroll lo haga un ancestro (ej. el área de `AppShell`). |
+| `headerBgColor` / `headerTextColor` / `headerBorderColor` | string | `#ffffff` / heredado / `rgba(0, 0, 0, 0.08)` | Colores del `header` (el fondo debe ser opaco para tapar el contenido que pasa por debajo). |
 | `borderColor` | string | `'rgba(0, 0, 0, 0.08)'` | Color del borde del contenedor (`--container-border`). Por defecto un negro claro sutil. |
 | `bgImage` | string | — | URL de una imagen de fondo, renderizada detrás del contenido (capa independiente del `backdrop-filter` existente) |
 | `blurBackground` | boolean | `false` | Difumina la imagen de `bgImage` (no afecta el `backdrop-filter` del contenido, que sigue activo siempre por compatibilidad) |
@@ -1584,7 +1589,7 @@ import DrawPanel from '../DrawPanel'; // export default (index.jsx)
 | `title` | string | — | Título del panel |
 | `closeIcon` | component | `XCircle` (lucide-react) | Ícono del botón de cerrar; recibe `size` y `color` como props (mismo contrato que cualquier ícono de lucide-react) |
 | `description` | string | — | Texto descriptivo, ubicado según `descriptionPosition` |
-| `descriptionPosition` | `'top' \| 'bottom'` | `'top'` | Dónde se muestra la descripción (o el `markdown`) |
+| `descriptionPosition` | `'top' \| 'bottom' \| 'body'` | `'top'` | Dónde se muestra la descripción (o el `markdown`): `'top'` en el encabezado, junto al título; `'bottom'` al final del cuerpo, separado por una línea; `'body'` al inicio del cuerpo, como contenido normal (ideal para un markdown largo con tablas o listas, que no debe quedar pegado al título). |
 | `markdown` | string | — | Texto markdown renderizado con `MarkdownContent` (negritas, listas, links, tablas, `{color:..}`, bloques copiables, Mermaid). Si viene, reemplaza a `description` y respeta `descriptionPosition`. |
 | `markdownProps` | object | — | Props extra para el `MarkdownContent` interno (`components`, `linkColor`, `images`, labels de copiar…). |
 | `children` | node | — | Contenido principal del panel |
@@ -1931,6 +1936,156 @@ import { FormCard, FormInput, FormTextArea } from '../FormControls/index'; // na
 ```
 
 **Notas:** `FormInput` y `FormTextArea` son wrappers delgados de `TextField` y `MultilinePlaceholder` respectivamente: heredan todas sus props.
+
+---
+
+### FileDropZone
+
+Zona para recibir un archivo por **arrastre, pegado (Ctrl/Cmd+V) o click** (selector del sistema). Sin `children` se muestra como tarjeta vacía; con `children` los envuelve y, al arrastrar un archivo encima, muestra un overlay para reemplazarlo. `MediaViewer` (modo `droppable`) usa este componente.
+
+**Import:**
+```jsx
+import { FileDropZone } from 'anteriority-ui';
+```
+
+**Uso básico:**
+```jsx
+<FileDropZone accept=".pdf,image/*" onFile={(file) => upload(file)} onReject={(file) => alert(`No admitido: ${file.name}`)} />
+
+// Envolviendo contenido existente (reemplazo por arrastre)
+<FileDropZone onFile={setFile}>
+  <MiPreview file={file} />
+</FileDropZone>
+```
+
+**Props:**
+
+| Prop | Tipo | Default | Descripción |
+|---|---|---|---|
+| `onFile` | function | — | Callback `(file: File)` con el archivo recibido (solo el primero si llegan varios). |
+| `onReject` | function | — | Callback `(file: File)` cuando el archivo no cumple `accept`. |
+| `accept` | string | — | Filtro con la sintaxis del `<input accept>` (`'.xlsx,.csv'`, `'image/*'`, `'application/pdf'`). Se aplica al elegir, arrastrar y pegar. |
+| `children` | node | — | Contenido a envolver. Sin él se renderiza la tarjeta vacía clickeable. |
+| `disabled` | boolean | `false` | Desactiva click, arrastre y pegado. |
+| `pasteEnabled` | boolean | `true` | Escucha Ctrl/Cmd+V a nivel ventana (ignora campos editables). |
+| `label` / `activeLabel` | string | `'Arrastrá un archivo, pegalo (Ctrl+V) o hacé click para elegirlo'` / `'Soltá el archivo para cargarlo'` | Texto de la tarjeta vacía y texto mientras se arrastra (también del overlay). |
+| `extra` | node | — | Acciones propias dentro de la tarjeta vacía (no abren el selector al clickearlas). |
+| `bgColor` / `borderColor` / `textColor` / `accentColor` | string | `#f8fafc` / `#cbd5e1` / `#475569` / `#2563eb` | Colores de la zona. |
+| `className` / `style` | string / object | — | Clase y estilo extra del contenedor. |
+
+---
+
+### Footer
+
+Barra inferior reutilizable: tres zonas (izquierda, centro y derecha) para texto, botones o cualquier nodo, con una línea separadora arriba. Sirve para acciones de página o de formulario (guardar, cancelar, paginar, etc.). `actions` es un atajo para botones en la zona derecha.
+
+**Import:**
+```jsx
+import { Footer } from 'anteriority-ui';
+```
+
+**Uso básico:**
+```jsx
+<Footer
+  left={<span>3 cambios sin guardar</span>}
+  actions={[
+    { key: 'cancel', label: 'Cancelar', onClick: () => {} },
+    { key: 'save', label: 'Guardar', icon: Save, onClick: save },
+  ]}
+/>
+```
+
+**Zonas personalizadas (botones de la librería):**
+```jsx
+<Footer
+  left={<Button variant="outline" size="small">Volver</Button>}
+  center={<small>Paso 2 de 4</small>}
+  right={<Button size="small">Continuar</Button>}
+/>
+```
+
+**Props:**
+
+| Prop | Tipo | Default | Descripción |
+|---|---|---|---|
+| `left` / `center` / `right` | node \| string | — | Contenido de cada zona. Un **string** se muestra con el componente [Text](#text) (con el color `textColor` de la barra; admite emojis e íconos inline `{icon:Nombre}`); cualquier otro nodo se renderiza tal cual. |
+| `actions` | `Array<{ key, label, icon?, variant?, onClick, disabled? }>` | — | Botones (`Button` de la librería, tamaño `small`) que se agregan al final de la zona derecha. `variant`: `'outline'` (default), `'primary'`, `'ghost'`, `'danger'`. |
+| `children` | node | — | Va al centro si no se pasa `center`. |
+| `sticky` | boolean | `false` | Lo deja pegado al borde inferior del contenedor con scroll (`position: sticky`). |
+| `height` | number \| string | `64` | Alto mínimo (px o cualquier largo CSS). |
+| `padding` | number \| string | `'0 24px'` | Padding interno. |
+| `bgColor` | string | `'#ffffff'` | Fondo de la barra. |
+| `textColor` | string | `'#0f172a'` | Color del texto de la barra y de las acciones que no son `primary`. |
+| `borderColor` | string | `'#e2e8f0'` | Color de la línea superior y del borde de los botones `outline`. |
+| `accentColor` | string | — | Fondo de las acciones `variant: 'primary'`. Sin la prop, usan el color primario del `Button`. |
+| `textProps` | object | `{}` | Props extra para el `Text` de cada zona que recibe un string (`variant`, `icon`, `markdown`, `animate`…, ver [Text](#text)). `style` se combina con el interno. |
+| `actionProps` | object | `{}` | Props por defecto para todos los botones de `actions` (`size`, `variant`, `iconPosition`…, ver [Button](#button)). Los de cada acción ganan; `style` se combina con los colores de la barra. |
+| `className` / `style` | string / object | — | Clase y estilo extra del contenedor. |
+
+**Notas:** en pantallas angostas (≤ 480px) las zonas se apilan en columna. Con `sticky`, la barra se queda visible mientras el contenido scrollea dentro de su contenedor.
+
+---
+
+### FloatingPanel
+
+Ventana flotante genérica que muestra **cualquier contenido** (`children`) en un panel que se puede mover, redimensionar y anclar a un elemento. Va en un portal a `body`, así que no lo recorta el `overflow` de quien lo usa.
+
+**Import:**
+```jsx
+import { FloatingPanel } from 'anteriority-ui';
+```
+
+**Uso básico:**
+```jsx
+<FloatingPanel title="Vista previa" subtitle="contrato.pdf" onClose={() => setOpen(false)}>
+  <p>Cualquier contenido: texto, formularios, tablas o un iframe.</p>
+</FloatingPanel>
+```
+
+**Props:**
+
+| Prop | Tipo | Default | Descripción |
+|---|---|---|---|
+| `children` | node | — | Contenido del panel. |
+| `title` / `subtitle` | node | — | Título y subtítulo del encabezado. Si no hay título, ni `onClose` ni `getAnchorRect`, no se muestra encabezado. |
+| `getAnchorRect` | function | — | Devuelve `{ left, top, right, bottom }` (px de viewport) o `null`. Si se pasa, el panel se ubica junto a ese rectángulo (derecha, izquierda, debajo o arriba, lo que entre) y lo sigue al scrollear o cambiar el tamaño de la ventana. |
+| `defaultPosition` | `{ left, top }` | esquina superior derecha | Posición inicial cuando no hay `getAnchorRect`. |
+| `width` / `height` | number | `280` / `300` | Tamaño inicial en px. |
+| `minWidth` / `minHeight` | number | `230` / `150` | Tamaño mínimo al redimensionar. |
+| `gap` | number | `10` | Separación con el ancla. |
+| `margin` | number | `8` | Distancia mínima al borde de la ventana. |
+| `zIndex` | number | `1300` | `z-index` del panel. |
+| `draggable` | bool | `true` | Permite arrastrar por el encabezado. Al moverlo, deja de seguir al ancla. |
+| `resizable` | bool | `true` | Permite redimensionar desde la esquina inferior derecha. |
+| `onClose` | function | — | Muestra el botón de cerrar. |
+| `labels` | object | `{ title, pin, close }` en español | Textos de los botones del encabezado. Se mezcla con los defaults. |
+| `bgColor` | string | `#ffffff` | Fondo del panel. |
+| `textColor` | string | `#334155` | Color del texto. |
+| `borderColor` | string | `#e2e8f0` | Color del borde. |
+| `headerBgColor` | string | `#f1f5f9` | Fondo del encabezado. |
+| `accentColor` | string | `#2563eb` | Color de los botones del encabezado. |
+| `className`, `style` | — | — | Estándar. El resto de las props se pasan al `div` del panel. |
+
+**Ejemplos:**
+```jsx
+// Anclado a un elemento: sigue la posición al scrollear; la chincheta lo vuelve a anclar tras arrastrarlo
+<FloatingPanel
+  title="Detalle"
+  getAnchorRect={() => {
+    const r = document.getElementById('boton')?.getBoundingClientRect();
+    return r && { left: r.left, top: r.top, right: r.right, bottom: r.bottom };
+  }}
+>
+  <p>Se ubica junto al botón.</p>
+</FloatingPanel>
+
+// Caja flotante fija, sin encabezado
+<FloatingPanel defaultPosition={{ left: 80, top: 80 }} draggable={false} resizable={false}>
+  <strong>Aviso</strong>
+</FloatingPanel>
+```
+
+**Notas:** La posición se calcula con `getBoundingClientRect` y se recalcula en scroll (captura) y `resize`. Los colores se aplican como variables CSS del propio panel, así que funcionan dentro del portal. [XlsxViewer](#mediaviewer)'s calculadora flotante usa este componente con los resultados de la selección como contenido.
 
 ---
 
@@ -2549,6 +2704,45 @@ const [texto, setTexto] = useState('');
 
 Los colores por item (`color`, `activeColor`) pasan directo al `Button`. Las stories: `Default`, `ConPegadoDeImagenes`, `SinVistaPreviaNiEnvio` y `TemaOscuro`.
 
+### Radio
+
+Grupo de opciones excluyentes (radio buttons) sobre MUI, con etiqueta, dirección y colores configurables. Se compone de `RadioGroup` (el grupo) y `Radio` (cada opción).
+
+**Import:**
+```jsx
+import { RadioGroup, Radio } from '../Radio/index'; // export con nombre (también `RadioGroup` es el default)
+```
+
+**Uso básico:**
+```jsx
+<RadioGroup label="Permitir" name="tipo" value={tipo} onChange={(e) => setTipo(e.target.value)}>
+  <Radio value="letters" label="Solo letras" />
+  <Radio value="number" label="Solo números" />
+</RadioGroup>
+```
+
+**Props de `RadioGroup`:**
+
+| Prop | Tipo | Default | Descripción |
+|---|---|---|---|
+| `label` | node | — | Título del grupo. |
+| `name` | string | id generado | Nombre del grupo. |
+| `value` / `defaultValue` | string | — | Valor seleccionado (controlado / inicial). |
+| `onChange` | function | — | `(event) => void`; el valor está en `event.target.value`. |
+| `direction` | `'row'` \| `'column'` | `'column'` | Disposición de las opciones. |
+| `size` | `'small'` \| `'medium'` \| `'large'` | `'medium'` | Tamaño (se propaga a cada `Radio`). |
+| `color` | `'primary'` \| `'secondary'` \| `'success'` \| `'error'` \| `'info'` \| `'warning'` | `'primary'` | Color de la paleta MUI (se propaga a cada `Radio`). |
+| `accentColor` | string | — | Color libre (hex, rgb…) del radio marcado; pisa a `color`. Se propaga a cada `Radio`. |
+| `textColor` | string | — | Color libre del texto de las opciones. Se propaga a cada `Radio`. |
+| `variant` | `'default'` \| `'card'` | `'default'` | `'card'`: cada opción es una tarjeta con borde y fondo; la marcada resalta con el acento. |
+| `radius` | number \| string | `8` (px) | Radio de las esquinas de la tarjeta (solo `variant="card"`). Número = px. |
+| `bgColor` / `borderColor` | string | `transparent` / `#e2e8f0` | Fondo y borde de la tarjeta (solo `variant="card"`). La opción marcada usa `accentColor` (default `#2563eb`). |
+| `disabled` | boolean | `false` | Deshabilita todas las opciones. |
+
+**Props de `Radio`:** `value`, `label`, `checked`, `onChange`, `disabled`, `size`, `color`, `accentColor`, `textColor`, `variant`, `radius`, `bgColor`, `borderColor`, `className`, `style`. Las que no se pasan se heredan del `RadioGroup`.
+
+---
+
 ### Resizable
 
 Contenedor con un handle arrastrable para agrandar o achicar un panel, igual que la terminal de VS Code. El handle va en el borde indicado y, al arrastrarlo, cambia el tamaño del área de contenido. Funciona también con teclado y, al hacer doble click, vuelve al tamaño inicial.
@@ -2854,6 +3048,8 @@ Renderiza un archivo (imagen, video, audio, PDF o cualquier otro tipo) a partir 
 
 Cuando el tipo resuelve a video y `controls` es `true` (default), el `<video>` no usa los controles nativos del browser: renderiza un reproductor custom (`components/VideoPlayer`) con la paleta de la librería — play/pause central y en la barra inferior, seek bar con preview de tiempo al hover y buscador de tiempo por texto (`mm:ss` o segundos), control de volumen, velocidad de reproducción (0.5x–2x), fullscreen y Picture-in-Picture (si el browser lo soporta), overlay de buffering (usando el componente `Loading`) y overlay de error con reintento. La barra espaciadora pausa/reanuda mientras el mouse está sobre el player o en fullscreen (vía el componente `KeyboardShortcut`, sin capturar la tecla globalmente en el resto de la página). Pasar `controls={false}` devuelve el `<video>` nativo del browser sin ningún control (útil para videos de fondo/autoplay silencioso).
 
+Cuando el tipo resuelve a hoja de cálculo (`.xlsx`, `.xls`, `.csv`, o `mimeType` de Excel/CSV) y `controls` es `true` (default), renderiza un visor (`components/XlsxViewer`), **de solo lectura por defecto** y editable con `xlsxEditable`: grilla estilo Excel con letras de columna y números de fila, pestañas por hoja en la barra inferior, valores ya formateados (fechas, moneda, porcentajes; las fórmulas muestran su resultado) y descarga del archivo original. Las filas están **virtualizadas** (solo se montan las visibles), así que soporta hojas con decenas de miles de filas. Se puede seleccionar una celda, un rango (arrastrar o shift+click), una fila completa (click en el número), una columna completa (click en la letra) o toda la hoja (esquina o Ctrl+A) y **copiarla** con el botón "Copiar" o Ctrl/Cmd+C; el texto copiado es tabulado, así que pegarlo en Excel o Google Sheets reconstruye las celdas. Navegación con flechas / PageUp / PageDown (sin selección previa, las flechas simplemente mueven el contenido). Cuando hay contenido fuera de vista aparecen **botones de flecha** (arriba / abajo / izquierda / derecha) que mueven la grilla al hacer click, y mantenerlos apretados repite el movimiento; las pestañas de hojas tienen sus propias flechas ◄ ► y la pestaña activa siempre queda visible. **Click derecho** sobre la selección (o sobre una celda, número de fila o letra de columna, que pasan a ser la selección si caían fuera) abre un menú con: copiar, copiar con encabezados (antepone la fila 1), copiar como CSV, copiar como JSON (array de objetos con la fila 1 como claves) y seleccionar fila / columna / todo. «Cortar» solo aparece con `xlsxEditable` (en solo lectura no hay nada que quitar). Requiere instalar el peer opcional `xlsx` (ver Notas).
+
 Cuando el tipo resuelve a Markdown (`.md`/`.markdown`, o `mimeType` `text/markdown`) y `controls` es `true` (default), el componente descarga el texto de la `url` y lo renderiza con [MarkdownContent](#markdowncontent) (`components/MarkdownViewer`), así que soporta todo lo que ese componente (tablas y listas GFM, bloques de código con botón de copiar, mermaid, íconos, etc.). Con `controls={false}` cae en la tarjeta genérica de archivo. Como hace un `fetch` real, necesita que el servidor de la `url` permita CORS.
 
 **Import:**
@@ -2868,6 +3064,10 @@ import MediaViewer from 'anteriority-ui/screens/components/MediaViewer'; // expo
 <MediaViewer url="https://ejemplo.com/audio.mp3" name="nota-de-voz.mp3" />
 <MediaViewer url="https://ejemplo.com/contrato.docx" name="contrato.docx" size={512000} />
 <MediaViewer url="https://ejemplo.com/README.md" name="README.md" />
+<MediaViewer url="https://ejemplo.com/ventas.xlsx" name="ventas.xlsx" />
+
+// El usuario carga el archivo: arrastrar, pegar (Ctrl+V) o click
+<MediaViewer droppable accept=".xlsx,.xls,.csv" onFileSelect={(file) => console.log(file)} />
 ```
 
 **Props:**
@@ -2912,6 +3112,37 @@ import MediaViewer from 'anteriority-ui/screens/components/MediaViewer'; // expo
 | markdownTextColor | string | `'#334155'` | Color de texto del visor de Markdown (el contenido lo hereda) y del mensaje de error. |
 | markdownBgColor | string | `'#ffffff'` | Color de fondo del área del visor de Markdown. |
 | markdownErrorLabel | string | `'No se pudo cargar el documento Markdown'` | Texto del estado de error del visor de Markdown (el botón de abrir usa `openLabel`). |
+| droppable | bool | `false` | Modo "cargar archivo": sin `url` muestra una zona para **arrastrar** un archivo, **pegarlo** (Ctrl/Cmd+V) o **elegirlo** con click, y lo renderiza con el visor que corresponda a su tipo (imagen, video, audio, PDF, DOCX, planilla, Markdown u otro). Con archivo cargado aparece su nombre con un botón "Quitar archivo", y arrastrar otro encima lo reemplaza. Si se pasa `url`/`src`, se muestra ese archivo hasta que el usuario cargue uno propio. El pegado escucha a nivel ventana y se ignora dentro de inputs/textarea/contenteditable; si hay varios `MediaViewer droppable` montados, todos reaccionan al pegar (usar `pasteEnabled={false}` en los que no deban). |
+| accept | string | — | Solo con `droppable`: filtro de archivos admitidos con la sintaxis del `<input accept>` (`'.xlsx,.xls,.csv'`, `'image/*'`, `'application/pdf'`). Se aplica al elegir, arrastrar y pegar. |
+| onFileSelect | function | — | Solo con `droppable`: callback `(file: File)` al cargar un archivo (para subirlo, guardarlo, etc.). |
+| onFileReject | function | — | Solo con `droppable`: callback `(file: File)` cuando el archivo no cumple `accept`. |
+| onClear | function | — | Solo con `droppable`: callback al tocar "Quitar archivo". |
+| pasteEnabled | bool | `true` | Solo con `droppable`: permite cargar el archivo con Ctrl/Cmd+V. |
+| dropLabel / dropActiveLabel / clearLabel | string | `'Arrastrá un archivo, pegalo (Ctrl+V) o hacé click para elegirlo'` / `'Soltá el archivo para verlo'` / `'Quitar archivo'` | Textos de la zona de carga, del estado "arrastrando" y del botón para quitar el archivo. |
+| dropBgColor / dropBorderColor / dropTextColor / dropAccentColor | string | `'#f8fafc'` / `'#cbd5e1'` / `'#475569'` / `'#2563eb'` | Colores de la zona de carga (fondo, borde punteado, texto y acento al pasar el mouse o arrastrar). |
+| xlsxAccentColor | string | `'#2563eb'` | Color de acento del visor de hojas de cálculo: selección, encabezados activos, pestaña activa y spinner de carga. |
+| xlsxTextColor | string | `'#334155'` | Color de texto del visor de hojas de cálculo. |
+| xlsxBgColor | string | `'#ffffff'` | Color de fondo de la grilla. |
+| xlsxHeaderBgColor | string | `'#f1f5f9'` | Color de fondo de los encabezados (letras de columna, números de fila) y de la barra inferior. |
+| xlsxBorderColor | string | `'#e2e8f0'` | Color de las líneas de la grilla. |
+| xlsxErrorLabel | string | `'No se pudo cargar la hoja de cálculo'` | Texto del estado de error del visor de hojas de cálculo (el botón de abrir usa `openLabel`). |
+| xlsxCopyLabel / xlsxCopiedLabel | string | `'Copiar'` / `'Copiado'` | Textos del botón de copiar la selección y de su confirmación. |
+| xlsxNew | bool | `false` | **Crea una planilla en blanco** (sin `url`): un libro nuevo con una hoja vacía, ya editable (implica `xlsxEditable`). Se llena con las mismas herramientas de edición (texto, números, fechas, fórmulas), se le pueden agregar hojas (botón «+» de la barra) y filas (menú contextual) y se guarda con «Guardar». Nombre del archivo guardado: `name` (default `planilla.xlsx`). |
+| xlsxNewRows / xlsxNewCols | number | `100` / `20` | Tamaño inicial de cada hoja nueva (filas × columnas). Se pueden agregar más filas de a 100 desde el menú contextual. |
+| xlsxData | array | — | **Arma la planilla desde JSON** (sin `url`): un array de objetos, una fila por registro. Implica planilla editable con `xlsxEditable`. Pasar una referencia estable (estado o `useMemo`): si cambia, la planilla se vuelve a armar y se pierden las ediciones. Ver «Planilla desde JSON». |
+| xlsxSchema | object | — | JSON Schema de `xlsxData` (`{ type: 'array', items: { properties } }`, `{ type: 'object', properties }` o `{ properties }`). Define las columnas (en el orden de `properties`, o de `'ui:order'`), sus títulos (`title`) y las validaciones. Sin esquema, las columnas salen de las claves de los datos. |
+| xlsxSheetName | string | `'Datos'` | Nombre de la hoja generada desde JSON. |
+| creatable | bool | `false` | Solo con `droppable`: agrega a la zona de carga un botón «Crear planilla en blanco» (equivale a `xlsxNew`). Textos: `createLabel` (default `'Crear planilla en blanco'`) y `newBarLabel` (default `'Planilla nueva'`, el título sobre la planilla creada). |
+| xlsxStatsLabels | object | ver descripción | Textos de la calculadora flotante. Claves: `title`, `sum`, `avg`, `count`, `min`, `max`, `empty`, `copy`, `insert`, `destination`, `below`, `right`, `single`, `pin`, `close`, `button`, `inserted` (defaults en español: «Calculadora», «Suma», «Promedio», «Cuenta», «Mínimo», «Máximo»…). Se mezcla con los defaults. |
+| xlsxEditable | bool | `false` | Habilita la **edición** del visor de hojas de cálculo (ver «Edición» en Notas): editar celdas, calendario en celdas de fecha, fórmulas, pegar, borrar, cortar, deshacer/rehacer y guardar. |
+| onXlsxChange | function | — | Solo con `xlsxEditable`: se llama en cada edición con `{ sheet, edits: [{ row, col, value, formula }] }` (`row`/`col` base 0). |
+| onXlsxSave | function | — | Solo con `xlsxEditable`: callback `({ blob, fileName, workbook })` del botón «Guardar» (para subir el archivo editado). Si no se pasa, «Guardar» descarga el archivo editado (xlsx; `.xls`/`.csv` conservan su formato). |
+| xlsxSaveLabel | string | `'Guardar'` | Texto del botón de guardar. |
+| xlsxValidations | array | — | Solo con `xlsxEditable`. Reglas de validación de datos iniciales: `[{ sheet?, range, type, pattern?, message? }]`. `range` en notación A1: `'E:E'` (columna completa), `'E2:E50'`, `'B2'`, `'3:3'` (fila completa). `type`: `'letters'` (solo letras), `'alphanumeric'` (letras y números), `'number'`, `'integer'`, `'date'`, `'custom'` (con `pattern`, una expresión regular) o `'any'`. `sheet` limita la regla a esa hoja (sin él, a todas). `message` reemplaza el texto del aviso de error; sin él se muestra un mensaje por defecto según el tipo (ej. «Solo se permiten letras»). Un valor que no cumple **no se guarda** (al tipear, pegar o insertar); vaciar la celda siempre se permite, y las fórmulas `=...` se aceptan en `number`/`integer`/`date`. |
+| xlsxValidationLabels | object | ver descripción | Textos del panel «Validar datos…» y del aviso de error. Claves: `title`, `range`, `type`, `pattern`, `patternPlaceholder`, `message`, `apply`, `clear`, `cancel`, `invalid`, `messages` (mensaje de error por defecto de cada tipo, `{ letters, alphanumeric, number, integer, date, custom }`) y `types` (`{ any, letters, alphanumeric, number, integer, date, custom }`). Se mezcla con los defaults. |
+| xlsxErrorColor | string | `'#dc2626'` | Color del aviso flotante de dato no válido. |
+| xlsxMenuLabels | object | ver descripción | Textos del menú contextual (click derecho). Claves: `copy`, `cut`, `edit`, `validate`, `editDate`, `pickDate`, `insertToday`, `insertNow`, `clear`, `autosum`, `copyWithHeaders`, `copyCsv`, `copyJson`, `selectRow`, `selectColumn`, `selectAll` (defaults: «Copiar», «Copiar con encabezados», «Copiar como CSV», «Copiar como JSON», «Seleccionar fila», «Seleccionar columna», «Seleccionar todo»). Se mezcla con los defaults, así que se puede pasar solo la clave a cambiar. |
+| xlsxEmptyLabel | string | `'Hoja vacía'` | Texto cuando la hoja activa no tiene datos. |
 | onError | function | — | Callback del evento `onError` nativo de `<img>`/`<video>`/`<audio>` (ej. para mostrar un fallback si la URL no carga). |
 | className | string | `''` | Clase adicional para el contenedor. |
 | style | object | — | Estilos inline adicionales para el contenedor. |
@@ -2961,6 +3192,114 @@ import { Download } from 'lucide-react';
 ```
 
 **Notas:** No sube ni persiste nada — es puramente presentacional, recibe una URL ya resuelta. Una `url` que sea una data-URL (`data:audio/webm;base64,...`) se tipa por su propio mimeType (no por extensión) y no se usa como nombre de archivo. El PDF se muestra embebido en un `<iframe>` (sujeto a las políticas de same-origin/CSP del sitio que lo sirve) con un link "Abrir" como fallback — la story `PdfLocal` usa un PDF de prueba real servido desde `fixtures/MediaViewer/documento-de-prueba.pdf` (ver `.storybook/main.js`, `staticDirs: ["../fixtures"]`). `MediaViewer.KIND` expone las constantes de tipo (`MediaViewer.KIND.IMAGE`, etc.) para quien quiera forzar `type` sin hardcodear el string. El ícono cuadrado de la tarjeta genérica de archivo no tiene prop de color propia (su color viene del tipo de archivo detectado); usar `bgColor`/`borderColor`/`textColor`/`accentColor` para el resto del contenedor. El request de detección por `HEAD`/`GET` (ver `detectTypeByHead`) necesita que la `url` sea alcanzable por `fetch` desde el navegador con CORS permitido — si el servidor bloquea el origen, el intento falla silenciosamente y el componente se queda con el fallback por extensión/tarjeta genérica, sin romper el render.
+
+**Calculadora flotante:** el botón de la calculadora de la barra inferior abre un panel con **suma, promedio, cuenta, mínimo y máximo** de los números seleccionados (las fechas no cuentan). El panel:
+- se ubica solo **al lado de la selección** (a la derecha si entra, si no a la izquierda, debajo o arriba) y la sigue al cambiarla, al scrollear y al redimensionar la ventana, sin salirse de la pantalla;
+- se **arrastra** por el encabezado (queda donde lo dejes) y la chincheta lo vuelve a anclar a la selección;
+- se **redimensiona** desde la esquina inferior derecha;
+- cada valor se **copia** al hacerle click;
+- con `xlsxEditable` (y `fast-formula-parser`), el botón ↳ de cada fila **inserta el resultado en la hoja como fórmula** (`=SUM(...)`, `=AVERAGE(...)`, `=COUNT(...)`, `=MIN(...)`, `=MAX(...)`), según el destino elegido: debajo de cada columna, a la derecha de cada fila, o en una sola celda debajo de la selección con todo el rango. La fórmula queda viva (se recalcula al editar los datos) y se puede deshacer con Ctrl+Z.
+
+**Planilla desde JSON (`xlsxData` + `xlsxSchema`):**
+```jsx
+const schema = {
+  type: 'array',
+  items: {
+    type: 'object',
+    required: ['id', 'titulo'],
+    properties: {
+      id:      { type: 'integer', title: 'ID', minimum: 1 },
+      titulo:  { type: 'string', title: 'Título', minLength: 3, maxLength: 60 },
+      estado:  { type: 'string', title: 'Estado', enum: ['todo', 'progress', 'done'] },
+      horas:   { type: 'number', title: 'Horas', minimum: 0, maximum: 200 },
+      vence:   { type: 'string', format: 'date', title: 'Vence' },
+      contacto:{ type: 'string', format: 'email', title: 'Contacto' },
+      urgente: { type: 'boolean', title: 'Urgente' },
+    },
+  },
+};
+
+<MediaViewer
+  xlsxData={tareas}          // [{ id: 1, titulo: 'Diseñar login', estado: 'todo', vence: '2026-11-10', ... }]
+  xlsxSchema={schema}
+  xlsxSheetName="Tareas"
+  xlsxEditable
+  name="tareas.xlsx"
+  onXlsxSave={({ blob, fileName, data }) => api.save(fileName, blob, data)}
+/>
+```
+La fila 1 son los títulos y cada registro ocupa una fila. Las fechas ISO (`format: 'date'` / `'date-time'`) se convierten en fechas reales de Excel (se ven como `dd/mm/aaaa`, se editan con el calendario y se exportan como fecha); los booleanos como VERDADERO/FALSO, los números como números y los objetos/arrays como texto JSON. Un valor que no cumple el esquema **no se guarda** y aparece el aviso con el motivo.
+
+| Palabra del esquema | Validación |
+|---|---|
+| `type: 'integer'` / `'number'` / `'boolean'` | Solo enteros / números / verdadero-falso |
+| `format: 'date'` / `'date-time'` | Solo fechas |
+| `format: 'email'` | Formato de correo |
+| `pattern` | Expresión regular (ECMA-262, con soporte `\p{L}`) |
+| `enum` | Solo esos valores |
+| `minimum` / `maximum` | Rango numérico |
+| `minLength` / `maxLength` | Largo del texto |
+| `required` | La celda no puede quedar vacía al tipear (borrar con Supr sigue permitido) |
+| `x-message` / `errorMessage` | Mensaje de error propio de la columna |
+
+**Ejemplo completo en JSON puro** (lo que llega de una API o de un archivo `.json`; se pega tal cual en el editor de la story `Components/MediaViewer/Planilla desde JSON → Editor`):
+
+`schema.json`
+```json
+{
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["id", "titulo", "estado"],
+    "properties": {
+      "id":       { "type": "integer", "title": "ID", "minimum": 1 },
+      "titulo":   { "type": "string", "title": "Título", "minLength": 3, "maxLength": 60 },
+      "estado":   { "type": "string", "title": "Estado", "enum": ["todo", "progress", "review", "done"] },
+      "horas":    { "type": "number", "title": "Horas", "minimum": 0, "maximum": 200 },
+      "vence":    { "type": "string", "format": "date", "title": "Vence" },
+      "contacto": { "type": "string", "format": "email", "title": "Contacto" },
+      "urgente":  { "type": "boolean", "title": "Urgente" }
+    }
+  }
+}
+```
+
+`data.json`
+```json
+[
+  { "id": 1, "titulo": "Diseñar pantalla de login", "estado": "todo", "horas": 6.5, "vence": "2026-11-10", "contacto": "ana@ejemplo.com", "urgente": true },
+  { "id": 2, "titulo": "Corregir error al exportar PDF", "estado": "progress", "horas": 3, "vence": "2026-11-12", "contacto": "luis@ejemplo.com", "urgente": false },
+  { "id": 3, "titulo": "Migrar tabla de usuarios", "estado": "review", "horas": 12, "vence": "2026-11-20", "contacto": "marta@ejemplo.com", "urgente": false }
+]
+```
+Resultado: una hoja con los títulos «ID · Título · Estado · Horas · Vence · Contacto · Urgente» y 3 filas. Si en la celda de Estado se escribe `inventado`, no se guarda y avisa «Valores permitidos: todo, progress, review, done»; si en Horas se escribe `999`, avisa «Debe ser menor o igual a 200». Lo que devuelve `onXlsxSave({ data })` tiene la misma forma que `data.json`.
+
+La story `Components/MediaViewer/Planilla desde JSON → Editor` permite escribir o pegar otro esquema y otros datos (o soltar un `.json`), elegir entre ejemplos (tareas, clientes, productos, sin esquema) y aplicar para ver cómo se arma y valida la planilla; un JSON inválido muestra el error sin romper nada.
+
+**Exportar:** «Guardar» descarga el `.xlsx` (o llama a `onXlsxSave`). Con una planilla desde JSON, `onXlsxSave` recibe además `data`: los registros actuales como array de objetos tipados con las claves del esquema (fechas como ISO, números y booleanos reales; filas vacías omitidas). Las validaciones **no** se escriben en el `.xlsx` (limitación de SheetJS community); quedan solo en el visor. Pendiente: que el archivo exportado conserve validaciones, estilos de encabezado y anchos de columna.
+
+**Planilla nueva (`xlsxNew`):**
+```jsx
+<MediaViewer xlsxNew name="presupuesto.xlsx" onXlsxSave={({ blob, fileName }) => upload(blob, fileName)} />
+
+// Zona de carga que además permite empezar de cero
+<MediaViewer droppable creatable xlsxEditable accept=".xlsx,.xls,.csv" />
+```
+Empieza con una hoja `Hoja1` de 100 × 20 celdas. Botón «+» de la barra inferior: agrega una hoja (`Hoja2`, `Hoja3`…); doble click en una pestaña la renombra (máx. 31 caracteres, sin `[ ] : * ? / \`, sin repetir). Menú contextual → «Agregar 100 filas». «Guardar» exporta un `.xlsx` real (con fórmulas), o llama a `onXlsxSave`. Renombrar una hoja no actualiza las fórmulas que la referencian.
+
+**Edición (`xlsxEditable`):**
+- **Editar:** doble click, Enter o F2 sobre una celda (o simplemente escribir con la celda seleccionada). Enter confirma y baja, Tab confirma y avanza, Esc cancela. Supr/Retroceso borra la selección; Ctrl+X corta; Ctrl+V pega desde Excel/Sheets/este visor (un solo valor se replica en toda la selección); Ctrl+Z / Ctrl+Y deshacen y rehacen (hasta 200 pasos).
+- **Fechas:** en una celda de fecha (o vacía dentro de una columna de fechas) el doble click abre el [CalendarPicker](#calendarpicker) pegado a la celda, con «Borrar» y «Hoy»; el valor se guarda como fecha real de Excel, con el formato de la celda. En columnas de fechas también se puede tipear `15/01/2025`, `15-1-25` o `2025-01-15`.
+- **Números y texto:** lo tipeado como número (`12,5` o `12.5`) se guarda como número conservando el formato de la celda; todo lo demás, como texto.
+- **Cálculos:** una celda que empieza con `=` es una fórmula (`=SUM(D2:D20)`, `=D2*1.21`, `=IF(D2>100,"alto","bajo")`, `=AVERAGE(A1:A9)`, referencias a otras hojas, etc.). Se recalculan todas las fórmulas del libro en cada edición y se muestra el resultado; el menú contextual tiene **Autosuma**, que escribe `=SUM(...)` bajo cada columna seleccionada. Las fórmulas con funciones que el motor no soporta conservan el valor que dejó Excel. Con 2 o más números seleccionados, la barra inferior muestra **Suma, Promedio y Cantidad** (el tooltip agrega mínimo y máximo), también en modo solo lectura.
+- **Fechas:** el visor reconoce como fecha tanto las celdas con formato de fecha como el texto ISO (`2026-10-25`, `2026-10-25T14:30:00Z`, típico de datos exportados de una API). Click derecho sobre una fecha → «Editar fecha…» abre el calendario (conserva el formato de la celda y, si la tenía, la hora). Click derecho sobre una celda **vacía** → «Elegir fecha…» (calendario), «Insertar fecha de hoy» e «Insertar fecha y hora actual», que escriben de una vez con el mismo estilo que las fechas de esa columna. La hora no se elige en el calendario: se edita como texto o se inserta la actual.
+- **Redimensionar:** el borde derecho de cada letra de columna y el borde inferior de cada número de fila se arrastran (usan el componente [Resizable](#resizable)) para cambiar el ancho (40–800 px) y el alto (22–400 px). Doble click en el borde vuelve al tamaño automático. Los tamaños se conservan al cambiar de hoja y se pierden al recargar el archivo (no se escriben en el `.xlsx`). El menú contextual usa el scroll de la librería (`ScrollBar`) cuando no entra en pantalla.
+- **Validación de datos:** click derecho sobre una celda, fila, columna o rango → «Validar datos…» abre un panel lateral pegado al menú (a la derecha, o a la izquierda si no hay lugar) para elegir qué se permite escribir (solo letras, letras y números, números, enteros, fechas, un patrón propio o cualquier valor). También se puede declarar por prop con `xlsxValidations`. Cuando un valor no cumple, no se guarda y aparece un aviso rojo sobre la grilla (editar, pegar e «Insertar fecha» pasan por la misma validación; con una regla de fecha, un texto como `15/01/2025` se convierte a fecha). Las reglas viven en el visor (no se escriben en el `.xlsx`: SheetJS community no exporta validaciones) y la más reciente que cubra una celda es la que aplica.
+- **Guardar:** el botón «Guardar» (activo tras el primer cambio) descarga el archivo editado o llama a `onXlsxSave`. El archivo original no se modifica.
+- **Dependencia:** las fórmulas usan `fast-formula-parser`, un peer **opcional** (`pnpm add fast-formula-parser`) cargado con `import()` solo cuando `xlsxEditable` es `true`; sin él, las celdas que empiezan con `=` se guardan como texto. Recalcular todo en cada edición es lineal en la cantidad de fórmulas: libros con decenas de miles de fórmulas pueden notarse lentos.
+- **Límites:** no se pueden insertar ni eliminar filas o columnas (sí escribir debajo de la última fila, por ejemplo con Autosuma); no se editan estilos de celda; borrados y pegados masivos están limitados a 200.000 celdas.
+
+**Notas (hojas de cálculo):** SheetJS (`xlsx`) es un peer **opcional**, cargado con `import()` dinámico solo cuando se muestra una planilla. La versión de npm (0.18.x) está desactualizada y con vulnerabilidades conocidas; instalar la oficial desde el CDN de SheetJS: `pnpm add https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz`. El archivo se descarga con `fetch` (requiere CORS) y se parsea completo en el hilo principal: con archivos de varios MB puede haber una pausa breve al abrir; solo las filas visibles se pintan. No muestra estilos de celda de Excel (colores, bordes, celdas combinadas), imágenes ni gráficos.
 
 ---
 
@@ -4121,6 +4460,67 @@ const uiSchema = {
 
 ---
 
+### QRCode
+
+Genera un código QR funcional (SVG) a partir de un texto o URL. Soporta logo central, tres estilos de módulo, colores configurables y descarga como PNG/SVG.
+
+**Import:**
+```jsx
+import { QRCode } from 'anteriority-ui';
+```
+
+**Uso básico:**
+```jsx
+<QRCode value="https://example.com" />
+```
+
+**Props:**
+
+| Prop | Tipo | Default | Descripción |
+|---|---|---|---|
+| `value` | string | `''` | Contenido a codificar (URL, texto, `WIFI:...`). Vacío no renderiza nada |
+| `size` | number | `200` | Lado en px |
+| `level` | `'L'`, `'M'`, `'Q'`, `'H'` | `'M'` | Corrección de errores (con `logo` se fuerza `'H'`) |
+| `margin` | number | `2` | Quiet zone, en módulos |
+| `moduleStyle` | `'square'`, `'rounded'`, `'dots'` | `'square'` | Forma de los módulos (los 3 ojos de las esquinas siempre son cuadrados) |
+| `logo` | string, elemento o función | — | Logo centrado: URL/data URI, un elemento React (ícono de `lucide-react` / `react-icons`, [Avatar](#avatar), etc.) o una función `(px) => nodo` que recibe el lado real en px (útil para que `Avatar` use `size={px}`) |
+| `logoBgColor` | string | el de `bgColor` | Fondo de la placa detrás del logo |
+| `logoRatio` | number | `0.22` | Fracción del lado que ocupa el logo (máx. 0.3) |
+| `downloadable` | boolean | `false` | Muestra botones "Descargar PNG / SVG" |
+| `fileName` | string | `'qr'` | Nombre base del archivo descargado |
+| `onError` | function | — | Se llama si el contenido es demasiado largo o falla la descarga |
+| `fgColor` | string | `#000000` | Color de los módulos |
+| `bgColor` | string | `#ffffff` | Color de fondo |
+| `borderColor` | string | `#d1d5db` | Color del borde del marco (`--qr-border`) |
+| `borderWidth` | number | `1` | Grosor del borde, en px |
+| `borderRadius` | number | `12` | Radio de las esquinas del marco, en px |
+| `padding` | number | `12` | Espacio entre el borde y el QR, en px |
+| `frameBgColor` | string | `#ffffff` | Fondo del marco (visible alrededor del QR cuando hay `padding`) |
+| `buttonBgColor`, `buttonTextColor`, `buttonBorderColor` | string | los de `Button` | Colores de los botones de descarga (mapean a `color`, `style.color` y `borderColor` de [Button](#button)) |
+| `buttonProps` | object | — | Props extra para ambos `Button` (ej. `variant`, `size`) |
+| `errorColor` | string | `#b91c1c` | Color del mensaje de error |
+| `loadingColor` | string | gris del `Skeleton` | Fondo de la capa de carga |
+| `overlayTextColor` | string | `#111827` | Color del texto de `blurOverlay` |
+| `loading` | boolean | `false` | Estado de carga: muestra un shimmer sobre el QR (sin `value` también reserva el espacio) y oculta los botones de descarga |
+| `blurred` | boolean | `false` | Difumina el QR con transición (ej. QR oculto/expirado hasta que el usuario lo revele) |
+| `blurAmount` | number | `8` | Intensidad del difuminado, en px |
+| `blurOverlay` | node | — | Contenido centrado sobre el QR difuminado (texto o botón "Mostrar") |
+| `visible` | boolean | `true` | Al pasar a `false` reproduce la animación de salida y luego desmonta; al volver a `true` reproduce la de entrada |
+| `animation` | `'scale'`, `'fade'`, `'slide'`, `'none'` | `'scale'` | Tipo de animación de entrada/salida |
+| `animationDuration` | number | `300` | Duración en ms (también de la transición del difuminado) |
+| `onExited` | function | — | Se llama cuando termina la animación de salida |
+| `className`, `style`, `aria-label` | — | — | Estándar |
+
+**Ejemplos:**
+```jsx
+<QRCode value="https://example.com" moduleStyle="dots" fgColor="#4f46e5" downloadable fileName="mi-qr" />
+<QRCode value="https://example.com" logo="/logo.png" size={260} />
+```
+
+**Notas:** Depende de la librería `qrcode` (solo calcula la matriz); el SVG lo dibuja el componente. Para que un QR con colores sea escaneable, mantené buen contraste y `fgColor` más oscuro que `bgColor`. El PNG exportado usa 4x la resolución de `size`; un `logo` de imagen de otro origen sin CORS puede impedir la exportación PNG (el SVG funciona igual). Los logos de tipo elemento/función se renderizan dentro de un `foreignObject` y al exportar se copian sus estilos computados; las imágenes externas dentro de ellos (ej. `Avatar` con `src` remoto) pueden no aparecer en el PNG — usar iniciales/íconos o un data URI.
+
+---
+
 ### RenderJsonSchema
 
 Vista de **solo lectura** de datos ya guardados a partir de un JSON Schema: a diferencia de `SchemaForm`, no renderiza un formulario editable ni depende de rjsf — recorre `schema.properties` y muestra cada valor de `formData` como texto (o imagen/audio/archivo, para `format: 'data-url'`: el tipo se lee del mimeType de la propia data-URL, ej. `data:audio/webm;base64,...` se muestra con el reproductor de audio), resolviendo el `title`, `enum`/`enumNames` (o `anyOf` con `const`/`title`), `boolean` y `format: 'date'`/`'date-time'` del propio schema. Pensado para mostrar el detalle de una respuesta ya enviada (ej. lo que guardó un `<SchemaForm />`) sin tener que escribir a mano el mapeo de cada campo.
@@ -4547,7 +4947,8 @@ import { Table } from 'anteriority-ui'; // o import Table from 'screens/componen
 | `link` | `href?` (string/fn), `text?`, `target?`, `onClick?`, `linkColor?` | `<a>`; sin `href` usa el valor como URL |
 | `button` | `label`/`text`, `onClick(row)`, `icon?`, `disabled?`, `buttonProps?` | `Button` en la celda |
 | `input` | `inputType?` (`'text'` \| `'number'` \| `'email'`…), `onChange(row, next)`, `onCommit(row, next)` (al salir del campo), `placeholder?`, `min?`, `max?`, `disabled?`, `error?`, `bgColor?`, `textColor?` | `Input` editable (`number` entrega un número) |
-| `select` | `options: [{ value, label }]`, `onChange(row, next)`, `placeholder?`, `disableClearable?` | `Selector` desplegable |
+| `select` | `options: [{ value, label }]`, `onChange(row, next)`, `placeholder?`, `disableClearable?`, `selectorProps?` (objeto o `fn(row)` que se reenvía al `Selector`, ej. `{ variant: 'flat', textColor, bgColor }` para verlo como badge con color por fila) | `Selector` desplegable |
+| `datepicker` | `onChange(row, 'YYYY-MM-DD')` (`''` si se usa «Borrar»), `format?`, `locale?`, `placeholder?`, `disabled?`, `accentColor?` | Fecha **editable** con el [CalendarPicker](#calendarpicker) de la librería: la celda muestra la fecha y al hacer click abre el calendario anclado (en un portal, no lo recorta el overflow de la tabla) |
 | `switch` | `onChange(row, next)`, `disabled?`, `showIcons?`, `activeColor?`, `inactiveColor?` | `Swich` |
 | `checkbox` | `onChange(row, next)`, `disabled?`, `checkedBgColor?` | `Checks` (solo ícono) |
 | `badge` / `actions` | ver TableB | Badge / botones de acción |
@@ -4624,6 +5025,8 @@ const data = [
 Diferencias que se conservan por variante: el estado de error (A: ícono + mensaje + "Reintentar"; B: `Loading` con frases) y el `emptyMessage` por defecto (A sin punto final, B con punto).
 
 ### TableA
+
+> **⚠️ Legacy / deprecado:** `TableA` es un wrapper de compatibilidad de [Table](#table) (`<Table variant="A" />`). Para código nuevo usar `Table`; no se agregan funciones nuevas acá.
 
 Tabla simple orientada a columnas con `accessor`/`render`, con estados de carga (skeleton), error y vacío incorporados.
 
@@ -4746,6 +5149,8 @@ function UsersTable() {
 
 ### TableB
 
+> **⚠️ Legacy / deprecado:** `TableB` es un wrapper de compatibilidad de [Table](#table) (`<Table variant="B" />`). Para código nuevo usar `Table`; no se agregan funciones nuevas acá.
+
 Tabla "moderna" orientada a columnas con `key`/`label`, con soporte para columnas de tipo badge y acciones, filas expandibles y estados de carga/error/vacío.
 
 **Import:**
@@ -4769,7 +5174,7 @@ import TableB from 'screens/components/TableB';
 
 | Prop | Tipo | Default | Descripción |
 |---|---|---|---|
-| `columns` | `Array<{ key, label, align?, width?, type?, render?(row, rowIndex), badgeType?(row), badgeClass?(row), actions?: Array<{ label, onClick(row), disabled?(row), icon?, invertIcon? }>, filter? }>` | `[]` | Definición de columnas. `label` es el texto de cabecera; `key` identifica la columna y por defecto se lee `row[col.key]`. `type: 'badge'` renderiza el valor dentro de un `Barnner` (color según `badgeType(row)`: `'success'`\|`'warning'`\|`'danger'`); `type: 'actions'` renderiza botones definidos en `actions`. `filter` agrega un ícono de embudo junto al header (misma forma que en `TableA`, ver abajo). |
+| `columns` | `Array<{ key, label, align?, width?, type?, render?(row, rowIndex), badgeType?(row), badgeClass?(row), actions?: Array<{ label, onClick(row), disabled?(row), icon?, invertIcon?, size? }>, filter? }>` | `[]` | Definición de columnas. Los botones de `actions` son `size: 'small'` por default (cada acción puede pedir `'medium'`/`'large'` con su propio `size`). `label` es el texto de cabecera; `key` identifica la columna y por defecto se lee `row[col.key]`. `type: 'badge'` renderiza el valor dentro de un `Barnner` (color según `badgeType(row)`: `'success'`\|`'warning'`\|`'danger'`); `type: 'actions'` renderiza botones definidos en `actions`. `filter` agrega un ícono de embudo junto al header (misma forma que en `TableA`, ver abajo). |
 | `data` | `Array<object>` | `[]` | Filas a renderizar; objetos planos leídos por `col.key` (o por `col.render`). |
 | `loading` | `boolean` | `false` | Muestra `skeletonRows` filas de `Skeleton`. |
 | `skeletonRows` | `number` | `6` | Cantidad de filas skeleton. |
