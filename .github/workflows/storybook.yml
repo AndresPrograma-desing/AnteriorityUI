@@ -38,7 +38,10 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build Storybook
-        run: pnpm run build-storybook -- --base /AnteriorityUI/
+        run: pnpm run build-storybook
+        env:
+          # GitHub Pages sirve el sitio en /<repo>/: los assets deben pedirse desde esa subruta.
+          STORYBOOK_BASE: /AnteriorityUI/
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
