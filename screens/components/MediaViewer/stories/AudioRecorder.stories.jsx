@@ -43,7 +43,7 @@ export const GrabadorDeAudioConRemitente = {
   render: renderRecorder,
   args: {
     onSend: fakeSend,
-    senderName: 'Ignacio Angel',
+    senderName: 'Jane Doe',
   },
 };
 

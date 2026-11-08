@@ -8,7 +8,7 @@ export default {
 
 export const Basico = {
   args: {
-    name: 'Product Backlog - Happy Pets v2.pdf',
+    name: 'Product Backlog - Proyecto Demo v2.pdf',
     size: '114.7 KB',
     date: '16/10/2026',
   },
@@ -26,7 +26,7 @@ export const ConSeleccion = {
 
 export const ConAccionesDefault = {
   args: {
-    name: 'Historias Usuario.docx',
+    name: 'Historias de Usuario.docx',
     size: '30.8 KB',
     date: '15/10/2026',
     selectable: true,
@@ -58,9 +58,9 @@ export const Clickeable = {
 export const ListaCompleta = {
   render: () => {
     const [items, setItems] = useState([
-      { id: 1, name: 'Product Backlog - Happy Pets v2.pdf', size: '114.7 KB', date: '16/10/2026', selected: false },
+      { id: 1, name: 'Product Backlog - Proyecto Demo v2.pdf', size: '114.7 KB', date: '16/10/2026', selected: false },
       { id: 2, name: 'hu_v2.md', size: '19.5 KB', date: '16/10/2026', selected: false },
-      { id: 3, name: 'Historias Usuario.docx', size: '30.8 KB', date: '15/10/2026', selected: false },
+      { id: 3, name: 'Historias de Usuario.docx', size: '30.8 KB', date: '15/10/2026', selected: false },
       { id: 4, name: 'SANYA TEKK_Slowed_MP3_160K_.mp3', size: '2.7 MB', date: '15/10/2026', selected: false },
     ]);
 

@@ -104,7 +104,7 @@ export const TruncatedWithTooltip = {
   args: {
     items: [
       { label: 'ContextHub', icon: Home, onClick: () => console.log('go home') },
-      { label: 'Gubernamentales-API / Sesiones', icon: Gem, onClick: () => console.log('go sessions') },
+      { label: 'Proyecto-API / Sesiones', icon: Gem, onClick: () => console.log('go sessions') },
       { label: '# Fix propuesto: memoización de `available_amount` para evitar recálculo en cada render de la tabla de compensación' },
     ],
   },

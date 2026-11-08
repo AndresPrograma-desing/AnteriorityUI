@@ -8,12 +8,12 @@ export default {
 };
 
 const items = [
-  { id: 's1', label: 'Gubernamentales-API', category: 'Sesiones', icon: Folder, onSelect: () => console.log('Gubernamentales-API') },
+  { id: 's1', label: 'Proyecto-API', category: 'Sesiones', icon: Folder, onSelect: () => console.log('Proyecto-API') },
   { id: 's2', label: 'Proyecto', category: 'Sesiones', icon: Folder, onSelect: () => console.log('Proyecto') },
   { id: 'p1', label: 'EDENOR', category: 'Proyectos', icon: Folder, onSelect: () => console.log('EDENOR') },
   { id: 'p2', label: 'reunir', category: 'Proyectos', icon: Folder, onSelect: () => console.log('reunir') },
   { id: 'p3', label: 'PROYECTO', category: 'Proyectos', icon: Folder, onSelect: () => console.log('PROYECTO') },
-  { id: 'p4', label: 'Kortech-Camuzzi', category: 'Proyectos', icon: Folder, onSelect: () => console.log('Kortech-Camuzzi') },
+  { id: 'p4', label: 'Proyecto-Demo', category: 'Proyectos', icon: Folder, onSelect: () => console.log('Proyecto-Demo') },
   { id: 'd1', label: 'Informe mensual.pdf', category: 'Documentos', icon: FileText, description: 'Modificado hoy', onSelect: () => console.log('doc') },
   { id: 'u1', label: 'Jane Doe', category: 'Usuarios', icon: User, description: 'jane.doe@example.com', onSelect: () => console.log('user') },
 ];

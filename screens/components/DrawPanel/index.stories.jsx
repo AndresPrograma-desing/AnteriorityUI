@@ -176,8 +176,8 @@ export const ConJsonSchemaControlado = {
   render: () => {
     const [isOpen, setIsOpen] = useState(true);
     const [formData, setFormData] = useState({
-      nombre: 'Ignacio Angel',
-      email: 'ignacio@example.com',
+      nombre: 'Jane Doe',
+      email: 'jane.doe@example.com',
       pais: 'ar',
     });
     return (
@@ -348,7 +348,7 @@ const avisosUiSchema = {
 export const ConTextosYBadges = {
   render: () => {
     const [isOpen, setIsOpen] = useState(true);
-    const [formData, setFormData] = useState({ nombre: 'Ignacio', edad: 16, plan: 'pro', puntos: 1200 });
+    const [formData, setFormData] = useState({ nombre: 'Jane', edad: 16, plan: 'pro', puntos: 1200 });
     return (
       <div>
         <Button onClick={() => setIsOpen(true)}>Abrir panel</Button>

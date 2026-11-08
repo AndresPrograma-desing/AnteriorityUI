@@ -5,11 +5,11 @@
 # anteriority-ui
 
 <p align="center">
-  <a href="https://andresprograma-desing.github.io/AnteriorityUI/">
+  <a href="https://andresprograma-desing.github.io/AnteriorityUI/iframe.html?id=playground-appshell--playground&viewMode=story/">
     <img src="assets/anteriorityUI/examples/example.ui.png" alt="AnteriorityUI Playground: tablero de tareas dentro del layout real" />
   </a>
   <br />
-  <strong><a href="https://andresprograma-desing.github.io/AnteriorityUI/">Probá la UI en vivo →</a></strong>
+  <strong><a href="https://andresprograma-desing.github.io/AnteriorityUI/iframe.html?id=playground-appshell--playground&viewMode=story/">Probá la UI en vivo →</a></strong>
 </p>
 
 Librería interna de componentes React (UI) para reutilizar entre proyectos. Construida sobre [MUI](https://mui.com/), [lucide-react](https://lucide.dev/) y CSS Modules, con [Storybook](https://storybook.js.org/) para navegar y probar cada componente de forma aislada. El componente `Chart` se apoya en [Recharts](https://recharts.org/) y en los paquetes de [Nivo](https://nivo.rocks/) (`@nivo/pie`, `@nivo/calendar`) para sus distintos tipos de gráfico — ambos vienen empaquetados como `dependencies`, sin que el proyecto consumidor tenga que instalarlos aparte.
