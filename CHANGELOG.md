@@ -6,6 +6,8 @@ Al hacer un cambio visible para quien consume la librería, se agrega una línea
 
 ## [Sin publicar]
 
+## [1.18.1] - 2026-11-10
+
 ### Corregido
 
 - El peer opcional `xlsx` ahora acepta `^0.18.5 || ^0.20.3`. Antes exigía `^0.20.3`, que no existe en npm (la última publicada es 0.18.5), así que instalar `anteriority-ui` 1.18.0 fallaba al resolver dependencias. La versión oficial de SheetJS (0.20.3, desde su CDN) sigue funcionando.
