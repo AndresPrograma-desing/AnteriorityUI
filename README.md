@@ -79,12 +79,14 @@ pnpm add react react-dom @mui/material @emotion/react @emotion/styled
    pnpm add pdfjs-dist
    ```
 
-6. (Opcional) Si vas a mostrar planillas (`.xlsx`, `.xls`, `.csv`) con `MediaViewer`, agregá `xlsx`. Instalá la versión oficial desde el CDN de SheetJS: la de npm (0.18.x) está desactualizada y tiene vulnerabilidades conocidas. Para poder **editarlas** con fórmulas (`xlsxEditable`), sumá también `fast-formula-parser`:
+6. (Opcional) Si vas a mostrar planillas (`.xlsx`, `.xls`, `.csv`) con `MediaViewer`, agregá `xlsx`. La librería **no** lo instala sola: es un peer dependency opcional, así que tenés que agregarlo a tu proyecto. Recomendamos la versión oficial de SheetJS desde su CDN (0.20.3), porque la de npm (0.18.x) está desactualizada y tiene vulnerabilidades conocidas. Para poder **editarlas** con fórmulas (`xlsxEditable`), sumá también `fast-formula-parser`:
 
    ```bash
    pnpm add https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz
    pnpm add fast-formula-parser   # solo si usás xlsxEditable
    ```
+
+   Si `pnpm add xlsx` falla con `No matching version found for xlsx@^0.20.3`, es porque la 0.20.3 no está en npm: usá el tarball de arriba. Con `anteriority-ui` 1.18.0 hay que usar el tarball del CDN; desde la versión que incluye la corrección del rango (`^0.18.5 || ^0.20.3`) también sirve `pnpm add xlsx@0.18.5`, aunque con las vulnerabilidades mencionadas.
 
 ## Importar componentes
 

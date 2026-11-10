@@ -40,7 +40,7 @@ Dependencias opcionales según el componente:
 |---|---|
 | `SchemaForm` | `@rjsf/core` y `@rjsf/validator-ajv8` |
 | `MediaViewer` (PDFs) | `pdfjs-dist` |
-| `MediaViewer` (planillas `.xlsx`/`.xls`/`.csv`) | `xlsx` desde `https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz` (no la de npm); con `xlsxEditable` y fórmulas, también `fast-formula-parser` |
+| `MediaViewer` (planillas `.xlsx`/`.xls`/`.csv`) | `xlsx` (peer opcional que el consumidor instala; no viene con la librería) desde `https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz` (preferido sobre la de npm, que es 0.18.x y tiene vulnerabilidades); con `xlsxEditable` y fórmulas, también `fast-formula-parser` |
 | `PasswordResetPanel`, `UserEditPopover` | configurar el cliente HTTP (ver §5) |
 
 Todo lo demás (Chart, Recharts, Nivo, lucide, react-icons, markdown, mermaid)
@@ -168,7 +168,8 @@ Nombres exactos del barrel.
 - `lucide` — `anteriority-ui/lucide` re-exporta lucide-react completo.
 
 **Otros**
-- `DesplegablePanel` — fila expandible tipo acordeón. `ScrollBar` — scroll personalizado que se oculta solo.
+- `DesplegablePanel` — fila expandible tipo acordeón.
+- `ScrollBar` — contenedor con scroll personalizado que se oculta solo. Úsalo para cualquier área con scroll en vez de la barra nativa (ver sección 7).
 - `QRCode` — genera un código QR (SVG) desde un texto/URL; logo, estilos y descarga.
 - `Footer` — barra inferior con zonas izquierda/centro/derecha y botones de acción (`actions`), opcionalmente sticky.
 - `FileDropZone` — zona para recibir un archivo por arrastre, pegado o click (filtro `accept`).
@@ -215,6 +216,17 @@ variant; las props de color son un override por encima de esa paleta.
 - **No mezcles MUI directo con componentes de la librería** para lo mismo. Si necesitás un componente MUI que la librería ya envuelve (`Button`, `TextField`, `Autocomplete`, etc.), usá el de la librería.
 - **Respetá los props de cada componente tal como están documentados.** No pases props que no aparecen en la doc; si una falla en silencio, revisá el nombre exacto en `AnteriorityUI.md`.
 - **Componentes con portal** (`DrawPanel`, `AlertModal`, `ModalTooltip`, `Frame` como modal, `EmojiPickerModal`) se renderizan sobre `document.body`. No los envuelvas en contenedores con `overflow: hidden` esperando que queden contenidos.
+- **Scroll siempre con `ScrollBar`:** cualquier área con scroll visible (listas, menús, paneles, diálogos) usa `ScrollBar` de la librería, no `overflow: auto` ni la barra nativa del navegador. Las páginas quedan con un scroll más prolijo y consistente. Ejemplo: `import { ScrollBar } from 'anteriority-ui';` y luego `<ScrollBar vertical maxHeight={300}>…</ScrollBar>`. Varios componentes ya traen su propio scroll: **no lo envuelvas en `ScrollBar` otra vez** (duplicaría el scroll). Los que scrollean por dentro y cómo activarlo:
+  - `Frame` con `scrollable` (y `maxHeight`); `NotificationsPanel` ya viene así.
+  - `TableA` / `TableB` con `maxHeight` (y `stickyHeader` para fijar el encabezado).
+  - `CommandPalette`: la lista de resultados, con `maxHeight`.
+  - `AppShell`: el área de `children`. `Container` y `Footer` también se comportan así con `sticky`/`stickyHeader`.
+  - `Selector`: la lista desplegable, con `hideScrollbar` (por defecto oculta la barra; `scrollbarColor` la colorea cuando se muestra).
+  - `EmojiPickerModal` / `EmojiPicker`: las grillas de emojis e íconos.
+  - `MarkdownEditor`: el textarea y la vista previa (`scrollbarColor`).
+  - `MediaViewer` (planillas, PDF, Word, Markdown) y `Resizable`: scroll interno del contenido.
+  - `ChatWindow`: la lista de mensajes, con scroll propio.
+  Si el componente que usás ya está en esta lista, usá su prop de scroll. Solo envolvé con `ScrollBar` contenido que no tenga scroll propio. Para el detalle de props, ver `AnteriorityUI.md`.
 - **Estado controlado:** la mayoría de los componentes de entrada son controlados (`value` + `onChange`, `open` + `onClose`). Mantené el estado en tu componente.
 - **Storybook de la librería** (si está disponible en el proyecto) muestra cada componente en variantes reales; úsalo como referencia visual.
 

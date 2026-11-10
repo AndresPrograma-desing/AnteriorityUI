@@ -3299,7 +3299,7 @@ Empieza con una hoja `Hoja1` de 100 × 20 celdas. Botón «+» de la barra infer
 - **Dependencia:** las fórmulas usan `fast-formula-parser`, un peer **opcional** (`pnpm add fast-formula-parser`) cargado con `import()` solo cuando `xlsxEditable` es `true`; sin él, las celdas que empiezan con `=` se guardan como texto. Recalcular todo en cada edición es lineal en la cantidad de fórmulas: libros con decenas de miles de fórmulas pueden notarse lentos.
 - **Límites:** no se pueden insertar ni eliminar filas o columnas (sí escribir debajo de la última fila, por ejemplo con Autosuma); no se editan estilos de celda; borrados y pegados masivos están limitados a 200.000 celdas.
 
-**Notas (hojas de cálculo):** SheetJS (`xlsx`) es un peer **opcional**, cargado con `import()` dinámico solo cuando se muestra una planilla. La versión de npm (0.18.x) está desactualizada y con vulnerabilidades conocidas; instalar la oficial desde el CDN de SheetJS: `pnpm add https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz`. El archivo se descarga con `fetch` (requiere CORS) y se parsea completo en el hilo principal: con archivos de varios MB puede haber una pausa breve al abrir; solo las filas visibles se pintan. No muestra estilos de celda de Excel (colores, bordes, celdas combinadas), imágenes ni gráficos.
+**Notas (hojas de cálculo):** SheetJS (`xlsx`) es un peer **opcional** que el consumidor debe instalar en su proyecto: la librería no lo incluye como dependencia. Se carga con `import()` dinámico solo cuando se muestra una planilla. Instalar la versión oficial desde el CDN de SheetJS: `pnpm add https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz`. La versión de npm (0.18.x) está desactualizada y con vulnerabilidades conocidas; la 0.20.3 no se publica en npm, por eso `pnpm add xlsx` falla con `No matching version found for xlsx@^0.20.3`. Con `anteriority-ui` 1.18.0 hay que usar el tarball del CDN; desde la versión que acepta `^0.18.5 || ^0.20.3` también sirve `xlsx@0.18.5`. El archivo se descarga con `fetch` (requiere CORS) y se parsea completo en el hilo principal: con archivos de varios MB puede haber una pausa breve al abrir; solo las filas visibles se pintan. No muestra estilos de celda de Excel (colores, bordes, celdas combinadas), imágenes ni gráficos.
 
 ---
 
@@ -4118,7 +4118,7 @@ Contenedor con scrollbars personalizados (vertical y/u horizontal) que se oculta
 
 **Import:**
 ```jsx
-import ScrollBar from 'screens/components/ScrollBar';
+import { ScrollBar } from 'anteriority-ui';
 ```
 
 **Uso básico:**
