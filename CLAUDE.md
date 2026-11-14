@@ -112,7 +112,32 @@ pnpm storybook          # levanta Storybook en http://localhost:6006
 pnpm build-storybook    # build estático de Storybook
 pnpm build              # check-case + compila a dist/ + verify-dist — correr antes de confiar en un release
 pnpm check-case         # solo el audit de mayúsculas/minúsculas en imports (rápido, sin compilar)
+pnpm check-scroll       # audita scroll nativo (ver "Convención: scroll siempre con el ScrollBar")
+pnpm check-security     # auditor estático de seguridad (ver skill component-security-audit); --strict falla con hallazgos high
 ```
+
+**No hay linter ni tests unitarios configurados.** El script `pnpm test` es un placeholder que falla a propósito, `vitest.config.js` existe pero `vitest` no está en `devDependencies`, y no hay ESLint. No inventar esos comandos ni darlos por ejecutados. La verificación real del repo son los comandos de arriba más la revisión visual en Storybook (`pnpm storybook`) y, para seguridad, el agente `component-security-reviewer`.
+
+## Definición de "terminado" (verificación obligatoria)
+
+**Una tarea no se da por terminada sin haber ejecutado la verificación y confirmado que pasa sin errores.** Hay que correr los comandos, leer su salida y reportarla fielmente; si algo falla o no se pudo correr, se dice, no se omite.
+
+Según lo que se tocó, el mínimo es:
+- **Cualquier cambio en código bajo `screens/`, `common/`, `features/`, `hooks/` o `index.js`:** `pnpm build` (incluye `check-case`, compilación y `verify-dist`). `pnpm build-storybook` si se tocaron stories o la config de Storybook.
+- **Componente con scroll, listas, menús o diálogos:** además `pnpm check-scroll <ruta>` sin hallazgos nuevos.
+- **Componente que renderiza contenido externo o del usuario, enlaces, iframes, requests o storage:** además `pnpm check-security <ruta>` sin hallazgos nuevos (o el agente `component-security-reviewer`).
+- **Componente visual nuevo o con cambios visuales:** verlo en Storybook (skill `browser-automation` si hace falta) antes de cerrar.
+- **Cambio de props o comportamiento visible:** `AnteriorityUI.md`, `CHANGELOG.md` y la story actualizados en el mismo cambio (ver reglas más abajo).
+
+## Flujo de trabajo con slash commands (`.claude/commands/`)
+
+Flujo por fases: planificar, implementar, corregir y revisar. Cada comando está en `.claude/commands/<nombre>.md`:
+- `/plan <tarea>`: explora y propone un plan por pasos; **se detiene a pedir confirmación antes de tocar código**.
+- `/implement [plan]`: ejecuta el plan aprobado de forma incremental, verificando al terminar cada bloque.
+- `/fix [error]`: diagnostica y corrige en bucle hasta que `pnpm build` (y los chequeos que apliquen) pasen en verde.
+- `/review`: revisa `git diff`/`git status` contra estas convenciones antes de commitear.
+
+Los comandos no reemplazan las reglas de este archivo: las aplican. Los commits y ramas siguen la convención `UI-<n>` y nunca se crean PRs (el usuario los abre).
 
 ## Barrel (`index.js`) — indexación de componentes
 
@@ -138,6 +163,7 @@ El paquete se publica en el registro público de npm como `anteriority-ui`, no v
 
 - **Rama nueva:** `<tipo>/UI-<n>-<slug>`, con el slug en minúsculas, ej. `feat/UI-1-consumer-skill`. Tipos permitidos: `feat`, `fix`, `add`, `revert`, `chore`, `docs`, `refactor`, `test`, `style`, `perf`, `build`, `ci` (los mismos que usan las ramas existentes, `feat/...` y `fix/...`). Se crea desde `main` salvo que se indique otra base. El `<n>` es el número de tarea que indica el usuario; no inventarlo.
 - **Commit:** el asunto empieza con `UI-<n>: ` seguido del asunto en inglés, ej. `UI-1: Add consumer skill`. El cuerpo, si lo hay, también en inglés.
+- **Sin firma de Claude:** los commits no llevan `Co-Authored-By: Claude`, `Generated with Claude Code` ni autor/committer Claude/Anthropic. `.claude/hooks/block-claude-signature.mjs` bloquea el `git commit` que la traiga (mensaje, `--author`, `GIT_AUTHOR_*`) y, como red de seguridad, el `git push` si algún commit local sin subir ya la tiene. Si pasa, rehacer el commit local sin ella (`git reset --soft HEAD~1` y commitear de nuevo).
 - **Enforcement:** `.claude/hooks/require-task-prefix.mjs` (PreToolUse sobre Bash) bloquea: rama nueva sin prefijo, asunto de commit sin prefijo, y commit desde una rama sin prefijo (`main` excluido). Corre junto a `block-spanish-git.mjs`, que exige inglés.
 - Para que el hook pueda leer el asunto, usar `-m "UI-<n>: ..."` o un heredoc con el asunto en la primera línea. `-F archivo` se bloquea. `git commit --amend` sin `-m` se permite.
 - **Numeración automática:** el `<n>` de una tarea nueva es el número más alto ya usado en las ramas (locales y remotas) y en los commits con prefijo `UI-<n>`, más 1. Si el último es `UI-2`, la siguiente es `UI-3`. Antes de crear la rama, revisar `git branch -a` y `git log --all` para calcularlo; no hace falta preguntarlo al usuario salvo que la rama o el commit estén ambiguos.

@@ -13,6 +13,7 @@
     "build-storybook": "storybook build",
     "check-case": "node scripts/check-case.mjs",
     "check-scroll": "node scripts/check-native-scroll.mjs",
+    "check-security": "node scripts/check-security.mjs",
     "build": "node scripts/check-case.mjs && node scripts/build.mjs && node scripts/verify-dist.mjs",
     "plasmic:sync": "plasmic sync --yes"
   },
