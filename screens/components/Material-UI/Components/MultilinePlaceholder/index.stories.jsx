@@ -61,3 +61,13 @@ export const WithImagePaste = {
     );
   },
 };
+
+export const Underline = {
+  render: (args) => <ControlledTemplate {...args} />,
+  args: {
+    label: 'Notes',
+    placeholder: 'Write here...',
+    rows: 3,
+    variant: 'underline',
+  },
+};

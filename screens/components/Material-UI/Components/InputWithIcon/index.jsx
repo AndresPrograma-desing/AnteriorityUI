@@ -5,6 +5,7 @@ import InputLabel from '@mui/material/InputLabel';
 import InputAdornment from '@mui/material/InputAdornment';
 import FormControl from '@mui/material/FormControl';
 import MuiTextField from '@mui/material/TextField';
+import { UNDERLINE_VARIANT, underlineSx } from '../../../../../common/utils/underlineSx';
 
 export default function InputWithIcon({
   label,
@@ -13,16 +14,45 @@ export default function InputWithIcon({
   icon: Icon,
   placeholder,
   type = 'text',
-  variant = 'outlined', // 'standard' | 'outlined' | 'row' | 'filled'
+  variant = 'outlined', // 'standard' | 'outlined' | 'row' | 'filled' | 'underline'
   fullWidth = true,
   iconColor = 'black',
+  lineColor,
+  lineFocusColor,
   ...props
 }) {
   const adornmentId = React.useId();
 
+  // `underline`: igual que outlined (ícono dentro del campo) pero sin caja, solo la línea inferior.
+  if (variant === UNDERLINE_VARIANT) {
+    return (
+      <MuiTextField
+        type={type}
+        label={label}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        variant="standard"
+        size="small"
+        fullWidth={fullWidth}
+        sx={{ m: 0, ...underlineSx(lineColor, lineFocusColor) }}
+        slotProps={{
+          input: {
+            startAdornment: Icon && (
+              <InputAdornment position="start">
+                <Icon size={18} style={{ color: iconColor }} />
+              </InputAdornment>
+            ),
+          },
+        }}
+        {...props}
+      />
+    );
+  }
+
   if (variant === 'standard') {
     return (
-      <FormControl variant="standard" fullWidth={fullWidth} sx={{ m: 0 }}>
+      <FormControl variant="standard" fullWidth={fullWidth} sx={{ m: 0, ...underlineSx(lineColor, lineFocusColor) }}>
         {label && <InputLabel htmlFor={adornmentId}>{label}</InputLabel>}
         <Input
           id={adornmentId}
@@ -55,6 +85,7 @@ export default function InputWithIcon({
           placeholder={placeholder}
           variant="standard"
           fullWidth={fullWidth}
+          sx={underlineSx(lineColor, lineFocusColor)}
           {...props}
         />
       </Box>

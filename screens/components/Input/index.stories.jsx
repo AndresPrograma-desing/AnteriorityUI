@@ -46,3 +46,22 @@ export const Numeric = {
     step: 5,
   },
 };
+
+export const Underline = {
+  name: 'Underline (solo la línea)',
+  args: {
+    label: 'Nombre',
+    variant: 'underline',
+  },
+};
+
+export const UnderlineCustomColors = {
+  name: 'Underline con colores',
+  args: {
+    label: 'Email',
+    variant: 'underline',
+    lineColor: '#94a3b8',
+    lineFocusColor: '#059669',
+    helperText: 'La línea se pone verde al enfocar',
+  },
+};

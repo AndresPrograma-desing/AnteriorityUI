@@ -1324,7 +1324,7 @@ const [color, setColor] = useState('#1717FF');
 
 ### Container
 
-Envoltorio de tarjeta genérico para secciones de contenido, con soporte opcional de paginación integrada (`Paginador` de Material-UI).
+Envoltorio de tarjeta genérico para secciones de contenido, con soporte opcional de paginación integrada (`Paginador` de Material-UI) de un indicador de pasos integrado (`Stepper`) y de un formulario generado desde un JSON Schema (`SchemaForm`). El formulario y el `Stepper` son independientes: funcionan juntos o por separado.
 
 **Import:**
 ```jsx
@@ -1352,6 +1352,30 @@ import Container from '../Container'; // export default (index.jsx)
 | `pageSize` | number | `10` | Tamaño de página actual |
 | `pageSizeOptions` | array | `[5, 10, 20, 50]` | Opciones de tamaño de página |
 | `onPageSizeChange` | function | — | Handler de cambio de tamaño de página |
+| `showStepper` | boolean | `false` | Muestra un `Stepper` arriba del contenido (bajo el `header`), con una línea separadora. |
+| `steps` | array | `[]` | Pasos del `Stepper` (ver sección Stepper). |
+| `activeStep` | number | `0` | Índice del paso activo. |
+| `onStepClick` | function(index, step) | — | Hace clicables los pasos completados. |
+| `stepperProps` | object | `{}` | Props adicionales pasadas directo al `Stepper` (colores, `orientation`, `size`, `surface`, etc.), spread al final: si repite `steps`/`activeStep`/`onStepClick`, gana este objeto. Por defecto usa `surface="plain"` para no duplicar la tarjeta. |
+| `schema` | object | — | JSON Schema: si viene, el `Container` renderiza un formulario (`SchemaForm`) después de `children` y antes de la paginación. No requiere `showStepper`. Si no viene pero `showStepper` está activo y el paso activo trae `steps[i].schema` (y opcional `steps[i].uiSchema`), se muestra el del paso. |
+| `uiSchema` | object | — | `uiSchema` de rjsf para el `schema` propio. |
+| `formData` | object | — | Valores del formulario (controlado). |
+| `onFormChange` | function(formData, event) | — | Se llama en cada cambio. |
+| `onFormSubmit` | function(formData, event, { step, stepData }) | — | Se llama al enviar un formulario válido. `formData` trae todo lo acumulado en `formData`; el 3er argumento trae `step` (índice del paso activo, `undefined` sin `steps` por paso) y `stepData` (solo los campos del `schema` que se acaba de enviar), ideal para guardar cada paso por separado. |
+| `onFormError` | function | — | Se llama si el envío falla la validación. |
+| `formDisabled` | boolean | `false` | Deshabilita el formulario. |
+| `showFormSubmit` | boolean | `true` | Muestra el botón de envío del formulario (texto con `schemaFormProps.submitText`). |
+| `schemaFormProps` | object | `{}` | Props adicionales pasadas directo a `SchemaForm` (`widgets`, `fieldGap`, `errorMessages`, `submitText`, etc.), spread al final: gana sobre las props nombradas. Por defecto el `Container` pasa `inputVariant: 'underline'` (campos sin caja, solo la línea inferior); para volver a la caja: `schemaFormProps={{ inputVariant: 'outlined' }}`. |
+| `loading` | boolean | `false` | Oculta el `Stepper`, el formulario (`schema`) y la paginación, y muestra un `Loading` en su lugar. Pensado para cuando los pasos y el schema vienen de un JSON que todavía se está pidiendo. El `header` y `children` siguen visibles (los controla el consumidor). |
+| `formLoading` | boolean | `false` | Muestra el skeleton solo en el lugar del formulario y deja visibles el `Stepper`, el `header` y `children`. Pensado para pedir el `schema` de cada paso de a uno (un paso sin `schema` aún no muestra formulario). `loading` tiene prioridad. |
+| `loadingText` | string | — | Texto del `Loading`. |
+| `loadingVariant` | string | `'skeleton'` | `'skeleton'` (default): con `showStepper` y/o `schema` muestra un esqueleto con la forma del contenido (círculos con línea para el stepper y campos para el formulario, en las mismas columnas del `uiSchema`); sin ellos, las líneas del `Loading` `skeleton`. Cualquier otra variante se pasa al `Loading` (ver [Loading](#loading)). `loadingText` no se muestra en `skeleton`. |
+| `showFormSkeleton` | boolean | `showStepper \|\| !!schema` | Fuerza (o quita) los campos del esqueleto; útil si el `schema` llega recién con los datos y `showStepper` está apagado. |
+| `loadingColor` | string | — | Color del `Loading` (también el de la carga del módulo del formulario). |
+| `loadingProps` | object | `{}` | Props adicionales pasadas directo a `Loading` (`size`, `phrases`, etc.), spread al final. |
+| `wattermarkText` | string | `'Desarrollado por AnteriorityUI'` | Texto del banner de marca de agua (solo con `wattermark`). |
+| `wattermarkProps` | object | `{}` | Props adicionales pasadas directo al banner (`Barnner`: `type`, `icon`, `textColor`, `borderColor`, `bgColor`, etc.), spread al final: gana sobre el `bgColor` por defecto (`'#e1ddecff'`). |
+| `schemaMissingLabel` | string | — | Mensaje que se muestra si no se pudo cargar el formulario (falta `@rjsf/core`). Sin prop, el de `ErrorState`. |
 | `header` | node | — | Topbar propio del Container (títulos, filtros, acciones). Ocupa todo el ancho de la tarjeta, sobre el contenido. |
 | `stickyHeader` | boolean | `true` | Con `header`: lo deja fijo arriba (`position: sticky`) del área con scroll, así el contenido que sube pasa por debajo en vez de quedar cortado. Requiere que el scroll lo haga un ancestro (ej. el área de `AppShell`). |
 | `headerBgColor` / `headerTextColor` / `headerBorderColor` | string | `#ffffff` / heredado / `rgba(0, 0, 0, 0.08)` | Colores del `header` (el fondo debe ser opaco para tapar el contenido que pasa por debajo). |
@@ -1359,6 +1383,40 @@ import Container from '../Container'; // export default (index.jsx)
 | `bgImage` | string | — | URL de una imagen de fondo, renderizada detrás del contenido (capa independiente del `backdrop-filter` existente) |
 | `blurBackground` | boolean | `false` | Difumina la imagen de `bgImage` (no afecta el `backdrop-filter` del contenido, que sigue activo siempre por compatibilidad) |
 | `...props` | — | — | Cualquier otra prop (ej. `onClick`, `id`, `style`) se pasa al `div` raíz |
+
+**Guardar paso a paso o todo al final:** `formData` lo controlas tú y se acumula entre pasos. Para guardar cada paso, en `onFormSubmit(values, event, { step, stepData })` llama a tu API con `stepData` (solo los campos de ese paso), usa `formDisabled` mientras guarda y avanza `activeStep`. Para un único envío, avanza en cada submit y llama a la API solo en el último paso con `values` (todo acumulado). Si el `schema` de cada paso llega por separado, ve completando `steps[i].schema` y usa `formLoading` mientras llega (a diferencia de `loading`, mantiene visible el `Stepper`).
+
+**Formato del JSON (Stepper + formulario):** el `Container` se alimenta con datos, así que los pasos y los formularios pueden venir de un único JSON del backend. Todo es opcional; el `Stepper` aparece solo si hay `steps` y el formulario si hay `schema` (propio o del paso activo).
+```jsx
+const config = {
+  steps: [                                   // → Stepper
+    {
+      label: 'Titular',                      // obligatorio
+      description: '…', error: false, disabled: false, icon: '…',   // opcionales (ver Stepper)
+      schema: { type: 'object', required: ['nombre'],                // formulario de ESE paso
+        properties: { nombre: { type: 'string', title: 'Nombre' } } },
+      uiSchema: { 'ui:options': { columns: 2 } },                   // opcional
+    },
+    { label: 'Confirmar', schema: { type: 'object', properties: { acepta: { type: 'boolean', title: 'Acepto' } } } },
+  ],
+  // O un formulario único, con o sin steps:
+  // schema: { … }, uiSchema: { … },        // el uiSchema raíz también es el fallback de los pasos sin uiSchema
+};
+
+<Container
+  showStepper={!!config.steps}
+  steps={config.steps ?? []}
+  activeStep={step}
+  onStepClick={setStep}
+  schema={config.schema}
+  uiSchema={config.uiSchema}
+  formData={data}
+  onFormChange={setData}
+  onFormSubmit={() => setStep(step + 1)}
+  loading={!config}
+/>
+```
+`uiSchema` útil: `'ui:options': { columns: 2, columnFlow: 'column' | 'row' }` (columnas), por campo `{ 'ui:options': { colSpan: 'full' } }` (ancho completo) o `{ 'ui:widget': 'textarea' }`. Para editar estos JSON en vivo, ver las stories **Container (JSON)** en Storybook.
 
 **Ejemplos:**
 ```jsx
@@ -1373,12 +1431,26 @@ import Container from '../Container'; // export default (index.jsx)
   <p>Lista de resultados paginados.</p>
 </Container>
 
+<Container showStepper steps={[{ label: 'Titular' }, { label: 'Ubicación' }, { label: 'Confirmar' }]} activeStep={step} onStepClick={setStep}>
+  <p>Contenido del paso actual.</p>
+</Container>
+
+<Container schema={schema} formData={data} onFormChange={setData} onFormSubmit={save} schemaFormProps={{ submitText: 'Guardar' }} />
+
+<Container
+  showStepper
+  steps={[{ label: 'Titular', schema: titularSchema }, { label: 'Ubicación', schema: ubicacionSchema }]}
+  activeStep={step}
+  onFormSubmit={() => setStep(step + 1)}
+/>
+
 <Container bgImage="/fondo.jpg" blurBackground style={{ minHeight: '100vh' }}>
   <p>Contenedor usado como fondo de pantalla completa, con imagen difuminada detrás.</p>
 </Container>
 ```
 
 **Notas:**
+- El formulario requiere `@rjsf/core` (peer opcional) y se carga con import dinámico solo cuando hay `schema`: quien no lo usa no necesita instalarlo.
 - Para usar `Container` como fondo de pantalla completa, combinar con `style={{ minHeight: '100vh', maxWidth: 'none' }}` (el `max-width: 1300px` por defecto está pensado para secciones de contenido, no para fondos).
 
 ---
@@ -1595,6 +1667,7 @@ import DrawPanel from '../DrawPanel'; // export default (index.jsx)
 | `children` | node | — | Contenido principal del panel |
 | `width` | string | `'400px'` | Ancho máximo del panel |
 | `showActions` | boolean | `true` | Muestra footer con botones cancelar/confirmar |
+| `showCancelButton` / `showConfirmButton` | boolean | `true` / `true` | Muestran u ocultan cada botón del footer (con `showActions`). Útil para dejar solo "Cerrar" al terminar un proceso, o "Reintentar" + "Cerrar" si falló. |
 | `onConfirm` | function | — | Handler del botón confirmar |
 | `confirmText` | string | `'Confirmar'` | Texto del botón confirmar (ignorado si `confirmButtonProps.children` viene definido) |
 | `cancelText` | string | `'Cancelar'` | Texto del botón cancelar (ignorado si `cancelButtonProps.children` viene definido) |
@@ -1609,6 +1682,11 @@ import DrawPanel from '../DrawPanel'; // export default (index.jsx)
 | `onSubmitError` | function | — | Se llama cuando el envío falla la validación del schema (rjsf no llama a `onSubmit` en ese caso). Solo con `schema`. |
 | `schemaFormProps` | object | — | Props extra pasadas al `SchemaForm` interno (`widgets`, `fields`, `templates`, `validator`, `readonly`, etc.). Solo con `schema`. |
 | `schemaMissingLabel` | string | `'No se pudo cargar el formulario. Verificá que @rjsf/core esté instalado.'` | Mensaje mostrado si no se pudo cargar `SchemaForm` (típicamente, falta instalar `@rjsf/core`). Solo con `schema`. |
+| `showStepper` | boolean | `false` | Muestra un `Stepper` vertical arriba del contenido del panel, pensado como seguimiento de un envío o proceso por etapas: el consumidor avanza `activeStep` a medida que cada etapa termina (por ejemplo, con los eventos del backend). Por defecto es vertical, con círculos chicos (28px), conectores punteados, más espacio entre pasos (36px) y la paleta del panel (`panelColor`, `textColor`, `mutedTextColor`, `borderColor`). |
+| `steps` | `Array<{ label, description?, icon?, error?, loading? }>` | `[]` | Pasos del `Stepper` (ver sección Stepper). |
+| `activeStep` | number | `0` | Paso activo; `steps.length` = todo completado. |
+| `onStepClick` | function(index, step) | — | Hace clicables los pasos completados. |
+| `stepperProps` | object | `{}` | Props adicionales pasadas directo al `Stepper` (`activeLoading`, `orientation`, `size`, colores, etc.), spread al final: pisa los defaults (`orientation="vertical"`, `surface="plain"`, `size`, `lineStyle="dashed"`, `stepGap` y la paleta del panel). |
 | `loading` | boolean | `false` | Estado de carga de los botones del footer |
 | `contentLoading` | boolean | `false` | Reemplaza `children` (y la descripción bottom) por un `Loading` centrado dentro del área de contenido |
 | `contentLoadingText` | string | — | Texto mostrado bajo el spinner cuando `contentLoading` está activo (pasado a `Loading` como `text`; ignorado si `typeLoading` es `'skeleton'`) |
@@ -2608,6 +2686,8 @@ import Input from '../Input/index'; // export default, forwardRef, archivo index
 | helperText | string | — | Texto de ayuda bajo el campo (se ignora si hay `error`). |
 | required | boolean | — | Muestra el indicador `**` junto a la etiqueta. |
 | requiredColor | string | `'red'` | Color del indicador de requerido. |
+| variant | `'outlined'` \| `'filled'` \| `'standard'` \| `'underline'` | `'outlined'` | `'underline'` quita la caja y deja solo la línea donde se escribe (ver `TextField`). |
+| lineColor / lineFocusColor | string | colores de MUI | Solo `variant="underline"`: color de la línea en reposo / al enfocar. |
 | numeric | boolean | `false` | Solo acepta números. Al enfocar muestra un popover con flechas ▲▼; la rueda del mouse y las flechas del teclado también suben/bajan el valor. |
 | min / max | number | — | Límites (solo con `numeric`); se aplican al usar el stepper y al salir del campo. |
 | step | number | `1` | Incremento por click/rueda (solo con `numeric`). |
@@ -3347,7 +3427,8 @@ import InputWithIcon from '../Material-UI/Components/InputWithIcon/index'; // ex
 | icon | componente (ícono) | — | Ícono mostrado como adorno. |
 | placeholder | string | — | Placeholder del campo. |
 | type | string | `'text'` | Tipo de input HTML. |
-| variant | `'standard'` \| `'outlined'` \| `'row'` \| `'filled'` | `'outlined'` | Presentación visual; `'row'` coloca el ícono fuera del campo. |
+| variant | `'standard'` \| `'outlined'` \| `'row'` \| `'filled'` \| `'underline'` | `'outlined'` | Presentación visual; `'row'` coloca el ícono fuera del campo; `'underline'` deja el ícono dentro del campo pero sin caja (solo la línea inferior). |
+| lineColor / lineFocusColor | string | colores de MUI | Con `underline`, `standard` y `row`: color de la línea en reposo / al enfocar. |
 | fullWidth | boolean | `true` | Si ocupa el 100% del ancho disponible. |
 | iconColor | string | `'black'` | Color del ícono (solo aplica en `standard` y `row`; en `outlined`/`filled` usa `currentColor`). |
 | ...props | any | — | Cualquier otra prop de `TextField`/`Input` de Material-UI. |
@@ -3430,11 +3511,12 @@ import MultilinePlaceholder from '../Material-UI/Components/MultilinePlaceholder
 | helperText | string \| node | — | Texto de ayuda (admite `**texto**` como el `label`). |
 | rows | number | `4` | Número de filas visibles. |
 | maxRows | number | — | Límite de filas al auto-crecer. |
-| variant | string | `'outlined'` | Variant de `TextField`. |
+| variant | string | `'outlined'` | Variant del campo: `'outlined'`, `'filled'`, `'standard'` o `'underline'` (sin caja: solo la línea inferior, fondo transparente). |
+| lineColor / lineFocusColor | string | colores de MUI | Solo `variant="underline"`: color de la línea en reposo / al enfocar (también el del label enfocado). |
 | size | string | `'small'` | Tamaño de `TextField`. |
 | fullWidth | boolean | `true` | Si ocupa el 100% del ancho disponible. |
 | placeholder | string | — | Placeholder del campo. |
-| bgColor | string | `'#fff'` | Color de fondo del input. |
+| bgColor | string | `'#fff'` (`'transparent'` con `variant="underline"`) | Color de fondo del input. |
 | onImagePaste | function | — | Callback `(files, event)` invocado cuando se pegan (Ctrl+V) una o más imágenes desde el clipboard; `files` es un array de `File` nativos listos para subir o guardar en cualquier storage (si se pega una sola imagen, el array tiene un elemento). Una imagen ya pegada antes (mismo archivo, detectado por nombre+tamaño+fecha+tipo) se ignora para no duplicarla. Si no se pasa, el paste de imágenes no se intercepta (se comporta como un textarea normal). |
 | showImagePreview | boolean | `true` | Si se muestran miniaturas de las imágenes pegadas debajo del textarea, cada una con su propio botón para quitarla. Solo aplica si se pasó `onImagePaste`. |
 | imagePreviewLabel | string | `'Imagen pegada'` | Texto del badge (`Barnner`) de cada imagen pegada (y `alt` de la miniatura). |
@@ -3567,7 +3649,7 @@ import Search from '../Material-UI/Components/Search/index'; // export default, 
 | selectedTooltipBgColor | string | — | Fondo del tooltip de selecciones (pasa a `ModalTooltip` `bgColor`). |
 | selectedTooltipTextColor | string | — | Texto del tooltip de selecciones (pasa a `ModalTooltip` `textColor`). |
 | selectedTooltipProps | object | — | Props extra para el `ModalTooltip` de selecciones. Van antes que las del Selector: `text`, `children` y el ancho del wrapper siguen controlados por el Selector. |
-| wrapOptions | boolean | `false` | Si es `false`, las opciones del listado no hacen salto de línea (el listado toma el ancho de su contenido). Con `true`, el texto de cada opción puede partirse en varias líneas. |
+| wrapOptions | boolean | `false` | Si es `false`, las opciones del listado no hacen salto de línea (el listado toma el ancho de su contenido, pero nunca menos que el campo: un selector ancho tiene un desplegable igual de ancho). Con `true`, el texto de cada opción puede partirse en varias líneas. |
 | iconColor | string | `rgba(0, 0, 0, 0.54)` | Color del ícono de limpiar (mismo gris que usa MUI por default para íconos de acción). |
 | ...props | any | — | Cualquier otra prop de `Autocomplete` de Material-UI. |
 
@@ -3701,13 +3783,14 @@ import TextField from '../Material-UI/Components/TextField/index'; // export def
 | error | boolean \| string | — | Estado/mensaje de error; si es un string, reemplaza a `helperText`. |
 | helperText | string \| node | — | Texto de ayuda (admite `**texto**` como el `label`). |
 | type | string | `'text'` | Tipo de input HTML. |
-| variant | string | `'outlined'` | Variant de `TextField`. |
+| variant | string | `'outlined'` | Variant de `TextField`: `'outlined'`, `'filled'`, `'standard'` o `'underline'` (sin caja: solo la línea inferior, fondo transparente). |
+| lineColor / lineFocusColor | string | colores de MUI | Solo `variant="underline"`: color de la línea en reposo / al enfocar (también el del label enfocado). |
 | size | string | `'small'` | Tamaño de `TextField`. |
 | fullWidth | boolean | `true` | Si ocupa el 100% del ancho disponible. |
 | placeholder | string | — | Placeholder del campo. |
 | required | boolean | — | Muestra un indicador `**` junto a la etiqueta. |
 | requiredColor | string | `'red'` | Color del indicador de requerido. |
-| bgColor | string | `'#fff'` | Color de fondo del input (incluye fix de autofill de Chrome). |
+| bgColor | string | `'#fff'` (`'transparent'` con `variant="underline"`) | Color de fondo del input (incluye fix de autofill de Chrome). |
 | textColor | string | `'#0f172a'` | Color de texto usado en el fix de autofill. |
 | ...props | any | — | Cualquier otra prop de `TextField` de Material-UI. |
 
@@ -4208,6 +4291,7 @@ const schema = {
 | `noHtml5Validate` | boolean | `true` | Desactiva la validación nativa del navegador (el globo "Incluye un signo @…"). La validación la hace el JSON Schema y el error sale inline bajo el campo, con el estilo del `Input`. |
 | `errorMessages` | object | — | Pisa los mensajes por defecto en español. Clave = keyword de ajv (`required`, `minimum`, `minLength`, `pattern`…) o `format:<nombre>` (ej. `format:email`); valor = string o `(params) => string`. |
 | `transformErrors` | function | — | `transformErrors` de rjsf; se aplica después de traducir los mensajes. |
+| `inputVariant` | `'outlined'` \| `'underline'` | — | Variante de todos los campos de texto/número/email/contraseña (`'underline'` = solo la línea inferior, sin caja). Un campo puede pisarla con `'ui:options': { variant }`; la línea se recolorea con `'ui:options': { lineColor, lineFocusColor }`. No afecta a `Selector`, `CalendarPicker` ni al resto de widgets. |
 | `fieldGap` | string | `'1.25rem'` | Espacio vertical entre campos (cualquier valor CSS: `'2rem'`, `'24px'`). En `DrawPanel` se pasa con `schemaFormProps={{ fieldGap: '2rem' }}`. |
 | `showErrorList` | boolean \| `'top'` \| `'bottom'` | `false` | Lista de errores de rjsf arriba/abajo del form. Por defecto se muestran solo inline. |
 
@@ -4236,6 +4320,11 @@ const schema = {
 | `AudioWidget` | `AudioRecorder` (de `MediaViewer`) + reproductor de audio | `string` con `format: 'data-url'` + `'ui:widget': 'AudioWidget'` (una grabación), o `array` de esos con `'ui:options': { multiple: true }` (varias) — graba desde el micrófono, ver nota de audio debajo |
 | `EmailWidget` / `URLWidget` | `Input` (`type="email"`/`"url"`) | `string` con `format: 'email'` / `format: 'uri'` (rjsf los resuelve por `format` con prioridad sobre `TextWidget`, por eso necesitan su propio mapeo) |
 | `PasswordWidget` | `Input` (`type="password"`) | `string` con `'ui:widget': 'password'` (shorthand de rjsf) |
+
+**Columnas:** por defecto los campos van en cascada (una columna). Con `'ui:options': { columns: N }` en el `uiSchema` del objeto (en la raíz: `uiSchema={{ 'ui:options': { columns: 2 } }}`) se reparten en N columnas.
+- `columnFlow: 'row'` (default) llena de izquierda a derecha, fila por fila; `columnFlow: 'column'` llena columna por columna (10 campos en 2 columnas → los primeros 5 a la izquierda y los otros 5 a la derecha).
+- Cada campo puede ocupar varias columnas con `'ui:options': { colSpan: N | 'full' }` (solo con `columnFlow: 'row'`); sirve para campos anchos como una dirección o notas.
+- Responsive según el ancho del propio formulario (no del viewport): por debajo de 520px vuelve a una columna. `fieldGap` controla el espacio entre filas y columnas. Aplica a cada objeto, incluidos los anidados.
 
 **Texto junto al switch:** por defecto el switch de un `boolean` va solo. Con `'ui:options': { labelPosition: 'top' | 'right' | 'left' }` muestra el `title` del campo (o `text` si se pasa) arriba, a la derecha o a la izquierda. También acepta `textColor`, `activeColor` e `inactiveColor`.
 
@@ -4457,6 +4546,41 @@ const uiSchema = {
 ```
 
 **Notas:** El validador (`@rjsf/validator-ajv8`) viene empaquetado como dependency de `anteriority-ui` y se usa por default — no hace falta instalarlo ni pasarlo por prop; `validator` solo sirve para forzar otra implementación. Los widgets propios pueden extenderse o pisarse por campo vía la prop `widgets` (se mergean sobre los default) sin perder el resto. Al igual que el resto de componentes con `children` libre, no se acopla a `DrawPanel` ni a ningún contenedor — cualquier componente puede envolverlo. `templates.ButtonTemplates.SubmitButton` está pisado con un componente que no renderiza nada: `@rjsf/core` agrega su propio botón de submit nativo (sin estilo) además de cualquier `children`/botón que se le pase al `<Form>`, así que sin ese override quedarían dos submits — el de `SchemaForm` y el default de rjsf.
+
+---
+
+### ProgressLine
+
+Línea de progreso: una pista con un relleno que avanza de 0 a 100 con animación. Continua o punteada (`- - - - -`), horizontal o vertical. Es la pieza que usa `Stepper` para los conectores entre pasos y la barra del resumen compacto; sirve también como barra de progreso o separador con avance.
+
+**Import:**
+```jsx
+import { ProgressLine } from 'anteriority-ui';
+```
+
+**Uso básico:**
+```jsx
+<ProgressLine progress={40} />
+<ProgressLine lineStyle="dashed" progress={70} />
+<div style={{ height: 160 }}><ProgressLine orientation="vertical" progress={50} /></div>
+```
+
+**Props:**
+
+| Prop | Tipo | Default | Descripción |
+|---|---|---|---|
+| `progress` | `number` | `0` | Avance de 0 a 100 (se limita a ese rango); el relleno se anima al cambiar. |
+| `orientation` | `'horizontal' \| 'vertical'` | `'horizontal'` | Horizontal ocupa el ancho del contenedor; vertical el alto (el padre lo define con `height`/`flex` vía `className` o `style`). |
+| `lineStyle` | `'solid' \| 'dashed'` | `'solid'` | Continua o punteada. |
+| `thickness` | `number` | `4` (`2` si `dashed`) | Grosor en px. |
+| `dash` / `gap` | `number` | `6` / `5` | Solo `dashed`: largo de cada raya y del hueco, en px. |
+| `trackColor` | `string` | `'#dbe7fb'` | Color de la pista (la parte sin avanzar). |
+| `fillColor` | `string` | `'#0284c7'` | Color del relleno (la parte avanzada). |
+| `as` | `string` | `'span'` | Etiqueta renderizada (`'li'` para usarla dentro de una lista). |
+| `aria-label` | `string` | — | Si se pasa, la línea se expone como `progressbar` (`aria-valuenow`); si no, es decorativa (`aria-hidden`). |
+| `className`, `style` | | | Clase / estilos extra. |
+
+**Notas:** el relleno se revela con `clip-path` (no con `scale`) para no deformar las rayas.
 
 ---
 
@@ -4801,6 +4925,67 @@ const [value, setValue] = useState(30);
 | `className` | `string` | `''` | Clase adicional. |
 | `style` | `object` | — | Estilos inline. |
 | `aria-label` | `string` | — | Texto accesible del slider. |
+
+---
+
+### Stepper
+
+Indicador de pasos para workflows / wizards (ej. Titular → Ubicación → Servicio → Instalación → Confirmar). Controlado por `activeStep`: los pasos anteriores se ven completados (check), el activo resaltado con halo y los siguientes pendientes. Responsive según **su propio ancho** (container query): por debajo de 560px oculta las etiquetas por paso (siguen disponibles para lectores de pantalla) y muestra una línea "Paso X de N · Etiqueta" con barra de progreso.
+
+**Import:**
+```jsx
+import { Stepper } from 'anteriority-ui';
+```
+
+**Uso básico:**
+```jsx
+const [step, setStep] = useState(0);
+
+<Stepper
+  activeStep={step}
+  steps={[{ label: 'Titular' }, { label: 'Ubicación' }, { label: 'Servicio' }, { label: 'Instalación' }, { label: 'Confirmar' }]}
+/>
+```
+
+**Props:**
+
+| Prop | Tipo | Default | Descripción |
+|---|---|---|---|
+| `steps` | `Array<{ label, description?, icon?, error?, disabled?, id? }>` | `[]` | Pasos. `icon` reemplaza el número/check dentro del círculo y se mantiene en todos los estados (completado y error muestran una insignia en la esquina). Acepta: URL o data URI de imagen/SVG (`string` → `<img>`), un elemento (`<svg>`, ícono de `lucide-react`) o un componente; `description` se muestra bajo la etiqueta (en modo angosto se oculta). |
+| `activeStep` | `number` | `0` | Índice (0-based) del paso activo. `activeStep === steps.length` marca todos los pasos como completados (ej. el proceso ya se entregó). |
+| `activeLoading` | `boolean` | `false` | Marca el paso activo como en curso: sin `icon` muestra un spinner en vez del número; con `icon` conserva el ícono y dibuja un aro que gira alrededor del círculo. También por paso: `steps[i].loading` (útil para mostrarlo solo en un paso). |
+| `lineStyle` | `'solid' \| 'dashed'` | `'solid'` | Estilo de los conectores: continuo o punteado (`- - - -`). Los conectores y la barra compacta son [ProgressLine](#progressline). |
+| `stepGap` | `number` | `28` | Solo `orientation="vertical"`: espacio en px entre un paso y el siguiente (largo del conector). |
+| `orientation` | `'horizontal' \| 'vertical'` | `'horizontal'` | Disposición. |
+| `surface` | `'card' \| 'plain'` | `'card'` | `card`: contenedor con degradé suave, borde y sombra; `plain`: sin fondo ni borde (para ponerlo sobre tu propia superficie). |
+| `imageFit` | `'cover' \| 'contain'` | `'cover'` | Ajuste de las imágenes (`icon` como string) dentro del círculo. |
+| `size` | `number` | `44` | Diámetro del círculo en px (en modo angosto se limita a 36). |
+| `onStepClick` | `function(index, step)` | — | Si se pasa, los pasos clicables son botones. |
+| `clickableSteps` | `'completed' \| 'all'` | `'completed'` | Qué pasos se pueden clickear (solo con `onStepClick`). |
+| `completedLabel`, `errorLabel` | `string` | `'Completado'`, `'Con error'` | Texto para lectores de pantalla. |
+| `compactLabel` | `function(current, total, label) => string` | `Paso X de N · label` | Texto del resumen en modo angosto. |
+| `aria-label` | `string` | `'Progreso'` | Nombre accesible de la lista. |
+| `bgColor` | `string` | `'#ffffff'` | Fondo del círculo pendiente. |
+| `surfaceColor` / `surfaceBorderColor` | `string` | degradé `#ffffff → #f1f6fe` / `'#e2e8f0'` | Fondo (acepta gradientes) y borde de la tarjeta (`surface="card"`). |
+| `textColor` | `string` | `'#475569'` | Etiquetas y números pendientes. |
+| `activeTextColor` | `string` | `'#0f172a'` | Etiqueta del paso activo/completado y resumen compacto. |
+| `descriptionColor` | `string` | `'#94a3b8'` | Descripciones. |
+| `accentColor` | `string` | `linear-gradient(135deg, #0ea5e9, #0369a1)` | Fondo del círculo activo/completado (acepta gradientes). |
+| `iconColor` | `string` | `'#ffffff'` | Número/check dentro del círculo relleno. |
+| `borderColor` | `string` | `'#bfdbfe'` | Borde del círculo pendiente. |
+| `haloColor` | `string` | `'#d4ecfc'` | Halo alrededor del paso activo. |
+| `lineColor` / `lineActiveColor` | `string` | `'#dbe7fb'` / `'#0284c7'` | Conector pendiente / completado (también barra de progreso compacta, brillo y foco). |
+| `errorColor` | `string` | `'#dc2626'` | Paso con `error`. |
+| `successColor` | `string` | `'#16a34a'` | Insignia de completado sobre marcadores con `icon`. |
+| `className`, `style` | | | Clase / estilos extra. |
+
+**Si un paso falla:** márcalo con `error: true` y deja `activeStep` en ese paso: el círculo se pone rojo con una X, la línea hacia el siguiente no se rellena y los pasos posteriores quedan pendientes. En un `DrawPanel` con `showStepper`, el footer puede pasar a "Reintentar" + "Cerrar" (`showConfirmButton`, `onConfirm`, `cancelText`); ver la story del `DrawPanel`.
+
+**Ejemplo clicable y vertical:**
+```jsx
+<Stepper steps={steps} activeStep={step} onStepClick={(i) => setStep(i)} />
+<Stepper orientation="vertical" steps={[{ label: 'Titular', description: 'Datos del titular' }, { label: 'Ubicación' }]} activeStep={0} />
+```
 
 ---
 

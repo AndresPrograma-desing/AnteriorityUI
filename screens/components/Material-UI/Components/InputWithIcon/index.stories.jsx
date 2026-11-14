@@ -47,3 +47,14 @@ export const Row = {
     variant: 'row',
   },
 };
+
+export const Underline = {
+  render: (args) => <ControlledTemplate {...args} />,
+  args: {
+    label: 'Buscar',
+    placeholder: 'Buscar...',
+    icon: SearchIcon,
+    variant: 'underline',
+    lineFocusColor: '#059669',
+  },
+};

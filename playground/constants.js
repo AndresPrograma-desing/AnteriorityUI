@@ -39,6 +39,7 @@ export const DEMO_GROUPS = {
   mediaViewer: 'MediaViewer',
   layout: 'Layout',
   upload: 'Carga',
+  workflow: 'Workflow',
 };
 
 export const DEMO_LABELS = {
@@ -51,6 +52,8 @@ export const DEMO_LABELS = {
   footer: 'Footer',
   frame: 'Frame',
   dropzone: 'FileDropZone',
+  containerWorkflow: 'Container: Stepper + JSON',
+  drawPanelWorkflow: 'DrawPanel: Stepper + JSON',
 };
 
 // --- Vista "Ver JSON" (compartida) ---

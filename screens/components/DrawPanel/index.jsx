@@ -2,13 +2,14 @@ import React, { useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { XCircle } from 'lucide-react';
 import styles from './index.module.css';
-import { SchemaFormContent } from './components/index.js';
-import { DEFAULT_SCHEMA_FORM_ID_PREFIX, DEFAULT_SCHEMA_MISSING_LABEL } from './constants.js';
+import SchemaFormLoader from '../../../common/schema-form/SchemaFormLoader/index';
+import { DEFAULT_SCHEMA_FORM_ID_PREFIX, DEFAULT_SCHEMA_MISSING_LABEL, DEFAULT_STEPPER_SIZE, DEFAULT_STEPPER_GAP } from './constants.js';
 import { isEmptyValue, hasUserValues, getSchemaRequiredFields } from './utils.js';
 
 import Button from '../Button/index';
 import CountdownBar from '../CountdownBar/index';
 import Loading from '../Loading/index';
+import Stepper from '../Stepper/index';
 import MarkdownContent from '../MarkdownContent/index';
 
 const DrawPanel = ({ 
@@ -23,6 +24,8 @@ const DrawPanel = ({
   children,
   width = '400px',
   showActions = true,
+  showCancelButton = true,
+  showConfirmButton = true,
   onConfirm,
   confirmText = 'Confirmar',
   cancelText = 'Cancelar',
@@ -37,6 +40,11 @@ const DrawPanel = ({
   onSubmitError,
   schemaFormProps,
   schemaMissingLabel = DEFAULT_SCHEMA_MISSING_LABEL,
+  showStepper = false,
+  steps = [],
+  activeStep = 0,
+  onStepClick,
+  stepperProps = {},
   loading = false,
   contentLoading = false,
   contentLoadingText,
@@ -243,8 +251,30 @@ const DrawPanel = ({
             </div>
           ) : (
             <>
+              {showStepper && (
+                <div className={styles.stepper}>
+                  {/* Por defecto vertical y con la paleta del panel; `stepperProps` pisa todo. */}
+                  <Stepper
+                    orientation="vertical"
+                    surface="plain"
+                    size={DEFAULT_STEPPER_SIZE}
+                    lineStyle="dashed"
+                    stepGap={DEFAULT_STEPPER_GAP}
+                    steps={steps}
+                    activeStep={activeStep}
+                    onStepClick={onStepClick}
+                    bgColor={panelColor}
+                    textColor={mutedTextColor}
+                    activeTextColor={textColor}
+                    descriptionColor={mutedTextColor}
+                    borderColor={borderColor}
+                    lineColor={borderColor}
+                    {...stepperProps}
+                  />
+                </div>
+              )}
               {isSchemaMode && (
-                <SchemaFormContent
+                <SchemaFormLoader
                   schema={schema}
                   uiSchema={uiSchema}
                   formData={currentFormData}
@@ -287,7 +317,7 @@ const DrawPanel = ({
 
         {showActions && (
           <div className={styles.footer} style={{ backgroundColor: panelColor, borderTopColor: borderColor }}>
-            <Button
+            {showCancelButton && <Button
               variant=""
               onClick={onClose}
               border={Button.COLORS.RED}
@@ -296,8 +326,8 @@ const DrawPanel = ({
               {...cancelButtonProps}
             >
               {cancelButtonProps?.children ?? cancelText}
-            </Button>
-            <Button
+            </Button>}
+            {showConfirmButton && <Button
               type={resolvedFormId ? 'submit' : 'button'}
               form={resolvedFormId}
               variant="primary"
@@ -309,7 +339,7 @@ const DrawPanel = ({
               {...confirmButtonProps}
             >
               {confirmButtonProps?.children ?? confirmText}
-            </Button>
+            </Button>}
           </div>
         )}
       </div>

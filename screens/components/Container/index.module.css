@@ -51,6 +51,28 @@
   z-index: 10;
 }
 
+/* Loader que ocupa el lugar del Stepper / formulario / paginación mientras `loading`. */
+.loadingBlock {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 0;
+}
+
+/* Esqueleto con la forma del contenido: arriba, a todo el ancho (el real también va arriba). */
+.loadingBlockShaped {
+  align-items: flex-start;
+  padding: 0.5rem 0 1rem;
+}
+
+/* Stepper integrado: va arriba del contenido, separado por una línea sutil. */
+.stepperContainer {
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--container-header-border, rgba(0, 0, 0, 0.08));
+}
+
 @media (max-width: 768px) {
   .containerCard {
     max-width: 100%;

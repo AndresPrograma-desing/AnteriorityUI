@@ -1,5 +1,9 @@
 export const DEFAULT_SUBMIT_TEXT = 'Enviar';
 
+// Ancho del propio formulario (px) por debajo del cual `ui:options.columns` colapsa a una columna.
+// Debe coincidir con el @container de index.module.css.
+export const COLUMNS_COLLAPSE_WIDTH = 520;
+
 // Mensajes de validación por defecto (clave = keyword de ajv, o `format:<nombre>` para formatos).
 // Se pueden sobrescribir por prop `errorMessages` de SchemaForm.
 export const ERROR_MESSAGES = {

@@ -2,6 +2,7 @@ import React, { forwardRef } from 'react';
 import MuiTextField from '@mui/material/TextField';
 import ImagePastePreview from '../../../ImagePastePreview/index';
 import { formatHighlightedText } from '../../../GreenHighlight/utils';
+import { UNDERLINE_VARIANT, underlineSx } from '../../../../../common/utils/underlineSx';
 import usePasteImage from '../../../../../common/hooks/usePasteImage';
 import styles from './index.module.css';
 import {
@@ -26,7 +27,9 @@ const MultilinePlaceholder = forwardRef(({
   size = "small",
   fullWidth = true,
   placeholder,
-  bgColor = DEFAULT_BG_COLOR,
+  bgColor,
+  lineColor,
+  lineFocusColor,
   onImagePaste,
   showImagePreview = true,
   imagePreviewLabel = DEFAULT_IMAGE_PREVIEW_LABEL,
@@ -55,6 +58,10 @@ const MultilinePlaceholder = forwardRef(({
 
   const { inputProps, ...restProps } = props;
 
+  // `variant="underline"`: sin caja, solo la línea inferior (MUI "standard", fondo transparente).
+  const isUnderline = variant === UNDERLINE_VARIANT;
+  const resolvedBg = bgColor ?? (isUnderline ? 'transparent' : DEFAULT_BG_COLOR);
+
   return (
     <div className={wrapperClassName || undefined} style={wrapperStyle}>
       <MuiTextField
@@ -63,14 +70,18 @@ const MultilinePlaceholder = forwardRef(({
         onChange={onChange}
         error={!!error}
         helperText={error || displayHelperText}
-        variant={variant}
+        variant={isUnderline ? 'standard' : variant}
         size={size}
         fullWidth={fullWidth}
         placeholder={placeholder}
         multiline
         rows={rows}
         maxRows={maxRows}
-        sx={{ m: 0, '& .MuiInputBase-root': { backgroundColor: bgColor } }}
+        sx={{
+          m: 0,
+          '& .MuiInputBase-root': { backgroundColor: resolvedBg },
+          ...(isUnderline ? underlineSx(lineColor, lineFocusColor) : {}),
+        }}
         inputRef={ref}
         onPaste={handlePaste}
         inputProps={{

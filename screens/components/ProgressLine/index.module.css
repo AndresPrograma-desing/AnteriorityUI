@@ -1,0 +1,61 @@
+/* Tokens locales: var(--progress-line-*, <default>) se pisa por props (trackColor / fillColor / thickness). */
+.line {
+  --progress-line-angle: 90deg;
+  position: relative;
+  display: block;
+  overflow: hidden;
+  box-sizing: border-box;
+  border-radius: 999px;
+  background: var(--progress-line-track, #dbe7fb);
+}
+
+/* El largo se declara con :where (especificidad 0) para que el padre lo pueda pisar con su className. */
+:where(.line[data-orientation='horizontal']) {
+  width: 100%;
+}
+
+.line[data-orientation='horizontal'] {
+  height: var(--progress-line-t);
+}
+
+:where(.line[data-orientation='vertical']) {
+  height: 100%;
+}
+
+.line[data-orientation='vertical'] {
+  --progress-line-angle: 180deg;
+  width: var(--progress-line-t);
+}
+
+.fill {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--progress-line-fill, #0284c7);
+  transition: clip-path 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Punteada: rayas y huecos con un gradiente repetido (pista y relleno comparten el patrón). */
+.line[data-dashed] {
+  border-radius: 0;
+  background: repeating-linear-gradient(
+    var(--progress-line-angle),
+    var(--progress-line-track, #dbe7fb) 0 var(--progress-line-dash),
+    transparent var(--progress-line-dash) calc(var(--progress-line-dash) + var(--progress-line-gap))
+  );
+}
+
+.line[data-dashed] .fill {
+  border-radius: 0;
+  background: repeating-linear-gradient(
+    var(--progress-line-angle),
+    var(--progress-line-fill, #0284c7) 0 var(--progress-line-dash),
+    transparent var(--progress-line-dash) calc(var(--progress-line-dash) + var(--progress-line-gap))
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fill {
+    transition: none;
+  }
+}

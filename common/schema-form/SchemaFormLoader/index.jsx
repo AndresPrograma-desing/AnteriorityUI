@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import Loading from '../../../Loading/index';
-import ErrorState from '../../../ErrorState/index';
+import Loading from '../../../screens/components/Loading/index';
+import ErrorState from '../../../screens/components/ErrorState/index';
 import styles from './index.module.css';
 
-// SchemaForm depende de @rjsf/core, que es una peer dependency OPCIONAL de la librería. Si
-// DrawPanel lo importara de forma estática, todo proyecto que use un DrawPanel (con o sin schema)
-// tendría que instalar rjsf. Por eso se carga con un import dinámico, solo cuando el panel recibe
-// un `schema`; el módulo queda cacheado para que reabrir el panel no vuelva a mostrar el loading.
+// Pieza compartida (DrawPanel, Container). SchemaForm depende de @rjsf/core, que es una peer
+// dependency OPCIONAL de la librería. Si el padre lo importara de forma estática, todo proyecto
+// que lo use (con o sin schema) tendría que instalar rjsf. Por eso se carga con un import dinámico, solo cuando el padre recibe
+// un `schema`; el módulo queda cacheado para que reabrir el padre no vuelva a mostrar el loading.
 let cachedSchemaForm = null;
 
-// Renderiza el formulario del JSON Schema que recibe el DrawPanel, dentro del área de contenido.
+// Renderiza el formulario del JSON Schema que recibe el padre, dentro de su área de contenido.
 // No agrega botones propios salvo que se pida (`showSubmitButton`, cuando el panel no muestra su
 // footer): el submit lo dispara el botón confirmar del footer vía `formId`.
-const SchemaFormContent = ({
+const SchemaFormLoader = ({
   schema,
   uiSchema,
   formData,
@@ -33,13 +33,13 @@ const SchemaFormContent = ({
   useEffect(() => {
     if (cachedSchemaForm) return undefined;
     let cancelled = false;
-    import('../../../SchemaForm/index')
+    import('../../../screens/components/SchemaForm/index')
       .then((module) => {
         cachedSchemaForm = module.default;
         if (!cancelled) setSchemaForm(() => module.default);
       })
       .catch((err) => {
-        console.error('[DrawPanel] No se pudo cargar SchemaForm:', err);
+        console.error('[SchemaForm] No se pudo cargar SchemaForm:', err);
         if (!cancelled) setFailed(true);
       });
     return () => {
@@ -75,4 +75,4 @@ const SchemaFormContent = ({
   );
 };
 
-export default SchemaFormContent;
+export default SchemaFormLoader;

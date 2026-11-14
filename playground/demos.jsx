@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FileSpreadsheet, Upload, FilePlus, Box, Square, Image as ImageIcon, Braces, Table2, BookOpen } from 'lucide-react';
+import { FileSpreadsheet, Upload, Workflow, PanelRight, FilePlus, Box, Square, Image as ImageIcon, Braces, Table2, BookOpen } from 'lucide-react';
 import logoUrl from '../assets/anteriorityUI/anteriority-logo.svg';
 import { sampleData, sampleSchema } from '../screens/components/MediaViewer/stories/jsonSample.js';
 import MediaViewer from '../screens/components/MediaViewer/index';
@@ -12,6 +12,8 @@ import Footer from '../screens/components/Footer/index';
 import FileDropZone from '../screens/components/FileDropZone/index';
 import Button from '../screens/components/Button/index';
 import ScrollBar from '../screens/components/ScrollBar/index';
+import JsonEditorDemo from '../screens/components/Container/stories/JsonEditorDemo';
+import JsonProgressDemo from '../screens/components/DrawPanel/stories/JsonProgressDemo';
 import MarkdownContent from '../screens/components/MarkdownContent/index';
 import {
   APP_NAME,
@@ -346,6 +348,9 @@ export const DEMOS = [
     icon: Square,
     render: () => <Frame title={FRAME_DEMO_TEXT.title} content={FRAME_DEMO_TEXT.content} />,
   },
+  // Cada demo trae su propio Container/DrawPanel y un editor de JSON: `ownContainer` evita duplicar el envoltorio.
+  { id: 'container-workflow', group: DEMO_GROUPS.workflow, label: DEMO_LABELS.containerWorkflow, icon: Workflow, ownContainer: true, render: () => <JsonEditorDemo /> },
+  { id: 'drawpanel-workflow', group: DEMO_GROUPS.workflow, label: DEMO_LABELS.drawPanelWorkflow, icon: PanelRight, ownContainer: true, render: () => <JsonProgressDemo /> },
   { id: 'dropzone', group: DEMO_GROUPS.upload, label: DEMO_LABELS.dropzone, icon: ImageIcon, render: DropZoneDemo },
 ];
 

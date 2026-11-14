@@ -29,6 +29,39 @@
 
 .gridItem {
   width: 100%;
+  min-width: 0;
+  grid-column: span var(--schemaform-span, 1);
+}
+
+/* Varias columnas (`'ui:options': { columns }`). El contenedor de consulta es el propio bloque de
+   campos, así que el colapso a una columna depende del ancho del formulario, no del viewport.
+   Mantener 520px sincronizado con COLUMNS_COLLAPSE_WIDTH en constants.js. */
+.fieldsWrap {
+  container-type: inline-size;
+  container-name: schemaform-fields;
+  width: 100%;
+}
+
+.fieldsGrid[data-columns] {
+  display: grid;
+  grid-template-columns: repeat(var(--schemaform-cols, 1), minmax(0, 1fr));
+}
+
+.fieldsGrid[data-flow='column'] {
+  grid-auto-flow: column;
+  grid-template-rows: repeat(var(--schemaform-rows, 1), auto);
+}
+
+@container schemaform-fields (max-width: 520px) {
+  .fieldsGrid[data-columns] {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+    grid-auto-flow: row;
+  }
+
+  .gridItem {
+    grid-column: auto;
+  }
 }
 
 .field {

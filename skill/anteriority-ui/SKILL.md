@@ -174,7 +174,7 @@ Nombres exactos del barrel.
 - `Footer` — barra inferior con zonas izquierda/centro/derecha y botones de acción (`actions`), opcionalmente sticky.
 - `FileDropZone` — zona para recibir un archivo por arrastre, pegado o click (filtro `accept`).
 - `FloatingPanel` — ventana flotante con contenido libre: se mueve, redimensiona y se ancla a un elemento.
-- `Slider` — slider con color de acento y tooltip. `CommandPalette` — paleta de comandos.
+- `Stepper` — indicador de pasos para workflows/wizards (horizontal/vertical, responsive). `ProgressLine` — línea de progreso continua o punteada con relleno animado. `Slider` — slider con color de acento y tooltip. `CommandPalette` — paleta de comandos.
 - `Text`, `ToggleCard`, `Callout` — para bloques de texto y avisos dentro de layouts.
 
 ## 5. Configuración de API (solo si usás componentes con red)

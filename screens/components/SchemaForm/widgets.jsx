@@ -28,7 +28,19 @@ import AudioRecorder from '../MediaViewer/components/AudioRecorder/index';
 // que rjsf les pasa a la interfaz de los componentes ya existentes de la librería,
 // para que un <SchemaForm /> se vea igual que cualquier otro formulario de AnteriorityUI.
 
-export function TextWidget({ id, value, required, disabled, readonly, label, placeholder, rawErrors, onChange, schema, options }) {
+// Variante visual de los campos de texto/número: `'ui:options': { variant: 'underline' }` por campo,
+// o `inputVariant` en SchemaForm para todos (llega por formContext). Colores de la línea vía
+// `'ui:options': { lineColor, lineFocusColor }`.
+const inputStyleProps = (options, formContext) => {
+  const variant = options?.variant ?? formContext?.inputVariant;
+  return {
+    ...(variant && { variant }),
+    ...(options?.lineColor && { lineColor: options.lineColor }),
+    ...(options?.lineFocusColor && { lineFocusColor: options.lineFocusColor }),
+  };
+};
+
+export function TextWidget({ id, value, required, disabled, readonly, label, placeholder, rawErrors, onChange, schema, options, formContext }) {
   // rjsf resuelve EmailWidget/URLWidget/PasswordWidget por 'format' con prioridad
   // sobre el widget de 'type', así que sin este mapeo esos campos caen al widget
   // nativo de rjsf (sin label ni estilo) en vez de a Input. Ver registro de widgets
@@ -38,6 +50,7 @@ export function TextWidget({ id, value, required, disabled, readonly, label, pla
     <Input
       id={id}
       type={htmlType}
+      {...inputStyleProps(options, formContext)}
       label={label}
       value={value ?? ''}
       required={required}
@@ -53,12 +66,13 @@ export function PasswordWidget(props) {
   return <TextWidget {...props} options={{ ...props.options, inputType: 'password' }} />;
 }
 
-export function NumberWidget({ id, value, required, disabled, readonly, label, placeholder, rawErrors, onChange, schema }) {
+export function NumberWidget({ id, value, required, disabled, readonly, label, placeholder, rawErrors, onChange, schema, options, formContext }) {
   return (
     <Input
       id={id}
       numeric
       {...numericPropsFromSchema(schema)}
+      {...inputStyleProps(options, formContext)}
       label={label}
       value={value ?? ''}
       required={required}
@@ -73,10 +87,11 @@ export function NumberWidget({ id, value, required, disabled, readonly, label, p
   );
 }
 
-export function TextareaWidget({ id, value, required, disabled, readonly, label, placeholder, onChange }) {
+export function TextareaWidget({ id, value, required, disabled, readonly, label, placeholder, onChange, options, formContext }) {
   return (
     <FormTextArea
       id={id}
+      {...inputStyleProps(options, formContext)}
       label={label}
       value={value ?? ''}
       required={required}
