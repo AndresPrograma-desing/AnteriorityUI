@@ -13,6 +13,11 @@
             "type": "command",
             "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/require-task-prefix.mjs\"",
             "statusMessage": "Verificando prefijo UI-<n> en rama y commit..."
+          },
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/block-claude-signature.mjs\"",
+            "statusMessage": "Verificando que no haya firma de Claude en commits..."
           }
         ]
       }
