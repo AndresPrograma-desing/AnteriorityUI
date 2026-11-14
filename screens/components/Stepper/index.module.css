@@ -1,0 +1,420 @@
+/* Tokens locales: cada var(--stepper-*, <original>) se pisa por prop de color desde index.jsx.
+   Paleta alineada con la librería: slate (#0f172a / #475569 / #e2e8f0) + azul de acción (#0ea5e9 → #0369a1). */
+.root {
+  --stepper-line-w: 4px; /* lo fija index.jsx según lineStyle; se usa para centrar el conector con el círculo */
+  container-type: inline-size;
+  container-name: stepper;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 20px 24px 22px;
+  font-family: var(--font-sans, inherit);
+}
+
+/* Superficie tipo tarjeta (default): degradé suave + borde + sombra, como los paneles de la librería. */
+.surfaceCard {
+  background: var(--stepper-surface, linear-gradient(180deg, #ffffff 0%, #f1f6fe 100%));
+  border: 1px solid var(--stepper-surface-border, #e2e8f0);
+  border-radius: var(--radius-lg, 0.75rem);
+  box-shadow: var(--shadow-sm, 0 1px 2px 0 rgb(0 0 0 / 0.05));
+}
+
+.surfacePlain {
+  padding: 4px 8px;
+  background: transparent;
+}
+
+.list {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  position: relative;
+  display: flex;
+  min-width: 0;
+}
+
+.stepBody {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: inherit;
+  cursor: default;
+}
+
+button.stepBody {
+  cursor: pointer;
+  border-radius: 12px;
+}
+
+button.stepBody:focus-visible {
+  outline: 2px solid var(--stepper-line-active, #0284c7);
+  outline-offset: 6px;
+}
+
+/* ---- Marcador (círculo) ---- */
+.marker {
+  position: relative;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: var(--stepper-size);
+  height: var(--stepper-size);
+  border-radius: 50%;
+  box-sizing: border-box;
+  border: 2px solid var(--stepper-border, #bfdbfe);
+  background: var(--stepper-bg, #ffffff);
+  color: var(--stepper-text, #475569);
+  font-weight: 700;
+  font-size: calc(var(--stepper-size) * 0.38);
+  line-height: 1;
+  box-shadow: var(--shadow-sm, 0 1px 2px 0 rgb(0 0 0 / 0.05));
+  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease, color 0.2s ease;
+}
+
+button.stepBody:hover .marker {
+  transform: translateY(-2px) scale(1.05);
+  border-color: var(--stepper-line-active, #0284c7);
+}
+
+.markerIcon {
+  width: 56%;
+  height: 56%;
+  display: grid;
+  place-items: center;
+}
+
+.markerImg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+/* Insignia de estado sobre marcadores con ícono/imagen propios. */
+.badge {
+  position: absolute;
+  right: -3px;
+  bottom: -3px;
+  display: grid;
+  place-items: center;
+  width: 38%;
+  height: 38%;
+  min-width: 11px;
+  min-height: 11px;
+  border-radius: 50%;
+  border: 2px solid var(--stepper-bg, #ffffff);
+  box-sizing: border-box;
+  color: var(--stepper-icon, #ffffff);
+  box-shadow: var(--shadow-sm, 0 1px 2px 0 rgb(0 0 0 / 0.05));
+}
+
+.badgeDone {
+  background: var(--stepper-success, #16a34a);
+}
+
+.badgeError {
+  background: var(--stepper-error, #dc2626);
+}
+
+.markerIcon > svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Paso en curso: aro que gira (hereda el color del ícono del marcador). */
+.spinner {
+  width: 46%;
+  height: 46%;
+  box-sizing: border-box;
+  border-radius: 50%;
+  border: 2.5px solid color-mix(in srgb, currentColor 30%, transparent);
+  border-top-color: currentColor;
+  animation: stepperSpin 0.8s linear infinite;
+}
+
+/* Paso en curso con ícono propio: aro que gira alrededor del círculo en vez de tapar el ícono. */
+.step[data-loading='true'] .marker::after {
+  content: '';
+  position: absolute;
+  inset: calc(var(--stepper-size) * -0.2);
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-top-color: var(--stepper-line-active, #0284c7);
+  border-right-color: color-mix(in srgb, var(--stepper-line-active, #0284c7) 35%, transparent);
+  animation: stepperSpin 1s linear infinite;
+  pointer-events: none;
+}
+
+/* ---- Texto ---- */
+.text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.label {
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: 0.005em;
+  line-height: 1.25;
+  color: var(--stepper-text, #475569);
+  transition: color 0.2s ease;
+}
+
+.description {
+  margin-top: 3px;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: var(--stepper-description, #94a3b8);
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---- Estados ---- */
+.step[data-status='active'] .marker {
+  border-color: transparent;
+  background: var(--stepper-accent, linear-gradient(135deg, #0ea5e9, #0369a1));
+  color: var(--stepper-icon, #ffffff);
+  box-shadow:
+    0 0 0 calc(var(--stepper-size) * 0.14) var(--stepper-halo, #d4ecfc),
+    0 10px 20px -6px color-mix(in srgb, var(--stepper-line-active, #0284c7) 60%, transparent);
+  animation: stepperHalo 2.6s ease-in-out infinite;
+}
+
+.step[data-status='active'] .label {
+  color: var(--stepper-text-active, #0f172a);
+  font-weight: 700;
+}
+
+.step[data-status='completed'] .marker {
+  border-color: transparent;
+  background: var(--stepper-accent, linear-gradient(135deg, #0ea5e9, #0369a1));
+  color: var(--stepper-icon, #ffffff);
+  box-shadow: 0 4px 10px -3px color-mix(in srgb, var(--stepper-line-active, #0284c7) 55%, transparent);
+}
+
+.step[data-status='completed'] .markerIcon {
+  animation: stepperPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.step[data-status='completed'] .label {
+  color: var(--stepper-text-active, #0f172a);
+}
+
+.step[data-status='error'] .marker {
+  border-color: transparent;
+  background: var(--stepper-error, #dc2626);
+  color: var(--stepper-icon, #ffffff);
+  box-shadow:
+    0 0 0 calc(var(--stepper-size) * 0.14) color-mix(in srgb, var(--stepper-error, #dc2626) 20%, transparent);
+}
+
+.step[data-status='error'] .label {
+  color: var(--stepper-error, #dc2626);
+}
+
+.step[data-disabled='true'] {
+  opacity: 0.5;
+}
+
+/* ---- Conector ---- (la línea en sí es ProgressLine; acá solo el lugar que ocupa) */
+.connector {
+  flex: 1 1 0;
+  min-width: 12px;
+}
+
+.railFlat {
+  display: contents;
+}
+
+/* ---- Horizontal: marcador arriba, etiqueta debajo, conector a la altura del círculo ---- */
+.horizontal .list {
+  align-items: flex-start;
+  padding-inline: calc(var(--stepper-size) * 0.14);
+}
+
+.horizontal .stepBody {
+  flex-direction: column;
+  gap: 10px;
+}
+
+.horizontal .stepBody {
+  align-items: center;
+}
+
+/* La columna del paso mide lo mismo que el círculo; la etiqueta (más ancha) desborda centrada,
+   así el conector llega pegado al borde del círculo. */
+.horizontal .text {
+  width: var(--stepper-size);
+  align-items: center;
+  text-align: center;
+}
+
+.horizontal .label,
+.horizontal .description {
+  width: max-content;
+  max-width: 9rem;
+}
+
+.horizontal .connector {
+  margin: calc(var(--stepper-size) / 2 - var(--stepper-line-w) / 2) 0 0;
+}
+
+/* Resumen compacto (solo visible en modo angosto): texto + barra de progreso. */
+.compact {
+  display: none;
+  margin-top: 16px;
+}
+
+.compactText {
+  margin: 0 0 8px;
+  text-align: center;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--stepper-text-active, #0f172a);
+}
+
+/* Angosto (según el ancho del propio componente): sin etiquetas por paso, resumen debajo.
+   Mantener 560px sincronizado con COMPACT_BREAKPOINT en constants.js. */
+@container stepper (max-width: 560px) {
+  .surfaceCard {
+    padding: 16px 16px 18px;
+  }
+
+  .horizontal .marker {
+    width: min(var(--stepper-size), 34px);
+    height: min(var(--stepper-size), 34px);
+    font-size: 0.85rem;
+  }
+
+  .horizontal .connector {
+    margin-top: calc(min(var(--stepper-size), 34px) / 2 - var(--stepper-line-w) / 2);
+  }
+
+  .horizontal .text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .compact {
+    display: block;
+  }
+}
+
+/* ---- Vertical ---- */
+.vertical .list {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.vertical .step {
+  display: block;
+}
+
+.vertical .stepBody {
+  align-items: stretch;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+}
+
+/* Carril del marcador: círculo arriba y, debajo, el conector que ocupa el alto restante del paso
+   (el siguiente círculo empieza justo donde termina, así la línea los une). */
+.vertical .rail {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  width: var(--stepper-size);
+}
+
+.vertical .connector {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 12px;
+  margin: 0;
+}
+
+/* El texto se alinea con el centro del círculo; el aire entre pasos va abajo (dentro del carril). */
+.vertical .text {
+  min-width: 0;
+  padding-top: calc(var(--stepper-size) / 2 - 0.6rem);
+  padding-bottom: var(--stepper-gap, 28px);
+}
+
+.vertical .step:last-child .text {
+  padding-bottom: 0;
+}
+
+/* ---- Animaciones ---- */
+@keyframes stepperHalo {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 calc(var(--stepper-size) * 0.14) var(--stepper-halo, #d4ecfc),
+      0 10px 20px -6px color-mix(in srgb, var(--stepper-line-active, #0284c7) 60%, transparent);
+  }
+  50% {
+    box-shadow:
+      0 0 0 calc(var(--stepper-size) * 0.22) color-mix(in srgb, var(--stepper-halo, #d4ecfc) 55%, transparent),
+      0 10px 20px -6px color-mix(in srgb, var(--stepper-line-active, #0284c7) 60%, transparent);
+  }
+}
+
+@keyframes stepperSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes stepperPop {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marker,
+  .label {
+    transition: none;
+  }
+
+  .step[data-status='active'] .marker,
+  .step[data-status='completed'] .markerIcon {
+    animation: none;
+  }
+
+  .spinner,
+  .step[data-loading='true'] .marker::after {
+    animation-duration: 2.4s;
+  }
+}

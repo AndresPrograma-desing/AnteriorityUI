@@ -134,10 +134,11 @@ export default function Selector({
                 popper: {
                     sx: { zIndex: popperZIndex }
                 },
-                // Sin wrapOptions el listado toma el ancho de su contenido (no el del input) y
-                // las opciones no hacen salto de línea.
+                // Sin wrapOptions el listado toma el ancho de su contenido y las opciones no hacen
+                // salto de línea, pero nunca más angosto que el input (minWidth 100% del popper, que mide
+                // lo mismo que el campo): un selector ancho tiene un desplegable igual de ancho.
                 paper: wrapOptions ? undefined : {
-                    sx: { width: 'max-content', maxWidth: 'min(90vw, 480px)' }
+                    sx: { width: 'max-content', minWidth: '100%', maxWidth: 'min(90vw, 480px)' }
                 },
                 popupIndicator: iconColor ? { sx: { color: iconColor } } : undefined,
                 chip: (chipBgColor || chipTextColor || chipIconColor) ? {

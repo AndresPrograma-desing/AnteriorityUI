@@ -1,6 +1,7 @@
 import React, { forwardRef } from 'react';
 import MuiTextField from '@mui/material/TextField';
 import { formatHighlightedText } from '../../../GreenHighlight/utils';
+import { UNDERLINE_VARIANT, underlineSx } from '../../../../../common/utils/underlineSx';
 
 const TextField = forwardRef(({ 
   label, 
@@ -15,10 +16,20 @@ const TextField = forwardRef(({
   placeholder,
   required,
   requiredColor = 'red',
-  bgColor = '#fff',
+  bgColor,
   textColor = '#0f172a',
+  lineColor,
+  lineFocusColor,
   ...props
 }, ref) => {
+  // `variant="underline"`: sin caja, solo la línea inferior donde se escribe (MUI "standard" con
+  // fondo transparente). `lineColor` / `lineFocusColor` recolorean la línea (reposo / foco); sin
+  // ellas se usan los colores por defecto de MUI.
+  const isUnderline = variant === UNDERLINE_VARIANT;
+  const muiVariant = isUnderline ? 'standard' : variant;
+  const resolvedBg = bgColor ?? (isUnderline ? 'transparent' : '#fff');
+  const autofillBg = resolvedBg === 'transparent' ? '#fff' : resolvedBg;
+
   const formattedLabel = typeof label === 'string' ? formatHighlightedText(label) : label;
   const displayLabel = formattedLabel ? (
     <span>
@@ -37,18 +48,19 @@ const TextField = forwardRef(({
       error={!!error}
       helperText={error || displayHelperText}
       type={type}
-      variant={variant}
+      variant={muiVariant}
       size={size}
       fullWidth={fullWidth}
       placeholder={placeholder}
       sx={{
         m: 0,
-        '& .MuiInputBase-root': { backgroundColor: bgColor },
+        '& .MuiInputBase-root': { backgroundColor: resolvedBg },
         '& input:-webkit-autofill': {
-          WebkitBoxShadow: `0 0 0 1000px ${bgColor} inset`,
+          WebkitBoxShadow: `0 0 0 1000px ${autofillBg} inset`,
           WebkitTextFillColor: textColor,
           caretColor: textColor,
         },
+        ...(isUnderline ? underlineSx(lineColor, lineFocusColor) : {}),
       }}
       inputRef={ref}
       {...props}

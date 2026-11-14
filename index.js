@@ -68,6 +68,7 @@ export { default as PlaceholderButton } from './screens/components/PlaceholderBu
 export { default as Profile } from './screens/components/Profile/index.js';
 export { default as ProfileAvatar } from './screens/components/Profile/Avatar/index.js';
 export { default as Radio } from './screens/components/Radio/index.js';
+export { default as ProgressLine } from './screens/components/ProgressLine/index.js';
 export { default as QRCode } from './screens/components/QRCode/index.js';
 export { default as RenderJsonSchema } from './screens/components/RenderJsonSchema/index.js';
 export { default as SchemaForm } from './screens/components/SchemaForm/index.js';
@@ -75,6 +76,7 @@ export { default as ScrollBar } from './screens/components/ScrollBar/index.js';
 export { default as Sidebar } from './screens/components/Sidebar/index.js';
 export { default as Skeleton } from './screens/components/Skeleton/index.js';
 export { default as Slider } from './screens/components/Slider/index.js';
+export { default as Stepper } from './screens/components/Stepper/index.js';
 export { default as SubSidebarLayout } from './screens/components/SubSidebarLayout/index.js';
 export { default as SummaryCard } from './screens/components/SummaryCard/index.js';
 export { default as Swich } from './screens/components/Swich/index.js';

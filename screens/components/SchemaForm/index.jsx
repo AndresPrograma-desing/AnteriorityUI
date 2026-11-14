@@ -41,6 +41,7 @@ const SchemaForm = ({
   transformErrors,
   showErrorList = false,
   fieldGap,
+  inputVariant,
   className = '',
   style,
   children,
@@ -51,7 +52,7 @@ const SchemaForm = ({
   const currentData = formData !== undefined ? formData : liveData;
   return (
     <Form
-      formContext={{ formData: currentData }}
+      formContext={{ formData: currentData, inputVariant }}
       noHtml5Validate={noHtml5Validate}
       showErrorList={showErrorList}
       transformErrors={buildTransformErrors(errorMessages, transformErrors)}
@@ -60,7 +61,7 @@ const SchemaForm = ({
       style={fieldGap ? { '--schemaform-gap': fieldGap, ...style } : style}
       schema={schema}
       uiSchema={uiSchema}
-      formData={formData}
+      formData={currentData}
       validator={validator}
       widgets={{ ...SCHEMA_FORM_WIDGETS, ...widgets }}
       fields={fields}

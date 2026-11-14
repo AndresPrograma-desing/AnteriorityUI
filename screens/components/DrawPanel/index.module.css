@@ -302,3 +302,8 @@
   display: table;
   width: 100%;
 }
+
+/* Stepper integrado (showStepper): arriba del contenido, con aire antes del formulario. */
+.stepper {
+  margin-bottom: 20px;
+}

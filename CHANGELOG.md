@@ -6,6 +6,30 @@ Al hacer un cambio visible para quien consume la librería, se agrega una línea
 
 ## [Sin publicar]
 
+### Agregado
+
+- Componente `ProgressLine`: línea de progreso (continua o punteada, horizontal o vertical) con relleno animado; es la pieza que ahora usa `Stepper` para sus conectores y su barra compacta.
+- Componente `Stepper`: indicador de pasos para workflows/wizards (horizontal y vertical), con estados completado/activo/pendiente/error, pasos clicables, íconos o imágenes (SVG, URL, componente) por paso y props de color. Es responsive según su propio ancho: en contenedores angostos oculta las etiquetas por paso y muestra "Paso X de N".
+
+- `Container`: nuevas props `showStepper`, `steps`, `activeStep`, `onStepClick` y `stepperProps` para integrar el `Stepper` arriba del contenido, igual que la paginación.
+- `Container`: nuevas props `schema`, `uiSchema`, `formData`, `onFormChange`, `onFormSubmit`, `onFormError`, `formDisabled`, `showFormSubmit` y `schemaFormProps` para renderizar un formulario desde un JSON Schema. Funciona con o sin `Stepper`; con `Stepper`, cada paso puede traer su propio `schema`.
+- `SchemaForm`: los campos se pueden repartir en columnas con `'ui:options': { columns: N }` en el `uiSchema` del objeto (`columnFlow: 'column'` para llenar columna por columna, `colSpan` por campo). Vuelve a una columna en formularios angostos.
+- `Input` y `TextField`: nueva variante `variant="underline"` (sin caja, solo la línea inferior) con `lineColor` y `lineFocusColor`. En `SchemaForm`, `inputVariant="underline"` la aplica a todos los campos de texto/número (o por campo con `'ui:options': { variant }`). La variante `underline` también existe en `InputWithIcon` y `MultilinePlaceholder`/`FormTextArea`. Los formularios del `Container` usan `underline` por defecto (`schemaFormProps={{ inputVariant: 'outlined' }}` para volver a la caja).
+- `Container`: nuevas props `loading`, `loadingText`, `loadingVariant`, `loadingColor` y `loadingProps`: mientras `loading` es true se oculta el `Stepper`, el formulario y la paginación y se muestra un `Loading` con la variante `skeleton` por defecto, que dibuja la forma del contenido (stepper y campos del formulario) cuando hay `showStepper` o `schema` (útil cuando los pasos y el schema vienen de un JSON).
+- `Container`: nuevas props `wattermarkText`, `wattermarkProps` (passthrough al banner de marca de agua) y `schemaMissingLabel`.
+
+- Storybook: stories **Container (JSON)** con un editor de JSON en vivo (wizard y solo formulario) para probar los `steps`/`schema`/`uiSchema` que espera el `Container`.
+- `Container`: nueva prop `formLoading` (skeleton solo donde va el formulario, sin ocultar el `Stepper`) y `onFormSubmit` recibe un 3er argumento `{ step, stepData }` con el paso enviado y solo sus campos (para guardar cada paso por separado).
+- `Stepper`: `activeStep === steps.length` marca todos los pasos como completados, y nuevas props `activeLoading` / `steps[i].loading` para mostrar un spinner en el paso en curso (seguimiento de un proceso).
+- `Stepper`: nuevas props `lineStyle` (`'dashed'` = conectores punteados) y `stepGap` (espacio entre pasos en vertical); en vertical la línea ahora siempre toca el círculo. Con `icon` en el paso, `activeLoading` conserva el ícono y muestra un aro que gira.
+- `DrawPanel`: nuevas props `showCancelButton` y `showConfirmButton` para mostrar solo uno de los botones del footer (ej. solo "Cerrar" al terminar un proceso).
+- `DrawPanel`: nuevas props `showStepper`, `steps`, `activeStep`, `onStepClick` y `stepperProps` para mostrar un `Stepper` vertical con el progreso de un envío por etapas, con la paleta del panel.
+
+### Corregido
+
+- `Selector`: el desplegable ya no queda más angosto que el campo cuando el selector es ancho; toma como mínimo el ancho del input (y crece según el contenido, hasta 480px).
+- `SchemaForm` sin `formData` controlado: ya no se reinicia el campo en cada tecla (no se podía escribir).
+
 ## [1.18.1] - 2026-11-10
 
 ### Corregido

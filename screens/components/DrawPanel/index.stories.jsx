@@ -1,8 +1,13 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import DrawPanel from './index.jsx';
 import Callout from '../Callout/index.jsx';
 import Button from '../Button/index.jsx';
-import { MedalIcon, Star, ShieldCheck, Gift } from 'lucide-react';
+import JsonProgressDemo from './stories/JsonProgressDemo';
+import {
+  MedalIcon, Star, ShieldCheck, Gift, Send, Database, PackageCheck,
+  LogIn, KeyRound, FileText, Sparkles, Calculator, FileCheck, Ticket, Receipt, PenLine, Lock,
+  CloudUpload, CheckCheck, ClipboardList, Bell,
+} from 'lucide-react';
 
 export default {
   title: 'Components/DrawPanel',
@@ -446,4 +451,196 @@ export const MarkdownEnElCuerpo = {
       '| Responsable | Ana Gómez |',
     ].join(String.fromCharCode(10)),
   },
+};
+
+// Stepper vertical como seguimiento de un envío: el usuario completa el formulario, lo envía y el
+// panel va avanzando solo paso a paso (iniciando → recolectando datos → validando → entregado).
+// Cada paso trae su propio ícono SVG (`icon`); el paso en curso lo conserva y se marca con un aro que
+// gira (`activeLoading`). Acá se simula con timers; en la app real `activeStep` se actualiza con los eventos del backend
+// (polling, websocket, respuesta de cada etapa...). `activeStep === steps.length` = todo completado.
+const SEND_STEPS = [
+  { label: 'Iniciando envío', description: 'Preparando la solicitud', icon: <Send /> },
+  { label: 'Recolectando datos', description: 'Reuniendo la información del formulario', icon: <Database /> },
+  { label: 'Validando', description: 'Verificando que todo esté correcto', icon: <ShieldCheck /> },
+  { label: 'Entregado', description: 'La solicitud llegó a destino', icon: <PackageCheck /> },
+];
+const SEND_SCHEMA = {
+  type: 'object',
+  required: ['nombre', 'email'],
+  properties: {
+    nombre: { type: 'string', title: 'Nombre' },
+    email: { type: 'string', title: 'Email', format: 'email' },
+  },
+};
+
+export const ConStepperProgreso = {
+  name: 'Con Stepper vertical (progreso de envío)',
+  render: () => {
+    const [open, setOpen] = useState(true);
+    const [phase, setPhase] = useState('form'); // 'form' | 'sending' | 'done' | 'error'
+    const [step, setStep] = useState(0);
+    const [failAtValidation, setFailAtValidation] = useState(false);
+    const timers = useRef([]);
+
+    const clearTimers = () => { timers.current.forEach(clearTimeout); timers.current = []; };
+    const reset = () => { clearTimers(); setPhase('form'); setStep(0); };
+
+    // Cada etapa termina a los 1,4 s. Con "simular fallo", la etapa 3 (Validando) falla: el paso
+    // queda con `error`, el proceso se detiene ahí y el footer ofrece Reintentar / Cerrar.
+    const start = () => {
+      clearTimers();
+      setPhase('sending');
+      setStep(0);
+      SEND_STEPS.forEach((_, index) => {
+        timers.current.push(setTimeout(() => {
+          if (failAtValidation && index === 2) {
+            setStep(2);
+            setPhase('error');
+            return;
+          }
+          setStep(index + 1); // completa el paso `index` y pasa al siguiente
+          if (index === SEND_STEPS.length - 1) setPhase('done');
+        }, (index + 1) * 1400));
+      });
+    };
+    const failed = phase === 'error';
+    const steps = SEND_STEPS.map((item, index) => ({ ...item, error: failed && index === step }));
+
+    return (
+      <>
+        <Button onClick={() => { reset(); setOpen(true); }}>Abrir panel</Button>
+        <DrawPanel
+          isOpen={open}
+          onClose={() => setOpen(false)}
+          title="Nueva solicitud"
+          description={phase === 'form' ? 'Completá los datos y enviá' : 'Seguimiento del envío'}
+          showStepper={phase !== 'form'}
+          steps={steps}
+          activeStep={step}
+          stepperProps={{ activeLoading: phase === 'sending' }}
+          schema={phase === 'form' ? SEND_SCHEMA : undefined}
+          onSubmit={start}
+          confirmText={failed ? 'Reintentar' : 'Enviar'}
+          onConfirm={failed ? start : undefined}
+          cancelText={phase === 'form' ? 'Cancelar' : 'Cerrar'}
+          // Footer: en el formulario Cancelar/Enviar; enviando sin botones; al terminar solo Cerrar;
+          // si falla, Reintentar + Cerrar.
+          showActions={phase !== 'sending'}
+          showConfirmButton={phase === 'form' || failed}
+        >
+          {phase === 'form' && (
+            <label style={{ display: 'block', marginTop: 16, fontSize: 14 }}>
+              <input type="checkbox" checked={failAtValidation} onChange={(e) => setFailAtValidation(e.target.checked)} />{' '}
+              Simular fallo en "Validando"
+            </label>
+          )}
+          {phase === 'done' && <p style={{ margin: 0 }}>¡Solicitud entregada!</p>}
+          {failed && (
+            <p style={{ margin: 0, color: '#dc2626' }}>
+              No se pudo validar la solicitud. Los pasos anteriores se completaron; podés reintentar.
+            </p>
+          )}
+        </DrawPanel>
+      </>
+    );
+  },
+};
+
+// 15 etapas con dos fallos: falla la 6 y la 11. En cada fallo el footer ofrece "Reintentar", que
+// retoma desde la etapa que falló (no desde cero); en el reintento esa etapa pasa y el proceso sigue
+// hasta el siguiente fallo o hasta el final. Con tantas etapas el contenido del panel hace scroll y
+// la story lleva la etapa en curso al centro.
+const LONG_STEP_DEFS = [
+  ['Iniciando sesión', LogIn], ['Verificando permisos', KeyRound], ['Leyendo formulario', FileText],
+  ['Normalizando datos', Sparkles], ['Calculando totales', Calculator], ['Validando documentos', FileCheck],
+  ['Reservando cupo', Ticket], ['Generando comprobante', Receipt], ['Firmando solicitud', PenLine],
+  ['Cifrando adjuntos', Lock], ['Enviando al servidor', CloudUpload], ['Confirmando recepción', CheckCheck],
+  ['Registrando auditoría', ClipboardList], ['Notificando al equipo', Bell], ['Entregando resultado', PackageCheck],
+];
+// Duración (ms) de cada etapa: rápidas por defecto y tres que tardan más, como un request real
+// (permisos, firma y envío al servidor). La duración corre antes de completarse o de fallar.
+const LONG_DEFAULT_MS = 600;
+const LONG_STEP_MS = { 1: 2200, 8: 3000, 10: 3500 };
+const LONG_FAIL_AT = { 5: 'El documento no pudo validarse (tiempo de espera agotado).', 10: 'El servidor no respondió. Intentá de nuevo.' };
+// `icon` acepta un componente (acá, íconos de lucide) además de un elemento, una URL o un SVG.
+const LONG_STEPS = LONG_STEP_DEFS.map(([label, icon]) => ({ label, icon }));
+
+export const ConStepperFallosYReintento = {
+  name: 'Stepper de 15 etapas con fallos y reintento',
+  render: () => {
+    const [open, setOpen] = useState(true);
+    const [phase, setPhase] = useState('idle'); // 'idle' | 'running' | 'error' | 'done'
+    const [step, setStep] = useState(0);
+    const passed = useRef(new Set()); // etapas que ya fallaron una vez: en el reintento pasan
+    const timer = useRef(null);
+
+    useEffect(() => () => clearTimeout(timer.current), []);
+    // Lleva la etapa en curso al centro del panel (el contenido hace scroll).
+    useEffect(() => {
+      const target = phase === 'done'
+        ? document.querySelector('ol[aria-label="Progreso"] > li:last-child')
+        : document.querySelector('[aria-current="step"]');
+      target?.scrollIntoView({ block: phase === 'done' ? 'end' : 'center', behavior: 'smooth' });
+    }, [step, phase]);
+
+    const run = (from) => {
+      clearTimeout(timer.current);
+      setPhase('running');
+      setStep(from);
+      const advance = (index) => {
+        timer.current = setTimeout(() => {
+          if (LONG_FAIL_AT[index] && !passed.current.has(index)) {
+            passed.current.add(index);
+            setStep(index);
+            setPhase('error');
+            return;
+          }
+          setStep(index + 1);
+          if (index === LONG_STEPS.length - 1) setPhase('done');
+          else advance(index + 1);
+        }, LONG_STEP_MS[index] ?? LONG_DEFAULT_MS);
+      };
+      advance(from);
+    };
+    const reset = () => { clearTimeout(timer.current); passed.current = new Set(); setPhase('idle'); setStep(0); };
+
+    const failed = phase === 'error';
+    const steps = LONG_STEPS.map((item, index) => ({ ...item, error: failed && index === step }));
+
+    return (
+      <>
+        <Button onClick={() => { reset(); setOpen(true); }}>Abrir panel</Button>
+        <DrawPanel
+          isOpen={open}
+          onClose={() => setOpen(false)}
+          title="Procesando solicitud"
+          description={`Etapa ${Math.min(step + 1, LONG_STEPS.length)} de ${LONG_STEPS.length}`}
+          showStepper
+          steps={steps}
+          activeStep={step}
+          stepperProps={{ activeLoading: phase === 'running', stepGap: 22 }}
+          confirmText={failed ? 'Reintentar' : 'Iniciar envío'}
+          onConfirm={() => run(failed ? step : 0)}
+          cancelText={phase === 'idle' ? 'Cancelar' : 'Cerrar'}
+          showActions={phase !== 'running'}
+          showConfirmButton={phase === 'idle' || failed}
+        >
+          {failed && (
+            <p style={{ margin: '12px 0 0', color: '#dc2626' }}>
+              Falló la etapa {step + 1} ({LONG_STEPS[step].label}): {LONG_FAIL_AT[step]}
+            </p>
+          )}
+          {phase === 'done' && <p style={{ margin: '12px 0 0' }}>¡Solicitud entregada! Todas las etapas se completaron.</p>}
+        </DrawPanel>
+      </>
+    );
+  },
+};
+
+// Formulario por JSON Schema + seguimiento del envío con Stepper vertical, todo desde un JSON que
+// se puede editar (schema, etapas, duración y qué etapas fallan). Formato en ./stories/presets.js.
+export const ConJsonEditable = {
+  name: 'JSON editable (formulario + progreso)',
+  parameters: { layout: 'fullscreen' },
+  render: () => <JsonProgressDemo />,
 };
