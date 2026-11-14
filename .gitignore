@@ -24,6 +24,8 @@ pnpm-debug.log*
 .claude/*
 !.claude/skills/
 !.claude/hooks/
+!.claude/agents/
+!.claude/commands/
 !.claude/settings.json
 .vscode/
 
