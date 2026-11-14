@@ -6,6 +6,8 @@ Al hacer un cambio visible para quien consume la librería, se agrega una línea
 
 ## [Sin publicar]
 
+## [1.19.0] - 2026-11-14
+
 ### Agregado
 
 - Componente `ProgressLine`: línea de progreso (continua o punteada, horizontal o vertical) con relleno animado; es la pieza que ahora usa `Stepper` para sus conectores y su barra compacta.
