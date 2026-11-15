@@ -6,6 +6,23 @@ Al hacer un cambio visible para quien consume la librería, se agrega una línea
 
 ## [Sin publicar]
 
+## [1.20.0] - 2026-11-15
+
+### Agregado
+
+- `Selector`: nueva variante `variant="underline"` (sin caja, solo la línea inferior) con `lineColor` y `lineFocusColor`, igual que `Input`/`TextField`.
+- `Sidebar` / `AppShell`: nuevas props `collapseIcon` y `expandIcon` en `ProSidebar`, y `sidebarCollapseIcon` / `sidebarExpandIcon` en `AppShell`, para cambiar el icono del botón de ocultar/desplegar la sidebar.
+
+### Cambiado
+
+- `Container`: al cambiar de paso con `showStepper`, la vista sube hasta el `Stepper` (`scrollIntoView`, con `scroll-margin-top` de 96px).
+
+### Corregido
+
+- `Selector`: con `disabled` o `readOnly` (también con `readonly` en `SchemaForm`) ya no abre el desplegable, no muestra el botón de limpiar y se ve bloqueado. Antes los campos `enum` seguían editables en formularios de solo lectura.
+- `Selector`: el desplegable se cierra al hacer scroll fuera de él, para que no quede flotando desanclado de su campo o encima del header.
+- `AppShell`: con `topBarProps.autoHide`, el área de scroll reserva `scroll-padding-top` para que un campo enfocado no quede debajo de la barra superior.
+
 ## [1.19.0] - 2026-11-14
 
 ### Agregado
