@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import styles from './index.module.css';
 import Paginador from '../Material-UI/Components/Paginador';
 import Barnner from '../Barnner';
@@ -73,6 +73,18 @@ export default function Container({
   const formSchema = schema ?? activeStepData?.schema;
   const formUiSchema = schema ? uiSchema : (activeStepData?.uiSchema ?? uiSchema);
 
+  // Al cambiar de paso, sube la vista hasta el Stepper para que el paso activo quede visible.
+  // No se ejecuta en el primer render (el montaje no debe mover la página).
+  const stepperRef = useRef(null);
+  const didMountRef = useRef(false);
+  useEffect(() => {
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      return;
+    }
+    stepperRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [activeStep]);
+
   // Con `loadingVariant="skeleton"` (default) y algo estructurado por venir (Stepper y/o formulario)
   // se muestra un esqueleto con esa forma; si no, el Loading genérico de esa variante.
   const formSkeleton = showFormSkeleton ?? (showStepper || Boolean(schema));
@@ -109,7 +121,7 @@ export default function Container({
         </div>
       )}
       {!loading && showStepper && (
-        <div className={styles.stepperContainer}>
+        <div className={styles.stepperContainer} ref={stepperRef}>
           <Stepper
             surface="plain"
             steps={steps}

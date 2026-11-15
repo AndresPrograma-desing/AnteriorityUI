@@ -21,3 +21,10 @@
 .scrollBar {
   height: 100%;
 }
+
+/* Con la TopBar en autoHide, la barra es un overlay sobre el contenido: al enfocar o hacer scroll
+   a un campo, el navegador lo deja debajo de la barra y su desplegable (Selector) queda tapando
+   el header. scroll-padding deja ese alto libre al desplazar. */
+.scrollAreaOverlayTop {
+  scroll-padding-top: 96px;
+}

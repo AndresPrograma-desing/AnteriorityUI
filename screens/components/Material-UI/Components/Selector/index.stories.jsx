@@ -52,6 +52,53 @@ export const FlatCustomColors = {
   },
 };
 
+// Sin caja: solo la línea inferior. lineColor / lineFocusColor recolorean la línea en reposo y en foco.
+export const Underline = {
+  render: (args) => <ControlledTemplate {...args} />,
+  args: {
+    label: 'Especie',
+    options,
+    variant: 'underline',
+    placeholder: 'Selecciona una especie',
+  },
+};
+
+export const UnderlineCustomLine = {
+  render: (args) => <ControlledTemplate {...args} />,
+  args: {
+    label: 'Especie',
+    options,
+    variant: 'underline',
+    value: 'perro',
+    lineColor: '#cbd5e1',
+    lineFocusColor: '#059669',
+    placeholder: 'Selecciona una especie',
+  },
+};
+
+// disabled / readOnly: no abre el listado, no muestra limpiar y se ve bloqueado (igual que SchemaForm con readonly).
+export const Disabled = {
+  render: (args) => <ControlledTemplate {...args} />,
+  args: {
+    label: 'Especie',
+    options,
+    value: 'perro',
+    disabled: true,
+    placeholder: 'Selecciona una especie',
+  },
+};
+
+export const ReadOnly = {
+  render: (args) => <ControlledTemplate {...args} />,
+  args: {
+    label: 'Especie',
+    options,
+    value: 'gato',
+    readOnly: true,
+    placeholder: 'Selecciona una especie',
+  },
+};
+
 const ControlledTemplate = (args) => {
   const [value, setValue] = useState(args.value || '');
   return (

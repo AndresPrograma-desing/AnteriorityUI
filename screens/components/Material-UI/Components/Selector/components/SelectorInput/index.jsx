@@ -2,12 +2,13 @@ import * as React from 'react';
 import TextField from '@mui/material/TextField';
 
 // Input del Autocomplete. En variant="flat" usa TextField "standard" sin subrayado
-// (sin caja ni borde). En "outlined" queda igual que antes.
+// (sin caja ni borde). En "underline" usa "standard" con la línea inferior. En "outlined" queda igual que antes.
 export default function SelectorInput({
     params,
     label,
     placeholder,
     isFlat = false,
+    isUnderline = false,
 }) {
     return (
         <TextField
@@ -15,7 +16,7 @@ export default function SelectorInput({
             label={label}
             placeholder={placeholder}
             size="small"
-            variant={isFlat ? 'standard' : 'outlined'}
+            variant={isFlat || isUnderline ? 'standard' : 'outlined'}
             sx={isFlat ? { width: 'auto', '& .MuiInputBase-root': { width: 'auto', flexWrap: 'nowrap' } } : undefined}
             inputProps={{
                 ...params.inputProps,

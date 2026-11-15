@@ -8,6 +8,8 @@ import styles from './index.module.css';
 const AppShell = ({
   sidebarProps = {},
   topBarProps = {},
+  sidebarCollapseIcon,
+  sidebarExpandIcon,
   children,
   contentBgColor,
   useContainer = false,
@@ -26,6 +28,8 @@ const AppShell = ({
       <ProSidebar
         isMobileOpen={isMobileSidebarOpen}
         onCloseMobile={() => setIsMobileSidebarOpen(false)}
+        collapseIcon={sidebarCollapseIcon}
+        expandIcon={sidebarExpandIcon}
         {...sidebarProps}
       />
 
@@ -39,7 +43,11 @@ const AppShell = ({
           className={styles.content}
           style={contentBgColor ? { '--app-shell-content-bg': contentBgColor } : undefined}
         >
-          <ScrollBar horizontal={false} className={styles.scrollBar}>
+          <ScrollBar
+            horizontal={false}
+            className={styles.scrollBar}
+            contentClassName={topBarProps.autoHide ? styles.scrollAreaOverlayTop : undefined}
+          >
             {content}
           </ScrollBar>
         </div>
