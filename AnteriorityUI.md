@@ -278,7 +278,9 @@ import AppShell from '../AppShell/index'; // export default, archivo index.jsx
 | Prop | Tipo | Default | Descripción |
 |---|---|---|---|
 | `sidebarProps` | object | `{}` | Spreadeado tal cual sobre el `Sidebar` interno (`groups`, `activeId`, `onSelect`, `user`, colores, etc. — ver [Sidebar](#sidebar)) |
-| `topBarProps` | object | `{}` | Spreadeado tal cual sobre el `TopBar` interno (`title`, `actions`, `user`, `searchProps`, colores, etc. — ver [TopBar](#topbar)) |
+| `topBarProps` | object | `{}` | Spreadeado tal cual sobre el `TopBar` interno (`title`, `actions`, `user`, `searchProps`, colores, etc. — ver [TopBar](#topbar)). Con `autoHide: true`, el área de contenido reserva `scroll-padding-top` para que un campo enfocado no quede debajo de la barra. |
+| `sidebarCollapseIcon` | `node` | `<ChevronLeft size={16} />` | Icono del botón de colapso de la sidebar interna (se pasa a `Sidebar` como `collapseIcon`). |
+| `sidebarExpandIcon` | `node` | `<ChevronRight size={16} />` | Icono del botón de expandir de la sidebar interna (se pasa a `Sidebar` como `expandIcon`). |
 | `children` | node | — | Contenido principal, renderizado dentro del área central con scroll propio |
 | `useContainer` | boolean | `false` | Envuelve `children` en un [Container](#container) (con `wattermark={false}`) para darle marco (card con borde/sombra) al contenido sin que el consumidor tenga que importarlo aparte |
 | `containerProps` | object | `{}` | Spreadeado tal cual sobre el `Container` interno cuando `useContainer` está activo (`borderColor`, `bgImage`, `showPagination`, etc. — ver [Container](#container)); ignorado si `useContainer` es `false` |
@@ -1352,7 +1354,7 @@ import Container from '../Container'; // export default (index.jsx)
 | `pageSize` | number | `10` | Tamaño de página actual |
 | `pageSizeOptions` | array | `[5, 10, 20, 50]` | Opciones de tamaño de página |
 | `onPageSizeChange` | function | — | Handler de cambio de tamaño de página |
-| `showStepper` | boolean | `false` | Muestra un `Stepper` arriba del contenido (bajo el `header`), con una línea separadora. |
+| `showStepper` | boolean | `false` | Muestra un `Stepper` arriba del contenido (bajo el `header`), con una línea separadora. Al cambiar `activeStep` la vista sube hasta el `Stepper` (`scrollIntoView` con un margen de 96px, `scroll-margin-top`), sin hacerlo al montar. |
 | `steps` | array | `[]` | Pasos del `Stepper` (ver sección Stepper). |
 | `activeStep` | number | `0` | Índice del paso activo. |
 | `onStepClick` | function(index, step) | — | Hace clicables los pasos completados. |
@@ -3716,6 +3718,10 @@ import Selector from '../Material-UI/Components/Selector/index'; // export defau
 | required | boolean | — | Muestra un indicador `**` junto a la etiqueta. |
 | requiredColor | string | `'red'` | Color del indicador de requerido. |
 | disableClearable | boolean | `false` | Si es `true`, oculta el botón de limpiar selección. |
+| disabled | boolean | `false` | Bloquea el selector: no abre el listado, no muestra el botón de limpiar y se ve como un campo deshabilitado. |
+| readOnly | boolean | `false` | Igual que `disabled` para el comportamiento (no abre el listado ni limpia), pensado para pantallas de solo lectura. `SchemaForm` pasa `disabled` cuando un campo tiene `readonly`, así que un `enum` en un formulario de solo lectura queda bloqueado. |
+| lineColor | string | — | Solo `variant="underline"`. Color de la línea inferior en reposo. Sin prop, usa el color por defecto de MUI. |
+| lineFocusColor | string | — | Solo `variant="underline"`. Color de la línea inferior y de la etiqueta con foco. Sin prop, usa el color por defecto de MUI. |
 | hideScrollbar | boolean | `true` | Oculta la barra de scroll de la lista desplegable (el scroll con rueda/teclado/touch sigue funcionando). Con `false`, la barra se muestra con una estética delgada propia (mismo grosor/color que `ScrollBar`) en vez del scrollbar crudo del navegador. |
 | multiSelect | boolean | `false` | Activa selección múltiple (`Autocomplete multiple`). En este modo `value` es un array de `value`s y `onChange` recibe `{ target: { value: nuevoArray } }`. Cada opción muestra un checkbox (`Checks`, modo `iconOnly`) como indicador de selección. |
 | checkedBgColor | string | — | Color de fondo del checkbox marcado (propaga a `Checks`, solo aplica con `multiSelect`). |
@@ -3724,12 +3730,14 @@ import Selector from '../Material-UI/Components/Selector/index'; // export defau
 | chipBgColor | string | — | Fondo de los chips de selección (modo `multiSelect`). |
 | chipTextColor | string | — | Color de texto de los chips. |
 | chipIconColor | string | — | Color del ícono "X" de cada chip. |
-| variant | `'outlined'` \| `'flat'` | `'outlined'` | `'outlined'`: caja con borde (comportamiento de siempre). `'flat'`: sin caja, borde ni subrayado; el texto se muestra completo (ancho según contenido, sin `…`) y el listado sigue abriéndose al clickear. Con `flat`, `fullWidth` default pasa a `false`. |
+| variant | `'outlined'` \| `'underline'` \| `'flat'` | `'outlined'` | `'outlined'`: caja con borde (comportamiento de siempre). `'underline'`: sin caja, solo la línea inferior (igual que `Input`/`TextField`); ancho completo por default y recoloreable con `lineColor`/`lineFocusColor`. `'flat'`: sin caja, borde ni subrayado; el texto se muestra completo (ancho según contenido, sin `…`) y el listado sigue abriéndose al clickear. Con `flat`, `fullWidth` default pasa a `false`. |
 | textColor | string | — | Color del texto del valor seleccionado. Sin prop, usa el color del tema de MUI. |
 | bgColor | string | — | Solo `variant="flat"`. Fondo del badge. Sin prop, usa un tinte del color del texto (12%). |
 | borderColor | string | — | Solo `variant="flat"`. Borde del badge. Sin prop, sin borde visible. |
 | iconColor | string | — | Color de la flecha del listado. Sin prop, usa el color del tema de MUI. |
 | popperZIndex | number | `100000` | `z-index` del `Popper` del listado desplegable (se renderiza en un portal al final de `<body>`, fuera del árbol del componente). Ajustar si un overlay/modal propio del proyecto consumidor tiene un `z-index` mayor y tapa los clics del listado. |
+
+Nota: mientras el listado está abierto, un scroll de la página o de un contenedor (que no sea el propio listado) lo cierra, para que no quede desanclado de su campo.
 
 **Ejemplos:**
 ```jsx
@@ -4745,6 +4753,8 @@ import Sidebar from 'screens/components/Sidebar/index';
 | `activeId` | `string`\|`number` | — | Id del item (o subitem) actualmente activo. Si matchea el id de un subitem, ese subitem se resalta y su grupo padre se auto-expande al montar el componente. |
 | `onSelect` | `function(item)` | — | Callback al seleccionar un item. |
 | `collapsible` | `boolean` | `true` | Muestra el botón de colapsar y habilita el atajo de teclado para colapsar/expandir. |
+| `collapseIcon` | `node` | `<ChevronLeft size={16} />` | Icono del botón de colapso mientras la sidebar está abierta. |
+| `expandIcon` | `node` | `<ChevronRight size={16} />` | Icono del botón de expandir mientras la sidebar está colapsada. |
 | `loading` | `boolean` | `false` | Muestra `skeletonItems` filas de `Skeleton` en vez de los grupos reales. |
 | `skeletonItems` | `number` | `15` | Cantidad de filas skeleton al cargar. |
 | `className` | `string` | `''` | Clase adicional para el `<aside>` raíz. |
