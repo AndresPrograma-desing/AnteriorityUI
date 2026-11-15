@@ -68,6 +68,8 @@
 
 /* Stepper integrado: va arriba del contenido, separado por una línea sutil. */
 .stepperContainer {
+  /* Al cambiar de paso el scroll deja este margen arriba del Stepper (ver Container/index.jsx). */
+  scroll-margin-top: 96px;
   margin-bottom: 16px;
   padding-bottom: 12px;
   border-bottom: 1px solid var(--container-header-border, rgba(0, 0, 0, 0.08));

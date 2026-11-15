@@ -5,6 +5,7 @@ import { DEFAULT_POPPER_Z_INDEX, DEFAULT_SELECTED_TOOLTIP_THRESHOLD } from './co
 import ModalTooltip from '../../../ModalTooltip/ModalTooltip';
 import { normalizeVal, createFindOption, measureTextPx } from './utils.js';
 import { SelectorOption, SelectorInput } from './components/index';
+import { UNDERLINE_VARIANT, underlineSx } from '../../../../../common/utils/underlineSx';
 
 export default function Selector({
     label,
@@ -15,16 +16,20 @@ export default function Selector({
     style = {},
     className = "",
     fullWidth,
-    variant = 'outlined',
+    variant = 'outlined', // 'outlined' | 'underline' | 'flat'
     textColor,
     iconColor,
     bgColor,
     borderColor,
+    lineColor,
+    lineFocusColor,
     wrapOptions = false,
     placeholder,
     required,
     requiredColor = "red",
     disableClearable = false,
+    disabled = false,
+    readOnly = false,
     hideScrollbar = true,
     multiSelect = false,
     checkedBgColor,
@@ -52,6 +57,28 @@ export default function Selector({
     // variant="flat": sin caja ni borde ni subrayado; el texto se muestra completo
     // (ancho según contenido, sin ellipsis). fullWidth por default es true solo en "outlined".
     const isFlat = variant === 'flat';
+    // disabled / readOnly (también los manda SchemaForm con readonly): no abre el listado,
+    // no deja limpiar la selección y se ve como los demás campos bloqueados.
+    const locked = disabled || readOnly;
+
+    // El listado va en un portal y se posiciona contra el campo. Si el campo se mueve (scroll de
+    // la página o de un contenedor, p. ej. una fila de tabla o un paso que se desplaza) el listado
+    // queda flotando lejos de su campo o encima del header. Para no mostrarlo desancorado, se
+    // cierra al hacer scroll fuera de él; el scroll dentro del propio listado no lo cierra.
+    const [open, setOpen] = React.useState(false);
+    React.useEffect(() => {
+        if (!open) return undefined;
+        const onScroll = (event) => {
+            const target = event.target;
+            if (target instanceof Element && target.closest('[role="listbox"]')) return;
+            setOpen(false);
+        };
+        document.addEventListener('scroll', onScroll, true);
+        return () => document.removeEventListener('scroll', onScroll, true);
+    }, [open]);
+    // variant="underline": como outlined (ancho completo por default) pero sin caja, solo la línea
+    // inferior; lineColor / lineFocusColor recolorean la línea (reposo / foco).
+    const isUnderline = variant === UNDERLINE_VARIANT;
     const resolvedFullWidth = fullWidth ?? !isFlat;
 
     // En flat el input se dimensiona en ch según el texto visible (label seleccionado o
@@ -73,6 +100,9 @@ export default function Selector({
     const autocomplete = (
         <Autocomplete
             id={id}
+            open={open}
+            onOpen={() => setOpen(true)}
+            onClose={() => setOpen(false)}
             sx={isFlat
                 ? {
                     display: 'inline-flex',
@@ -107,13 +137,16 @@ export default function Selector({
                         '& .MuiAutocomplete-inputRoot': { flexWrap: 'nowrap', overflow: 'hidden', minWidth: 0 },
                         '& .MuiChip-root': { maxWidth: '100%', minWidth: 0 },
                     } : {}),
+                    ...(isUnderline ? underlineSx(lineColor, lineFocusColor) : {}),
                 }}
             style={style}
             className={className}
             options={options}
             autoHighlight
             openOnFocus
-            disableClearable={disableClearable || isFlat}
+            disabled={locked}
+            readOnly={readOnly}
+            disableClearable={disableClearable || isFlat || locked}
             multiple={multiSelect}
             disableCloseOnSelect={multiSelect}
             getOptionLabel={(option) => option.label || ""}
@@ -182,6 +215,7 @@ export default function Selector({
                     label={displayLabel}
                     placeholder={placeholder}
                     isFlat={isFlat}
+                    isUnderline={isUnderline}
                 />
             )}
         />

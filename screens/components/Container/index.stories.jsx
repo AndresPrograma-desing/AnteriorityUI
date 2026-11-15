@@ -59,6 +59,27 @@ export const WithCustomStepper = {
   },
 };
 
+// Verifica el auto-scroll al cambiar de paso: el contenido es alto y los botones quedan al final,
+// así que al pulsar "Siguiente" con la página bajada la vista debe subir hasta el Stepper.
+export const StepperAutoScroll = {
+  render: () => {
+    const [step, setStep] = useState(0);
+    const steps = [{ label: 'Titular' }, { label: 'Ubicación' }, { label: 'Servicio' }, { label: 'Confirmar' }];
+    return (
+      <div style={{ padding: 16 }}>
+        <Container showStepper steps={steps} activeStep={step} onStepClick={setStep}>
+          <p>Paso {step + 1}: {steps[step].label}. Al cambiar de paso, la vista debe subir hasta el Stepper.</p>
+          <div style={{ height: 900, background: 'repeating-linear-gradient(0deg, transparent 0 39px, #e2e8f0 39px 40px)' }} />
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button type="button" disabled={step === 0} onClick={() => setStep(step - 1)}>Anterior</button>
+            <button type="button" disabled={step === steps.length - 1} onClick={() => setStep(step + 1)}>Siguiente</button>
+          </div>
+        </Container>
+      </div>
+    );
+  },
+};
+
 const CONTACT_SCHEMA = {
   type: 'object',
   required: ['nombre', 'email'],

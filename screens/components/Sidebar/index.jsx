@@ -13,6 +13,8 @@ export const ProSidebar = ({
   activeId,
   onSelect,
   collapsible = true,
+  collapseIcon,
+  expandIcon,
   loading = false,
   skeletonItems = 12,
   className = '',
@@ -236,7 +238,9 @@ export const ProSidebar = ({
                       text={effectiveCollapsed ? TEXTS.openMenu : TEXTS.closeMenu}
                       position="bottom"
                     >
-                      {effectiveCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+                      {effectiveCollapsed
+                        ? (expandIcon ?? <ChevronRight size={16} />)
+                        : (collapseIcon ?? <ChevronLeft size={16} />)}
                     </ModalTooltip>
                   </Button>
                 )}
