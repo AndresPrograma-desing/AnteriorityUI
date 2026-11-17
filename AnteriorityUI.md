@@ -6,29 +6,29 @@ Referencia detallada de uso de cada componente de la librería (props, ejemplos,
 
 ## Skill para la IA del proyecto consumidor
 
-La librería incluye una **skill de Claude Code** que enseña a la IA del proyecto consumidor a usar los componentes como están pensados: setup, qué componente usar para cada caso, cómo importar, dónde leer las props exactas y las reglas de color y de API. Está en el repo en `skill/anteriority-ui/SKILL.md` y viaja dentro del paquete publicado, en `node_modules/anteriority-ui/skill/anteriority-ui/SKILL.md`.
+La librería incluye una **skill agnóstica para agentes de código** que enseña a Claude Code, Codex u otro agente del proyecto consumidor a usar los componentes como están pensados: setup, qué componente usar para cada caso, cómo importar, dónde leer las props exactas y las reglas de color y de API. Está en el repo en `skill/anteriority-ui/SKILL.md` y viaja dentro del paquete publicado, en `node_modules/anteriority-ui/skill/anteriority-ui/SKILL.md`.
 
 ### Instalación
 
-Claude Code no lee skills desde `node_modules`: solo lee `.claude/skills/` del proyecto (y `~/.claude/skills/` del usuario). Por eso hay que copiarla una vez, desde la **raíz del proyecto consumidor**:
+Los agentes no deben depender de leer skills desde `node_modules`. Por eso hay que copiarla una vez, desde la **raíz del proyecto consumidor**; el comando crea `.claude/skills/anteriority-ui/` para Claude Code y `.agents/skills/anteriority-ui/` para Codex:
 
 ```bash
 pnpm anteriority-ui-install-skill
 # o: npx anteriority-ui-install-skill
 ```
 
-Resultado: `.claude/skills/anteriority-ui/SKILL.md` dentro del proyecto consumidor. El comando:
+Resultado: dos copias sincronizadas dentro del proyecto consumidor. El comando:
 
 - Usa como destino la carpeta desde donde se ejecuta (`INIT_CWD` de pnpm/npm, o el cwd actual).
 - Acepta otra carpeta como argumento: `pnpm anteriority-ui-install-skill ../otro-proyecto`.
 - Borra la copia anterior antes de copiar, así que nunca quedan archivos de versiones viejas.
 - Requiere que la librería esté instalada completa; si no encuentra la skill, termina con error y lo informa.
 
-**Actualizar:** después de `pnpm update anteriority-ui`, volver a ejecutar el mismo comando. Claude Code toma la skill nueva en la próxima sesión (o al reiniciar).
+**Actualizar:** después de `pnpm update anteriority-ui`, volver a ejecutar el mismo comando. Claude Code y Codex toman la skill nueva en la próxima sesión (o al reiniciar).
 
-**Verificar que quedó instalada:** existe `.claude/skills/anteriority-ui/SKILL.md` y la sesión de Claude Code muestra `anteriority-ui` entre las skills disponibles. Si no aparece, revisar que el archivo esté en la carpeta del proyecto que se abrió en Claude Code (no en la carpeta padre ni en `node_modules`) y reiniciar la sesión.
+**Verificar que quedó instalada:** existen `.claude/skills/anteriority-ui/SKILL.md` y `.agents/skills/anteriority-ui/SKILL.md`. Si el agente no la muestra, revisar que el archivo esté en la carpeta del proyecto que se abrió (no en la carpeta padre ni en `node_modules`) y reiniciar la sesión.
 
-**Desinstalar:** borrar la carpeta `.claude/skills/anteriority-ui/`.
+**Desinstalar:** borrar `.claude/skills/anteriority-ui/` y `.agents/skills/anteriority-ui/`.
 
 ### Qué contiene y qué no
 
@@ -1666,6 +1666,8 @@ import DrawPanel from '../DrawPanel'; // export default (index.jsx)
 | `descriptionPosition` | `'top' \| 'bottom' \| 'body'` | `'top'` | Dónde se muestra la descripción (o el `markdown`): `'top'` en el encabezado, junto al título; `'bottom'` al final del cuerpo, separado por una línea; `'body'` al inicio del cuerpo, como contenido normal (ideal para un markdown largo con tablas o listas, que no debe quedar pegado al título). |
 | `markdown` | string | — | Texto markdown renderizado con `MarkdownContent` (negritas, listas, links, tablas, `{color:..}`, bloques copiables, Mermaid). Si viene, reemplaza a `description` y respeta `descriptionPosition`. |
 | `markdownProps` | object | — | Props extra para el `MarkdownContent` interno (`components`, `linkColor`, `images`, labels de copiar…). |
+| `richChatInput` | boolean \| object | `false` | Renderiza un `RichChatInput` nativo fijo en el footer. Puede ser `true` para usar `richChatInputProps`, o un objeto con las props del editor. |
+| `richChatInputProps` | object | `{}` | Props del `RichChatInput` cuando `richChatInput` es `true` (por ejemplo `value`, `onChange`, `onSend`, `tools` y `placeholder`). |
 | `children` | node | — | Contenido principal del panel |
 | `width` | string | `'400px'` | Ancho máximo del panel |
 | `showActions` | boolean | `true` | Muestra footer con botones cancelar/confirmar |
@@ -2785,6 +2787,55 @@ const [texto, setTexto] = useState('');
 | `separator` / `spacer` | — | Divisor vertical o espacio flexible (empuja lo que sigue a la derecha). |
 
 Los colores por item (`color`, `activeColor`) pasan directo al `Button`. Las stories: `Default`, `ConPegadoDeImagenes`, `SinVistaPreviaNiEnvio` y `TemaOscuro`.
+
+### RichChatInput
+
+Input de chat con **formato en vivo**: lo que se escribe se renderiza al instante (negrita, cursiva, tachado, código en línea, enlaces) en vez de verse como `**texto**`. A diferencia de `ChatComposer` (textarea + vista previa) y `MarkdownEditor` (editor con panel de preview), acá es un solo campo editable. El valor que entra y sale es **markdown** inline con saltos de línea.
+
+**Import:**
+```jsx
+import { RichChatInput } from 'anteriority-ui';
+```
+
+**Uso básico:**
+```jsx
+const [texto, setTexto] = useState('');
+<RichChatInput
+  value={texto}
+  onChange={setTexto}
+  onSend={(markdown) => { enviar(markdown); setTexto(''); }}
+/>
+```
+
+Cómo se aplica el formato: con los botones de la barra, con atajos (`Ctrl+B` negrita, `Ctrl+I` cursiva, `Ctrl+Shift+X` tachado, `Ctrl+E` código, `Ctrl+K` enlace) o escribiendo el markdown (`**x**`, `*x*`, `_x_`, `~~x~~`, `` `x` ``), que se convierte al cerrar el marcador. Los botones muestran su estado activo según donde está el cursor. Al pegar texto se toma el texto plano (nunca el HTML ajeno) y se interpreta como markdown, así lo copiado con `**x**` o `` `código` `` llega ya formateado. Con `onImagePaste`, pegar una imagen (Ctrl+V) la muestra como chip arriba del campo.
+
+**Props:**
+
+| Prop | Tipo | Default | Descripción |
+|---|---|---|---|
+| `value` / `onChange(markdown)` | string / function | `''` / — | Markdown controlado (`onChange` recibe el string, no el evento). Si `value` cambia desde afuera (ej. `''` tras enviar) el campo se vuelve a renderizar; si el cambio vino del propio campo no se toca el cursor. |
+| `onSend(markdown, files)` | function | — | Se llama con el atajo de envío o el botón. `files` son las imágenes pegadas que siguen en los chips (los chips se limpian solos al enviar). No limpia el texto: el consumidor decide. |
+| `onImagePaste(files, event)` | function | — | Recibe las imágenes pegadas (array de `File`). Sin este prop el pegado de imágenes está desactivado. El botón de enviar también se habilita con solo imágenes. |
+| `imagePreviewLabel`, `imageRemoveLabel`, `imagePreviewProps` | string / string / object | `'Imagen'`, `'Quitar imagen'`, — | Chips de imagen (mismos que `ChatComposer`). |
+| `sendShortcut` | `'enter'` \| `'ctrl+enter'` \| `'ctrl+shift+enter'` \| `'none'` | `'enter'` | Atajo de envío. Con `'enter'`, Shift+Enter inserta un salto de línea; con los demás, Enter lo inserta. |
+| `placeholder`, `disabled`, `autoFocus` | — | `'Escribí un mensaje…'`, `false`, `false` | Campo editable. |
+| `minRows`, `maxRows` | number | `2`, `10` | Alto mínimo y máximo en líneas; pasado el máximo scrollea con el `ScrollBar` de la librería. |
+| `tools` | `Array<'bold'\|'italic'\|'strike'\|'code'\|'link'\|'emoji'>` | todas | Herramientas habilitadas (botón, atajo y autoformato). `'emoji'` abre el `EmojiPickerModal` anclado a la barra e inserta el emoji en el cursor (un ícono se muestra como SVG inline dentro del campo, con el color elegido, y se borra de una vez con Backspace; en el markdown queda como `{icon:Nombre}` o `{icon:Nombre:color}`, que renderiza `MarkdownContent`). |
+| `emojiPickerProps` | object | — | Props extra para el `EmojiPickerModal` (`locale`, `theme`, `quickEmojis`, colores…). `anchorEl`, `open`, `onClose` y `onSelect` los controla el componente. |
+| `toolbarPosition` | `'top'` \| `'bottom'` | `'top'` | Barra arriba del campo (con una línea separadora) o abajo, junto al envío. |
+| `extraTools` | `Array<item>` | `[]` | Botones propios al final de la barra; mismos items que el `toolbar` de `ChatComposer` (`icon`, `button`, `toggle`, `custom`, `separator`, `spacer`). |
+| `labels` | object | — | Textos: `boldTooltip`, `italicTooltip`, `strikeTooltip`, `codeTooltip`, `linkTooltip`, `emojiTooltip`, `linkPlaceholder`, `linkApplyLabel`, `linkCancelLabel`. |
+| `showSend`, `sendLabel`, `sendIcon`, `sendColor`, `sendLoading`, `sendButtonProps` | — | `true`, `'Enviar (Enter)'`, `Send`, `Button.COLORS.PRIMARY`, `false`, — | Botón de envío (igual que `ChatComposer`; `disabled`/`onClick` los controla el componente). |
+| `bgColor`, `borderColor`, `focusBorderColor`, `textColor`, `placeholderColor`, `toolbarBorderColor` | string | — | Colores del contenedor, borde (normal y con foco), texto, placeholder y líneas internas. |
+| `codeBgColor`, `codeTextColor`, `linkColor` | string | — | Colores del código en línea y de los enlaces. |
+| `ref` | ref | — | Apunta al elemento editable (`ref.current.focus()`). |
+| `width`, `maxWidth`, `className`, `style` | — | `100%` | Se aplican al contenedor. |
+
+**Notas:**
+- Solo se soporta markdown inline (negrita, cursiva, tachado, código, enlaces `[texto](url)`) y saltos de línea; no hay listas, títulos ni imágenes. Para renderizar el resultado en el historial del chat, usar `MarkdownContent`.
+- Cada enlace muestra al final un ícono de "abrir en otra pestaña"; al hacerle click abre la URL en una pestaña nueva (el click en el texto del enlace solo mueve el cursor, para poder editarlo).
+- Los enlaces se validan con la misma regla que usa `MarkdownContent` al mostrarlos (`http(s)`, `mailto:` y poco más): lo que acepta el campo se renderiza igual después. Una URL sin esquema se completa con `https://`; cualquier otra cosa (`javascript:`, `data:`…) se descarta.
+- Las stories: `Default`, `WithInitialValue`, `CustomTools`, `ExtraToolsAndColors` y `Disabled`.
 
 ### Radio
 
@@ -5109,7 +5160,7 @@ const [value, setValue] = useState(false);
 
 ### Table
 
-Tabla unificada que fusiona `TableA` y `TableB`: la prop `variant` elige el look (`'A'` compacta, `'B'` cómoda) y todas las funciones están disponibles en ambas. `TableA` y `TableB` siguen existiendo como wrappers (`<Table variant="A" />` / `<Table variant="B" />`) con su API y su aspecto de siempre, así que no hay que migrar nada.
+Tabla unificada: `variant` elige `'A'` compacta, `'B'` cómoda o `'results'` para resultados organizados en columnas con cabecera acentuada, resumen destacado y valores comparables por fila. `TableA` y `TableB` siguen existiendo como wrappers de compatibilidad.
 
 **Import:**
 ```jsx
@@ -5125,7 +5176,12 @@ import { Table } from 'anteriority-ui'; // o import Table from 'screens/componen
 
 | Prop | Tipo | Default | Descripción |
 |---|---|---|---|
-| `variant` | `'A'` \| `'B'` | `'A'` | `'A'` = look de TableA (variables `--tableA-*`), `'B'` = look de TableB (`--tableB-*`). |
+| `variant` | `'A'` \| `'B'` \| `'results'` | `'A'` | `'results'` muestra columnas visuales amplias, resumen por columna y acciones contextuales. |
+| `summary` / `summaryLabel` | object / string | — / `'Total'` | Fila de totales al inicio de `results`; cada clave usa el mismo formato de su columna. Si falta el valor de la primera columna se muestra `summaryLabel`. |
+| `cellBgColor` / `cellColor` | string o función `(row, rowIndex, column)` | — | Color de fondo y texto de las celdas de `results`. Cada columna puede sobrescribirlos en `columns` o `uiSchema[field]['ui:options']`. |
+| `alternateCellBgColor` | string | `'#f8fafc'` | Fondo de las filas alternas en `results`. Si se pasa `cellBgColor` como string y no esta prop, ambos fondos usan `cellBgColor`. |
+| `summaryBgColor` / `summaryTextColor` / `accentColor` | string | — | Colores de los resúmenes y del acento de cabecera. `surfaceColor`, `headerColor`, `headingColor`, `textColor`, `mutedTextColor`, `borderColor` y `hoverColor` también aplican. |
+| `resultsScrollBarProps` / `resultsSkeletonProps` | object | — | Props adicionales para `ScrollBar` y `Skeleton` de carga en `results`. Se reenvían al final; en `ScrollBar`, `className` y `style` se combinan con los del panel. |
 | `columns` | `Array` | `[]` | Acepta `header`/`accessor` (estilo A) o `label`/`key` (estilo B) en cualquier variante, además de `type: 'badge' \| 'actions'`, `render(row, index)`, `filter`, `align`, `width`. |
 | `keyExtractor` / `rowKey` | `function` / `string` | — / `'id'` | Clave de fila: `keyExtractor(row)` si existe, si no `row[rowKey]`, si no el índice. |
 | `expandable` | `{ expandedRowRender, rowExpandable? }` | — | Filas expandibles (también en la variante A). |
@@ -5149,6 +5205,9 @@ import { Table } from 'anteriority-ui'; // o import Table from 'screens/componen
 | `badge` / `actions` | ver TableB | Badge / botones de acción |
 
 Los controles interactivos no disparan `onRowClick` ni expanden la fila. `linkColor` (prop de `Table`) define el color por defecto de los links.
+
+En `variant="results"`, el `schema` define columnas y `data` aporta las filas. Cada campo acepta en `uiSchema[field]['ui:options']` las opciones `formatValue(value, row, rowIndex)`, `secondaryKey` (clave para una segunda línea), `cellBgColor` / `cellColor` (valor o función) y `action: { icon, label, onClick(row, rowIndex, column) }`. Las mismas opciones se pueden pasar en `columns` explícitas. La fila `summary` usa `formatValue`, pero no acciones ni colores individuales.
+`emptyIcon` y `rowClassName` funcionan también en `results`. Las opciones en `resultsScrollBarProps` y `resultsSkeletonProps` prevalecen sobre los valores que `Table` asigna a esos hijos, salvo `className` y `style` del scroll, que se combinan para conservar la apariencia de la variante.
 
 **Desde un JSON Schema:** `schema` (objeto con `properties`, o array con `items`) y `uiSchema` generan las columnas, igual que `SchemaForm`. El `type` se deduce (`boolean` → `switch`, `format: 'date'` → `date`, `format: 'uri'` → `link`, `number`/`integer` → `number` alineado a la derecha, `enum` → etiqueta con `enumNames`); se fuerza con `'ui:widget'` y se agregan props de columna con `'ui:options'`. `'ui:order'` ordena. Si también pasás `columns`, esas mandan.
 

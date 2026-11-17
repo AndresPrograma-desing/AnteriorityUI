@@ -110,11 +110,11 @@ import { Home, Bell, Search } from 'anteriority-ui/lucide';
 
 Para íconos de marcas/tecnologías/UI (react-icons empaquetado, sin instalar nada extra), ver la sección "Icons (react-icons)" en [AnteriorityUI.md](AnteriorityUI.md). Para buscar/listar esos íconos programáticamente sin conocer de antemano en qué pack vive cada uno, `anteriority-ui/common/icons` expone `findIcons`, `ICON_PACKS` y `ICON_PACK_NAMES` (ver [findIcons](AnteriorityUI.md#findicons)).
 
-## Skill para tu asistente de IA (Claude Code)
+## Skill para tu asistente de IA (Claude Code y Codex)
 
-La librería trae una skill (`skill/anteriority-ui/SKILL.md` en el repo, `skill/` dentro del paquete publicado) que le enseña a la IA de tu proyecto cómo usar los componentes: setup, índice de qué componente usar para cada caso, dónde leer las props exactas y las reglas de color/API. Así la IA deja de inventar props o de reimplementar componentes que ya existen.
+La librería trae una skill agnóstica (`skill/anteriority-ui/SKILL.md` en el repo, `skill/` dentro del paquete publicado) que le enseña a Claude Code, Codex u otro agente cómo usar los componentes: setup, índice de qué componente usar para cada caso, dónde leer las props exactas y las reglas de color/API. Así la IA deja de inventar props o de reimplementar componentes que ya existen.
 
-Claude Code no lee skills desde `node_modules`, así que hay que copiarla a `.claude/skills/` de tu proyecto. La librería trae un comando para eso, desde la raíz del proyecto consumidor:
+Los agentes no deben depender de leer skills desde `node_modules`, así que hay que copiarla a sus carpetas de proyecto. El comando instala copias compatibles en `.claude/skills/` (Claude Code) y `.agents/skills/` (Codex), desde la raíz del proyecto consumidor:
 
 ```bash
 pnpm anteriority-ui-install-skill

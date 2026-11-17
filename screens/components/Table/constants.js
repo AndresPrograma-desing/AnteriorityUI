@@ -1,4 +1,4 @@
-export const VARIANTS = { A: 'A', B: 'B' };
+export const VARIANTS = { A: 'A', B: 'B', RESULTS: 'results' };
 export const DEFAULT_VARIANT = 'A';
 
 export const DEFAULT_FILTER_ACTIVE_COLOR = '#10b981';

@@ -216,6 +216,14 @@
   background-color: #f8fafc;
 }
 
+.footerWithInput {
+  justify-content: stretch;
+}
+
+.footerWithInput > * {
+  width: 100%;
+}
+
 .descriptionBottom {
   margin-top: 1.5rem;
   border-top: 1px solid #e2e8f0;

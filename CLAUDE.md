@@ -172,13 +172,13 @@ El paquete se publica en el registro público de npm como `anteriority-ui`, no v
 
 ## Skill para consumidores (`skill/anteriority-ui/`)
 
-Hay DOS carpetas de skills, no confundirlas:
+Hay DOS carpetas de skills del repo, no confundirlas:
 - `.claude/skills/` → skills **internas** de este repo, para trabajar en la librería (`design-color-props`, `expose-child-props`, `extract-shared-components`). No se publican.
-- `skill/anteriority-ui/SKILL.md` → skill **para los consumidores**: le enseña a la IA del proyecto que instala la librería a usar sus componentes. Se publica dentro del paquete.
+- `skill/anteriority-ui/SKILL.md` → skill **para los consumidores**: le enseña a Claude Code, Codex u otro agente del proyecto que instala la librería a usar sus componentes. Se publica dentro del paquete.
 
 **Cómo llega al consumidor:**
 - `scripts/build.mjs` copia `skill/` a `dist/skill/` y `bin/` a `dist/bin/`, y agrega el campo `bin` al `dist/package.json`.
-- `bin/install-skill.mjs` (comando `anteriority-ui-install-skill`) copia `dist/skill/anteriority-ui/` a `.claude/skills/anteriority-ui/` del proyecto consumidor. Claude Code no lee skills desde `node_modules`, así que este paso es obligatorio.
+- `bin/install-skill.mjs` (comando `anteriority-ui-install-skill`) copia `dist/skill/anteriority-ui/` a `.claude/skills/anteriority-ui/` y `.agents/skills/anteriority-ui/` del proyecto consumidor. Así se mantienen disponibles para Claude Code y Codex sin depender de leerlas desde `node_modules`.
 - El README y [AnteriorityUI.md](AnteriorityUI.md#skill-para-la-ia-del-proyecto-consumidor) documentan el comando. Si cambia el nombre del comando, la ruta de la skill o el destino, actualizar los tres (README, AnteriorityUI.md y `bin/install-skill.mjs`).
 
 **Qué mantener sincronizado en `SKILL.md`:**
@@ -191,10 +191,10 @@ Hay DOS carpetas de skills, no confundirlas:
 
 **Cómo verificar un cambio en la skill:**
 1. `pnpm build` → confirmar que `dist/skill/anteriority-ui/SKILL.md` y `dist/bin/install-skill.mjs` existen y que `dist/package.json` tiene `bin`.
-2. Probar el comando contra una carpeta temporal: `node dist/bin/install-skill.mjs <carpeta-temporal>` y verificar `<carpeta-temporal>/.claude/skills/anteriority-ui/SKILL.md`.
+2. Probar el comando contra una carpeta temporal: `node dist/bin/install-skill.mjs <carpeta-temporal>` y verificar `<carpeta-temporal>/.claude/skills/anteriority-ui/SKILL.md` y `<carpeta-temporal>/.agents/skills/anteriority-ui/SKILL.md`.
 3. Si el frontmatter de `SKILL.md` cambia, revisar que `name` siga siendo `anteriority-ui` (es el nombre de la carpeta destino) y que `description` siga describiendo cuándo activarla.
 
-**Por qué `skill/` y no `.claude/skills/`:** `.gitignore` ignora `.claude/*` y solo re-incluye `.claude/skills/` (para las internas). Ubicar la skill del consumidor en `skill/` la mantiene separada de las internas y no depende de esa excepción del `.gitignore`. Si alguien la mueve a `.claude/skills/`, no se publicaría (el build no la copia desde ahí).
+**Por qué `skill/` y no `.claude/skills/`:** `.gitignore` ignora `.claude/*` y solo re-incluye las configuraciones internas versionadas. Ubicar la skill del consumidor en `skill/` la mantiene separada de las internas y permite que el build la publique para instalarla en ambos agentes.
 
 ## ⚠️ Gotcha de pnpm workspace
 

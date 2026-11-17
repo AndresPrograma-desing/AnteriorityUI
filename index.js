@@ -47,6 +47,7 @@ export { default as InfoTooltip } from './screens/components/InfoTooltip/index.j
 export { default as Input } from './screens/components/Input/index.js';
 export { default as KeyboardShortcut } from './screens/components/KeyboardShortcut/index.js';
 export { default as Resizable } from './screens/components/Resizable/index.js';
+export { default as RichChatInput } from './screens/components/RichChatInput/index.js';
 export { default as ChatComposer } from './screens/components/ChatComposer/index.js';
 export { default as Loading } from './screens/components/Loading/index.js';
 export { default as MarkdownContent } from './screens/components/MarkdownContent/index.js';

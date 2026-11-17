@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import stylesA from './tableA.module.css';
 import stylesB from './tableB.module.css';
+import { ResultsTable } from './components';
 import { AlertCircle, Inbox, ChevronDown, ChevronUp, Filter as FilterIcon } from 'lucide-react';
 import Barnner from '../Barnner';
 import Button from '../Button';
@@ -30,6 +31,16 @@ const Table = ({
   columns: columnsProp,
   schema,
   uiSchema,
+  summary,
+  summaryLabel = 'Total',
+  cellBgColor,
+  alternateCellBgColor,
+  cellColor,
+  summaryBgColor,
+  summaryTextColor,
+  accentColor,
+  resultsScrollBarProps,
+  resultsSkeletonProps,
   linkColor,
   data = [],
   keyExtractor,
@@ -70,14 +81,29 @@ const Table = ({
 }) => {
   // `schema` (+ `uiSchema`) genera las columnas; si además llega `columns`, esa definición manda.
   const columns = columnsProp ?? (schema ? columnsFromSchema(schema, uiSchema) : []);
+  const [expandedKeys, setExpandedKeys] = useState({});
+  const scrollAreaRef = useRef(null);
+  if (variant === 'results') {
+    return <ResultsTable
+      columns={columns} data={data} summary={summary} summaryLabel={summaryLabel}
+      cellBgColor={cellBgColor} alternateCellBgColor={alternateCellBgColor} cellColor={cellColor}
+      summaryBgColor={summaryBgColor} summaryTextColor={summaryTextColor}
+      accentColor={accentColor}
+      surfaceColor={surfaceColor} headerColor={headerColor} textColor={textColor}
+      headingColor={headingColor} mutedTextColor={mutedTextColor} borderColor={borderColor}
+      hoverColor={hoverColor} loading={loading} error={error} onRetry={onRetry}
+      emptyIcon={EmptyIcon} emptyMessage={emptyMessage} skeletonRows={skeletonRows}
+      skeletonProps={resultsSkeletonProps} scrollBarProps={resultsScrollBarProps}
+      keyExtractor={keyExtractor} rowClassName={rowClassName}
+      rowKey={rowKey} onRowClick={onRowClick} stickyHeader={stickyHeader}
+      maxHeight={maxHeight} width={width} className={className} style={style}
+    />;
+  }
   const isB = variant === 'B';
   const config = VARIANT_CONFIG[isB ? 'B' : 'A'];
   const styles = isB ? stylesB : stylesA;
   const p = config.prefix;
   const resolvedEmptyMessage = emptyMessage ?? config.emptyMessage;
-
-  const [expandedKeys, setExpandedKeys] = useState({});
-  const scrollAreaRef = useRef(null);
 
   const handleCycleFilter = (filter) => {
     if (!filter || !Array.isArray(filter.options) || filter.options.length === 0) return;
@@ -334,6 +360,6 @@ const Table = ({
   );
 };
 
-Table.VARIANTS = { A: 'A', B: 'B' };
+Table.VARIANTS = { A: 'A', B: 'B', RESULTS: 'results' };
 
 export default Table;

@@ -152,11 +152,12 @@ export function ChecksWidget({ id, value, disabled, readonly, label, onChange })
   );
 }
 
-export function SelectWidget({ id, value, disabled, readonly, label, placeholder, options, onChange }) {
+export function SelectWidget({ id, value, disabled, readonly, label, placeholder, options, formContext, onChange }) {
   const enumOptions = (options?.enumOptions || []).map((opt) => ({ label: opt.label, value: opt.value }));
   return (
     <Selector
       id={id}
+      {...inputStyleProps(options, formContext)}
       label={label}
       placeholder={placeholder}
       value={value}

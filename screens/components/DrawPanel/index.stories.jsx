@@ -453,6 +453,48 @@ export const MarkdownEnElCuerpo = {
   },
 };
 
+// El editor enriquecido puede declararse como contenido nativo del panel. `value` sigue siendo
+// markdown, igual que cuando se usa RichChatInput directamente, y el panel no necesita conocer
+// la implementación interna del editor.
+export const ConRichChatInput = {
+  render: () => {
+    const [isOpen, setIsOpen] = useState(true);
+    const [value, setValue] = useState('Hola **equipo** 👋');
+    const [sent, setSent] = useState('');
+
+    return (
+      <div>
+        <Button onClick={() => setIsOpen(true)}>Abrir panel</Button>
+        <DrawPanel
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          title="Enviar comentario"
+          description="Escribí una respuesta con formato, enlaces o emojis."
+          width="480px"
+          showActions={false}
+          richChatInput={{
+            value,
+            onChange: setValue,
+            onSend: (message) => {
+              setSent(message);
+              setValue('');
+            },
+            placeholder: 'Escribí tu comentario…',
+            sendLabel: 'Enviar comentario',
+            minRows: 4,
+            maxRows: 8,
+          }}
+        />
+        {sent && (
+          <p style={{ maxWidth: 480, marginTop: 16 }}>
+            Último envío: <strong>{sent}</strong>
+          </p>
+        )}
+      </div>
+    );
+  },
+};
+
 // Stepper vertical como seguimiento de un envío: el usuario completa el formulario, lo envía y el
 // panel va avanzando solo paso a paso (iniciando → recolectando datos → validando → entregado).
 // Cada paso trae su propio ícono SVG (`icon`); el paso en curso lo conserva y se marca con un aro que

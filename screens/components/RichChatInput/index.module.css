@@ -1,0 +1,149 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: 100%;
+  background: var(--rich-chat-bg, #ffffff);
+  border: 1px solid var(--rich-chat-border, #e2e8f0);
+  border-radius: 6px;
+  transition: border-color 0.15s ease;
+}
+
+.root:focus-within {
+  border-color: var(--rich-chat-focus-border, #7c9cff);
+}
+
+.disabled {
+  opacity: 0.6;
+}
+
+.topBar {
+  padding: 4px 8px;
+  background: var(--rich-chat-toolbar-bg, #f1f5f9);
+  border-bottom: 1px solid var(--rich-chat-toolbar-border, #e2e8f0);
+}
+
+/* border-box: sin esto el padding se suma al 100% y la barra de scroll se sale del marco. */
+.scroll {
+  box-sizing: border-box;
+  padding: 8px 12px 0;
+  min-width: 0;
+}
+
+.previews {
+  padding: 8px 12px 0;
+}
+
+.editor {
+  box-sizing: border-box;
+  outline: none;
+  line-height: 1.5;
+  color: var(--rich-chat-text, #0f172a);
+  white-space: pre-wrap;
+  word-break: break-word;
+  cursor: text;
+}
+
+.editor[data-empty='true']::before {
+  content: attr(data-placeholder);
+  color: var(--rich-chat-placeholder, rgba(0, 0, 0, 0.42));
+  pointer-events: none;
+  position: absolute;
+}
+
+.editor b,
+.editor strong {
+  font-weight: 700;
+}
+
+.editor s,
+.editor strike {
+  text-decoration: line-through;
+}
+
+.editor code {
+  padding: 1px 5px;
+  border-radius: 5px;
+  background: var(--rich-chat-code-bg, rgba(15, 23, 42, 0.08));
+  color: var(--rich-chat-code-text, inherit);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.9em;
+}
+
+.editor a {
+  color: var(--rich-chat-link, #2563eb);
+  text-decoration: underline;
+}
+
+/* Ícono "abrir en otra pestaña" al final del enlace (lucide external-link). Es parte del recuadro del
+   enlace, así que handleClick lo detecta por posición. Va con mask para tomar el color del enlace. */
+.editor a::after {
+  content: '';
+  display: inline-block;
+  width: 0.85em;
+  height: 0.85em;
+  margin-left: 3px;
+  vertical-align: -0.1em;
+  background-color: currentColor;
+  cursor: pointer;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 3h6v6'/%3E%3Cpath d='M10 14 21 3'/%3E%3Cpath d='M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 3h6v6'/%3E%3Cpath d='M10 14 21 3'/%3E%3Cpath d='M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.linkRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--rich-chat-toolbar-border, #e2e8f0);
+}
+
+.linkInput {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--rich-chat-border, #e2e8f0);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--rich-chat-text, #0f172a);
+  font: inherit;
+  font-size: 14px;
+  outline: none;
+}
+
+.linkInput:focus {
+  border-color: var(--rich-chat-focus-border, #7c9cff);
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px 8px;
+}
+
+.tools {
+  border: none;
+  padding: 0;
+  background: transparent;
+  min-width: 0;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.sendBtn {
+  height: 32px;
+  min-width: 44px;
+  border-radius: 8px !important;
+}
+
+/* Ícono SVG inline (`{icon:Nombre}`): un bloque atómico que se borra de una vez con Backspace. */
+.editor [data-icon] {
+  display: inline-flex;
+  vertical-align: -0.2em;
+  margin: 0 1px;
+  line-height: 1;
+}
