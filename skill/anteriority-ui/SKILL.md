@@ -5,9 +5,14 @@ description: Guía para usar la librería anteriority-ui (componentes React sobr
 
 # anteriority-ui — guía para el consumidor
 
-Esta skill viene empaquetada con la librería. Sirve para que la IA use los
+Esta skill viene empaquetada con la librería. Sirve para que Claude Code, Codex
+u otro agente de código use los
 componentes de `anteriority-ui` como están pensados, sin inventar props ni
 reimplementar algo que ya existe.
+
+Es deliberadamente independiente del proveedor: no presupone comandos, APIs o
+herramientas exclusivas de un agente. Cuando una herramienta concreta no esté
+disponible, usa el equivalente de lectura, búsqueda o verificación del entorno.
 
 ## 1. Antes de escribir código: verificar el setup
 
@@ -153,7 +158,7 @@ Nombres exactos del barrel.
 - `GreenHighlight` — `<strong>` con color personalizable.
 - `MediaViewer` — visor de imagen, video, audio, PDF, DOCX, Markdown según la URL/mime.
 - `FileListItem` — fila de archivo con ícono por tipo.
-- `ChatWindow` — ventana de chat completa. `ChatComposer` — composer con Markdown, pegado de imágenes y envío configurable.
+- `ChatWindow` — ventana de chat completa. `ChatComposer` — composer con Markdown, pegado de imágenes y envío configurable. `RichChatInput` — input de chat con formato en vivo (negrita, cursiva, código, enlaces) que se renderiza al escribir.
 - `ImagePastePreview` — chips de imágenes pegadas.
 
 **Identidad de usuario**

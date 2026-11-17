@@ -11,6 +11,7 @@ import CountdownBar from '../CountdownBar/index';
 import Loading from '../Loading/index';
 import Stepper from '../Stepper/index';
 import MarkdownContent from '../MarkdownContent/index';
+import RichChatInput from '../RichChatInput/index';
 
 const DrawPanel = ({ 
   isOpen, 
@@ -21,6 +22,10 @@ const DrawPanel = ({
   descriptionPosition = 'top',
   markdown,
   markdownProps,
+  // Permite usar el editor enriquecido en el footer nativo del panel. Puede ser `true` y
+  // configurar el editor con `richChatInputProps`, o un objeto con las props del RichChatInput.
+  richChatInput = false,
+  richChatInputProps = {},
   children,
   width = '400px',
   showActions = true,
@@ -86,6 +91,11 @@ const DrawPanel = ({
   // área de contenido. Los datos pueden ser controlados (prop `formData`) o internos (el panel los
   // guarda y los reinicia a `defaultFormData` al cerrarse).
   const isSchemaMode = Boolean(schema);
+  const resolvedRichChatInputProps = richChatInput && typeof richChatInput === 'object'
+    ? richChatInput
+    : richChatInput
+      ? richChatInputProps
+      : null;
   const isFormDataControlled = formData !== undefined;
   const [internalFormData, setInternalFormData] = useState(defaultFormData);
   const generatedFormId = useId();
@@ -315,31 +325,39 @@ const DrawPanel = ({
           )}
         </div>
 
-        {showActions && (
-          <div className={styles.footer} style={{ backgroundColor: panelColor, borderTopColor: borderColor }}>
-            {showCancelButton && <Button
-              variant=""
-              onClick={onClose}
-              border={Button.COLORS.RED}
-              disabled={loading}
-              fullWidth
-              {...cancelButtonProps}
-            >
-              {cancelButtonProps?.children ?? cancelText}
-            </Button>}
-            {showConfirmButton && <Button
-              type={resolvedFormId ? 'submit' : 'button'}
-              form={resolvedFormId}
-              variant="primary"
-              color={Button.COLORS.PRIMARY}
-              onClick={onConfirm}
-              loading={loading}
-              success={success}
-              fullWidth
-              {...confirmButtonProps}
-            >
-              {confirmButtonProps?.children ?? confirmText}
-            </Button>}
+        {(showActions || resolvedRichChatInputProps) && (
+          <div
+            className={`${styles.footer} ${resolvedRichChatInputProps ? styles.footerWithInput : ''}`}
+            style={{ backgroundColor: panelColor, borderTopColor: borderColor }}
+          >
+            {resolvedRichChatInputProps && (
+              <RichChatInput {...resolvedRichChatInputProps} />
+            )}
+            {showActions && <>
+              {showCancelButton && <Button
+                variant=""
+                onClick={onClose}
+                border={Button.COLORS.RED}
+                disabled={loading}
+                fullWidth
+                {...cancelButtonProps}
+              >
+                {cancelButtonProps?.children ?? cancelText}
+              </Button>}
+              {showConfirmButton && <Button
+                type={resolvedFormId ? 'submit' : 'button'}
+                form={resolvedFormId}
+                variant="primary"
+                color={Button.COLORS.PRIMARY}
+                onClick={onConfirm}
+                loading={loading}
+                success={success}
+                fullWidth
+                {...confirmButtonProps}
+              >
+                {confirmButtonProps?.children ?? confirmText}
+              </Button>}
+            </>}
           </div>
         )}
       </div>

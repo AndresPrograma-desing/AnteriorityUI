@@ -6,6 +6,7 @@ import { MermaidBlock } from './MermaidBlock';
 import { CopyButton } from './CopyButton';
 import { extractCopyBlocks, remarkCopyBlocks } from './copyBlocks.js';
 import DynamicIcon from '../DynamicIcon/index';
+import { createIconTagPattern } from '../../../common/utils/markdownTags';
 
 const isMermaidLanguage = (className = '') => /(^|\s)language-mermaid(\s|$)/.test(className);
 
@@ -51,7 +52,7 @@ const preprocessCopyTags = (markdown) => {
     .join('');
 };
 
-const ICON_TAG_PATTERN = /\{icon:([A-Za-z][A-Za-z0-9]*)(?::([^}]+))?\}/g;
+const ICON_TAG_PATTERN = createIconTagPattern('g');
 const ICON_LINK_PROTOCOL = 'icon:';
 
 // {icon:Nombre} o {icon:Nombre:color} -> [icon](icon:Nombre:color-codificado), mismo truco que

@@ -1,5 +1,6 @@
 import { ICON_PACKS, ICON_PACK_NAMES } from '../Icons/registry';
 import { ALL_PACKS, LABELS, DEFAULT_LOCALE } from './constants';
+import { buildIconTag } from '../../../common/utils/markdownTags';
 
 // Índice plano de TODOS los íconos de los packs de react-icons, construido una sola vez
 // (lazy) porque son decenas de miles de entradas. Los nombres de react-icons llevan el
@@ -83,5 +84,5 @@ export function resolveLabels(locale, overrides) {
 export function toInlineValue(value, { color } = {}) {
   if (!value) return '';
   if (!resolveIcon(value)) return value;
-  return `{icon:${value}${color ? `:${color}` : ''}}`;
+  return buildIconTag(value, color);
 }

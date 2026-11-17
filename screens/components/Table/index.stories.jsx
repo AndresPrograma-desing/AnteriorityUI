@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import Table from './index';
+import { Info, RefreshCw } from 'lucide-react';
 
 export default {
   title: 'Components/Table',
   component: Table,
-  argTypes: { variant: { control: 'inline-radio', options: ['A', 'B'] } },
+  argTypes: { variant: { control: 'inline-radio', options: ['A', 'B', 'results'] } },
 };
 
 const data = [
@@ -39,6 +40,55 @@ export const VarianteA = {
 
 export const VarianteB = {
   args: { variant: 'B', columns: columnsB, data },
+};
+
+const resultsSchema = {
+  type: 'array', items: { type: 'object', properties: {
+    muestra: { type: 'string', title: 'Muestra analizada' },
+    pureza: { type: 'number', title: 'Pureza' },
+    ph: { type: 'number', title: 'Nivel de pH' },
+    concentracion: { type: 'number', title: 'Concentración' },
+    estado: { type: 'string', title: 'Evaluación' },
+  } },
+};
+const resultsUiSchema = {
+  muestra: { 'ui:options': { secondaryKey: 'codigo', action: { icon: Info, label: 'Ver muestra', onClick: (row) => console.log('Muestra', row) } } },
+  pureza: { 'ui:options': { formatValue: (value) => `${value}%`, cellColor: (row) => row.pureza < 90 ? '#b45309' : '#047857' } },
+  ph: { 'ui:options': { formatValue: (value) => Number(value).toFixed(1) } },
+  concentracion: { 'ui:options': { formatValue: (value) => `${value} mg/L`, action: { icon: RefreshCw, label: 'Repetir medición', onClick: (row) => console.log('Repetir', row) } } },
+  estado: { 'ui:options': { cellBgColor: (row) => row.estado === 'Revisar' ? '#fff7e9' : '#edfaf4', cellColor: (row) => row.estado === 'Revisar' ? '#9a5b12' : '#087551' } },
+};
+
+export const ResultadosDesdeSchema = {
+  args: {
+    variant: 'results', schema: resultsSchema, uiSchema: resultsUiSchema,
+    data: [
+      { id: 1, muestra: 'Agua de entrada', codigo: 'LAB-042', pureza: 98.6, ph: 7.2, concentracion: 12.4, estado: 'Óptimo' },
+      { id: 2, muestra: 'Filtro de carbono', codigo: 'LAB-043', pureza: 87.1, ph: 6.4, concentracion: 24.8, estado: 'Revisar' },
+      { id: 3, muestra: 'Agua tratada', codigo: 'LAB-044', pureza: 99.2, ph: 7.0, concentracion: 4.1, estado: 'Óptimo' },
+    ],
+    summary: { muestra: 'Resumen del lote', pureza: 94.9, ph: 6.9, concentracion: 13.8, estado: '3 muestras' },
+  },
+};
+
+// Estado de carga de la variante results, con el mismo esquema y colores por defecto.
+export const ResultadosCargando = {
+  args: {
+    variant: 'results', schema: resultsSchema, uiSchema: resultsUiSchema,
+    loading: true, skeletonRows: 4,
+  },
+};
+
+export const ResultadosPersonalizadosCargando = {
+  args: {
+    variant: 'results', schema: resultsSchema, uiSchema: resultsUiSchema,
+    loading: true, skeletonRows: 3,
+    surfaceColor: '#f1f7f6', headerColor: '#ffffff', accentColor: '#168474',
+    alternateCellBgColor: '#e8f3f0', summaryBgColor: '#d5ece6',
+    summaryTextColor: '#14594f',
+    resultsScrollBarProps: { autoHide: false },
+    resultsSkeletonProps: { height: '22px', radius: '10px', style: { backgroundColor: '#b4d9cf' } },
+  },
 };
 
 // Mismas funciones en ambas variantes: filas expandibles y badges también en la A.

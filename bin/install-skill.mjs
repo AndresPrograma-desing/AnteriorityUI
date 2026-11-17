@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-// Copia la skill de anteriority-ui al proyecto consumidor, en .claude/skills/anteriority-ui/,
-// que es donde Claude Code la detecta. Claude Code no lee skills desde node_modules, así que
-// este paso es necesario una vez por instalación (y de nuevo después de cada actualización).
+// Copia la skill de anteriority-ui a los directorios de skills de Claude Code y Codex:
+// .claude/skills/anteriority-ui/ y .agents/skills/anteriority-ui/. Ninguno de los dos agentes
+// debe depender de leer skills directamente desde node_modules.
 //
 // Uso (desde la raíz del proyecto consumidor):
 //   pnpm anteriority-ui-install-skill
@@ -13,7 +13,7 @@ import { cp, mkdir, rm, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const HELP = `anteriority-ui-install-skill — copia la skill de anteriority-ui a .claude/skills/
+const HELP = `anteriority-ui-install-skill — copia la skill de anteriority-ui a Claude Code y Codex
 
 Uso:
   anteriority-ui-install-skill [carpeta-del-proyecto]
@@ -34,7 +34,10 @@ const skillSrc = path.resolve(here, '..', 'skill', 'anteriority-ui');
 // pnpm/npm exponen en INIT_CWD la carpeta desde la que se invocó el script, aunque el bin
 // corra desde node_modules. Sin eso, usamos el cwd actual.
 const projectRoot = path.resolve(args[0] ?? process.env.INIT_CWD ?? process.cwd());
-const dest = path.join(projectRoot, '.claude', 'skills', 'anteriority-ui');
+const destinations = [
+  path.join(projectRoot, '.claude', 'skills', 'anteriority-ui'),
+  path.join(projectRoot, '.agents', 'skills', 'anteriority-ui'),
+];
 
 try {
   await stat(path.join(skillSrc, 'SKILL.md'));
@@ -43,11 +46,14 @@ try {
   process.exit(1);
 }
 
-// Reemplaza la copia anterior para que quede exactamente la versión instalada
+// Reemplaza ambas copias para que queden exactamente en la versión instalada
 // (sin archivos viejos que hayan sido eliminados en una versión nueva).
-await rm(dest, { recursive: true, force: true });
-await mkdir(path.dirname(dest), { recursive: true });
-await cp(skillSrc, dest, { recursive: true });
+for (const dest of destinations) {
+  await rm(dest, { recursive: true, force: true });
+  await mkdir(path.dirname(dest), { recursive: true });
+  await cp(skillSrc, dest, { recursive: true });
+}
 
-console.log(`Skill de anteriority-ui instalada en: ${dest}`);
-console.log('Claude Code la detecta en la próxima sesión (o al reiniciar).');
+console.log('Skill de anteriority-ui instalada en:');
+for (const dest of destinations) console.log(`- ${dest}`);
+console.log('Claude Code y Codex la detectan en la próxima sesión (o al reiniciar).');

@@ -41,10 +41,17 @@ function UserFooter({
     if (!isUserMenuOpen || !userFooterButtonRef.current) return;
     const buttonRect = userFooterButtonRef.current.getBoundingClientRect();
     const sidebarRect = userFooterButtonRef.current.closest('aside')?.getBoundingClientRect() ?? buttonRect;
-    setUserMenuPosition({
-      bottom: window.innerHeight - buttonRect.bottom,
-      left: sidebarRect.right + USER_MENU_GAP,
-    });
+    const sideLeft = sidebarRect.right + USER_MENU_GAP;
+    if (sideLeft + USER_MENU_WIDTH + USER_MENU_GAP <= window.innerWidth) {
+      setUserMenuPosition({ bottom: window.innerHeight - buttonRect.bottom, left: sideLeft });
+    } else {
+      // Pantallas angostas (drawer mobile): al costado no entra, se muestra arriba del botón,
+      // dentro de la pantalla.
+      setUserMenuPosition({
+        bottom: window.innerHeight - buttonRect.top + USER_MENU_GAP,
+        left: Math.max(USER_MENU_GAP, Math.min(buttonRect.left, window.innerWidth - USER_MENU_WIDTH - USER_MENU_GAP)),
+      });
+    }
   }, [isUserMenuOpen, effectiveCollapsed]);
 
   useEffect(() => {

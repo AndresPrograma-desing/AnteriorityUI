@@ -6,6 +6,18 @@ Al hacer un cambio visible para quien consume la librería, se agrega una línea
 
 ## [Sin publicar]
 
+### Agregado
+
+- `Table`: variante `results` con columnas de resultados, resumen destacado, colores por celda y datos/columnas desde JSON Schema y `uiSchema`.
+- `Table results`: permite personalizar el fondo alterno y reenviar opciones a `ScrollBar` y `Skeleton`; también respeta `emptyIcon` y `rowClassName`.
+- Nuevo componente `RichChatInput`: input de chat con formato en vivo (negrita, cursiva, tachado, código en línea, enlaces, emojis e íconos SVG con `EmojiPickerModal` y pegado de imágenes con `onImagePaste`) que se renderiza mientras se escribe, con barra de herramientas configurable, atajos de teclado y autoformato al cerrar `**x**`, `*x*`, `~~x~~` o `` `x` ``. Los enlaces muestran al final un ícono que abre la URL en una pestaña nueva. El valor es markdown.
+
+### Corregido
+
+- `Table results`: los botones de acción ya no muestran el tooltip nativo del navegador; conservan su etiqueta accesible.
+- `SchemaForm`: los campos con `enum` (`SelectWidget`) ahora respetan `inputVariant` / `'ui:options': { variant, lineColor, lineFocusColor }`, igual que los demás campos; con `inputVariant: 'underline'` el `Selector` también se muestra con línea inferior.
+- `Sidebar`: en el drawer mobile el menú del usuario ya no se corta por el borde derecho de la pantalla; si no entra al costado de la sidebar se muestra arriba del botón, dentro de la pantalla.
+
 ## [1.20.0] - 2026-11-15
 
 ### Agregado
