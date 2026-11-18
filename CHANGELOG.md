@@ -6,6 +6,8 @@ Al hacer un cambio visible para quien consume la librería, se agrega una línea
 
 ## [Sin publicar]
 
+## [1.21.0] - 2026-11-17
+
 ### Agregado
 
 - `Table`: variante `results` con columnas de resultados, resumen destacado, colores por celda y datos/columnas desde JSON Schema y `uiSchema`.
